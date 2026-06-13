@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://game_context_godbomb"]
+[gd_scene load_steps=28 format=3 uid="uid://game_context_godbomb"]
 
 [ext_resource type="Script" path="res://src/contexts/game_context/game_context.gd" id="1"]
 [ext_resource type="Script" path="res://src/contexts/game_context/game_logic/game_manager/game_manager.gd" id="2"]
@@ -21,6 +21,13 @@
 [ext_resource type="AudioStream" path="res://assets/audio/sfx/Explosion.mp3" id="19"]
 [ext_resource type="AudioStream" path="res://assets/audio/sfx/Tick1.mp3" id="20"]
 [ext_resource type="AudioStream" path="res://assets/audio/sfx/Tick2.mp3" id="21"]
+[ext_resource type="Script" path="res://src/features/bomb/bomb_visual.gd" id="22"]
+[ext_resource type="Script" path="res://src/features/background/game_background.gd" id="23"]
+[ext_resource type="Script" path="res://src/features/explosion/explosion_effect.gd" id="24"]
+[ext_resource type="Script" path="res://core/systems/haptics/haptics_manager.gd" id="25"]
+[ext_resource type="Texture2D" path="res://assets/textures/Background/background_stone.jpg" id="26"]
+[ext_resource type="Texture2D" path="res://assets/textures/Background/background_lava.jpg" id="27"]
+[ext_resource type="Texture2D" path="res://assets/textures/Background/background_mask.png" id="28"]
 
 [node name="GameContext" type="Control" node_paths=PackedStringArray("game_manager")]
 layout_mode = 3
@@ -36,23 +43,60 @@ main_events = ExtResource("14")
 game_events = ExtResource("15")
 game_manager = NodePath("GameManager")
 
-[node name="Background" type="ColorRect" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-color = Color(0.08, 0.06, 0.05, 1)
-
 [node name="GameArea" type="Control" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 
-[node name="BombSprite" type="Sprite2D" parent="GameArea"]
+[node name="Background" type="Node2D" parent="GameArea" node_paths=PackedStringArray("stone_layer", "lava_layer", "mask_layer")]
 position = Vector2(540, 960)
+script = ExtResource("23")
+game_events = ExtResource("15")
+stone_layer = NodePath("Stone")
+lava_layer = NodePath("Lava")
+mask_layer = NodePath("Mask")
+
+[node name="Stone" type="Sprite2D" parent="GameArea/Background"]
+scale = Vector2(1.1, 1.1)
+texture = ExtResource("26")
+
+[node name="Lava" type="Sprite2D" parent="GameArea/Background"]
+scale = Vector2(1.08, 1.08)
+texture = ExtResource("27")
+
+[node name="Mask" type="Sprite2D" parent="GameArea/Background"]
+texture = ExtResource("28")
+
+[node name="BombRoot" type="Node2D" parent="GameArea" node_paths=PackedStringArray("bomb_sprite")]
+position = Vector2(540, 1180)
+script = ExtResource("22")
+game_events = ExtResource("15")
+bomb_sprite = NodePath("BombSprite")
+
+[node name="BombSprite" type="Sprite2D" parent="GameArea/BombRoot"]
 scale = Vector2(0.5, 0.5)
 texture = ExtResource("16")
+
+[node name="ExplosionEffect" type="Node2D" parent="GameArea" node_paths=PackedStringArray("particles")]
+position = Vector2(540, 1180)
+script = ExtResource("24")
+game_events = ExtResource("15")
+particles = NodePath("Particles")
+
+[node name="Particles" type="CPUParticles2D" parent="GameArea/ExplosionEffect"]
+emitting = false
+amount = 48
+lifetime = 0.8
+one_shot = true
+explosiveness = 0.95
+spread = 180.0
+gravity = Vector2(0, 280)
+initial_velocity_min = 180.0
+initial_velocity_max = 420.0
+scale_amount_min = 2.0
+scale_amount_max = 6.0
+color = Color(1, 0.45, 0.15, 1)
 
 [node name="GameManager" type="Node" parent="." node_paths=PackedStringArray("game_events")]
 script = ExtResource("2")
@@ -75,6 +119,10 @@ script = ExtResource("7")
 
 [node name="ResultState" type="Node" parent="GameManager"]
 script = ExtResource("8")
+
+[node name="HapticsManager" type="Node" parent="."]
+script = ExtResource("25")
+game_events = ExtResource("15")
 
 [node name="GameSound" type="Node" parent="." node_paths=PackedStringArray("game_events")]
 script = ExtResource("11")

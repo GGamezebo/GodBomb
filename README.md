@@ -1,7 +1,7 @@
 # GodBomb
 
 Порт party-игры «Бомба» с Unity на **Godot 4.6.3 / GDScript**.  
-Архитектура повторяет [quizmatik](../quizmatik): контексты, event-ресурсы, FSM, `EventListener`, без autoload.
+Архитектура повторяет quizmatik: контексты, event-ресурсы, FSM, `EventListener`, без autoload.
 
 ## Запуск
 
@@ -14,47 +14,48 @@
 | Путь | Назначение |
 |------|------------|
 | `src/contexts/main_context/` | `MainContext`, сохранение аккаунта |
-| `src/contexts/menu_context/` | Лобби, игроки, длительность партии |
-| `src/contexts/game_context/` | Матч: FSM, бомба, HUD, звук |
-| `src/common/` | `GameConfig`, события, модели игрока/карты |
+| `src/contexts/menu_context/` | Лобби, настройки времени партии |
+| `src/contexts/game_context/` | Матч: FSM, HUD, звук |
+| `src/features/player_selection/` | Круглый стол, drag-and-drop, окно редактирования |
+| `src/features/bomb/` | Анимации бомбы |
+| `src/features/background/` | Фон (камень/лава) |
+| `src/features/explosion/` | VFX взрыва |
+| `core/systems/haptics/` | Вибрация на mobile |
 | `core/lib/` | FSM, `EventListener`, `ResourceUtils` |
 | `assets/` | Спрайты, текстуры, аудио из Unity |
 
 ## Этапы порта
 
-### Этап 1 — Фундамент ✅
-- `.gitignore`, `.cursorignore`, `.cursor/rules/` (как в quizmatik)
-- `project.godot`, `core/lib/`, event-ресурсы, `IContext`, `MainContext`
-- Копирование ассетов из Unity
+### Этапы 1–5 ✅
+Фундамент, меню, игровой FSM, ассеты, сохранение аккаунта.
 
-### Этап 2 — Меню ✅ (базовая версия)
-- `MenuContext`: список игроков, пресеты слаймов, слайдер времени
-- `PDataAccount` → `user://account.tres`
-- Старт игры через `MainEvents.ev_start_game`
+### Этап 6 — Полировка ✅
+- Круглый `PlayerSelectionWidget`: drag swap, удаление на кнопку, hold 2s → редактирование
+- `EditPlayerWindow` с выбором пресета слайма
+- `PlayerPresetStorage` — блокировка занятых цветов
+- Визуал меню: `Background_Menu`, текстуры кнопки старта
+- `BombVisual` — анимации ready / comes / alert / boom
+- `GameBackground` — слои stone/lava + реакция на alert/explosion
+- `ExplosionEffect` — CPUParticles2D
+- `HapticsManager` — `Input.vibrate_handheld` на play/alert/explosion
 
-### Этап 3 — Игровой контекст ✅ (ядро)
-- FSM: `player_choice` → `ready_to_start` → `countdown` → `play` → `explosion` → `result`
-- `GameSession`: колода карт, таймер бомбы, очки
-- HUD, ввод (тап / свайп назад), возврат в меню с экрана результатов
-- Базовый звук (countdown, play, alert ticks, explosion)
-
-### Этап 4 — Полировка (TODO)
-- [ ] Круглый стол с drag-and-drop как в Unity (`PlayerSelectionWidget`)
-- [ ] Анимации бомбы и фона
-- [ ] VFX взрыва, haptics (мобильная вибрация)
-- [ ] Полный визуал меню (фоны, кнопки из `assets/sprites/`)
-- [ ] Локализация через CSV/TranslationServer
-
-### Этап 5 — Экспорт (TODO)
+### Этап 7 — Экспорт (TODO)
 - [ ] Android / iOS пресеты
 - [ ] Проверка portrait 1080×1920 на устройствах
+- [ ] Локализация через CSV (опционально)
 
-## Отличия от Unity-версии
+## Управление в матче
 
-- Один `GameContext` вместо отдельной сцены `Game.unity` + `GlobalContext`
-- Состояния матча — FSM quizmatik, а не switch в `Update()`
-- Сохранение — Godot `Resource` вместо JSON + `JsonUtility`
-- UI лобби упрощён (список вместо кругового виджета) — доработка в этапе 4
+- **Тап** — передать бомбу следующему игроку
+- **Длинный свайп** — вернуть предыдущему (1 раз за раунд)
+- **Экран результатов** — тап для возврата в меню
+
+## Лобби
+
+- **Кнопка «+»** — добавить игрока
+- **Перетаскивание** на другого игрока — поменять местами
+- **Перетаскивание на «+»** (в режиме удаления) — убрать игрока
+- **Удержание 2 сек** — редактировать имя и слайм
 
 ## Язык
 
