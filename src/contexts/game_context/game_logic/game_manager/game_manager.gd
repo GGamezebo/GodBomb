@@ -2,18 +2,42 @@ class_name GameManager
 extends Node
 
 @export var game_events: GameEvents
-@export var states: Array[StateBase]
 
 var fsm: FSM
 var session: GameSession = GameSession.new()
+var states: Array[StateBase] = []
+var _session_ready: bool = false
 
 
 func _ready() -> void:
-	if states.is_empty():
-		for child in get_children():
-			if child is StateBase:
-				states.append(child)
+	_collect_states()
+	set_process(_session_ready)
 
+
+func _exit_tree() -> void:
+	if fsm:
+		fsm.deinit()
+
+
+func setup_session(game_config: GameConfig, account: PDataAccount) -> void:
+	if not game_events:
+		game_events = load("res://src/common/game_events.tres") as GameEvents
+	session.setup(game_config, game_events, account)
+	_session_ready = true
+	if fsm == null:
+		_start_fsm()
+	set_process(true)
+
+
+func _collect_states() -> void:
+	if not states.is_empty():
+		return
+	for child in get_children():
+		if child is StateBase:
+			states.append(child)
+
+
+func _start_fsm() -> void:
 	for state in states:
 		if state.state_name.is_empty():
 			state.state_name = state.get_state()
@@ -58,17 +82,10 @@ func _ready() -> void:
 	fsm.ev_state_changed.connect(_on_state_changed)
 
 
-func _exit_tree() -> void:
-	fsm.deinit()
-
-
-func setup_session(game_config: GameConfig, account: PDataAccount) -> void:
-	session.setup(game_config, game_events, account)
-	session.next_card()
-	session.reset_round()
-
-
 func _process(delta: float) -> void:
+	if not _session_ready or fsm == null:
+		return
+
 	var state_name := fsm.get_current_state_name()
 	match state_name:
 		FSMGameStates.PLAYER_CHOICE:
@@ -130,4 +147,5 @@ func _on_explosion_finished() -> void:
 
 
 func _on_state_changed(from_state_name: String, to_state_name: String) -> void:
-	game_events.ev_game_state_changed.emit(from_state_name, to_state_name)
+	if game_events:
+		game_events.ev_game_state_changed.emit(from_state_name, to_state_name)

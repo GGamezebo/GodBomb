@@ -11,9 +11,12 @@ var _players: Array[AudioStreamPlayer] = []
 
 
 func _ready() -> void:
-	listener.add(game_events.ev_countdown_tick_changed, _on_countdown_tick)
-	listener.add(game_events.ev_alert, _on_alert)
-	listener.add(game_events.ev_game_state_changed, _on_game_state_changed)
+	if not game_events:
+		game_events = load("res://src/common/game_events.tres") as GameEvents
+	if game_events:
+		listener.add(game_events.ev_countdown_tick_changed, _on_countdown_tick)
+		listener.add(game_events.ev_alert, _on_alert)
+		listener.add(game_events.ev_game_state_changed, _on_game_state_changed)
 
 
 func _exit_tree() -> void:

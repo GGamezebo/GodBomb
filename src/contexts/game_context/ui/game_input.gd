@@ -11,9 +11,12 @@ var touch_start_position: Vector2 = Vector2.ZERO
 
 
 func _ready() -> void:
+	if not game_events:
+		game_events = load("res://src/common/game_events.tres") as GameEvents
 	if start_round_button:
 		start_round_button.pressed.connect(_on_start_round_pressed)
-	listener.add(game_events.ev_game_state_changed, _on_game_state_changed)
+	if game_events:
+		listener.add(game_events.ev_game_state_changed, _on_game_state_changed)
 
 
 func _exit_tree() -> void:
@@ -47,11 +50,12 @@ func _handle_play_input(event: InputEvent) -> void:
 		if touch.pressed:
 			touch_start_position = touch.position
 		elif touch.position.distance_to(touch_start_position) > game_config.drag_prev_player_threshold:
-			if game_manager.prev_player():
+			if game_manager.prev_player() and game_events:
 				game_events.ev_touch_prev_player.emit()
 		else:
 			game_manager.next_player()
-			game_events.ev_touch_next_player.emit()
+			if game_events:
+				game_events.ev_touch_next_player.emit()
 	elif event is InputEventMouseButton:
 		var mouse := event as InputEventMouseButton
 		if mouse.button_index != MOUSE_BUTTON_LEFT:
@@ -59,11 +63,12 @@ func _handle_play_input(event: InputEvent) -> void:
 		if mouse.pressed:
 			touch_start_position = mouse.position
 		elif mouse.position.distance_to(touch_start_position) > game_config.drag_prev_player_threshold:
-			if game_manager.prev_player():
+			if game_manager.prev_player() and game_events:
 				game_events.ev_touch_prev_player.emit()
 		else:
 			game_manager.next_player()
-			game_events.ev_touch_next_player.emit()
+			if game_events:
+				game_events.ev_touch_next_player.emit()
 
 
 func _handle_result_input(event: InputEvent) -> void:

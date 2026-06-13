@@ -12,10 +12,13 @@ var listener: EventListener = EventListener.new()
 
 
 func _ready() -> void:
-	listener.add(game_events.ev_game_state_changed, _on_game_state_changed)
-	listener.add(game_events.ev_current_player_changed, _on_current_player_changed)
-	listener.add(game_events.ev_countdown_tick_changed, _on_countdown_tick)
-	listener.add(game_events.ev_card_changed, _on_card_changed)
+	if not game_events:
+		game_events = load("res://src/common/game_events.tres") as GameEvents
+	if game_events:
+		listener.add(game_events.ev_game_state_changed, _on_game_state_changed)
+		listener.add(game_events.ev_current_player_changed, _on_current_player_changed)
+		listener.add(game_events.ev_countdown_tick_changed, _on_countdown_tick)
+		listener.add(game_events.ev_card_changed, _on_card_changed)
 	_hide_all()
 
 

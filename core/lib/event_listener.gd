@@ -17,6 +17,8 @@ func clear() -> void:
 
 
 func add(event: Signal, callback: Callable) -> void:
+	if event == null:
+		return
 	var callbacks = self._events.get_or_add(event, [])
 	if callback not in callbacks:
 		event.connect(callback)

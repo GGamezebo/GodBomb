@@ -1,0 +1,45 @@
+[gd_scene load_steps=3 format=3 uid="uid://player_icon_godbomb"]
+
+[ext_resource type="Script" path="res://src/features/player_selection/player_icon.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/sprites/PlayerIcon.png" id="2"]
+
+[node name="PlayerIcon" type="Control" node_paths=PackedStringArray("slime_rect", "name_label")]
+custom_minimum_size = Vector2(120, 140)
+mouse_filter = 0
+script = ExtResource("1")
+slime_rect = NodePath("Panel/Slime")
+name_label = NodePath("PlayerName")
+
+[node name="Panel" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+
+[node name="Slime" type="TextureRect" parent="Panel"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Frame" type="TextureRect" parent="Panel"]
+layout_mode = 2
+texture = ExtResource("2")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PlayerName" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -60.0
+offset_top = -28.0
+offset_right = 60.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 18
+horizontal_alignment = 1
+vertical_alignment = 1

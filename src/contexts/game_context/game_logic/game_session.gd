@@ -125,7 +125,8 @@ func update_bomb(delta: float) -> bool:
 
 	if not bomb_is_alerted and (bomb_alive_time - bomb_duration) < game_config.alert_bomb_time:
 		bomb_is_alerted = true
-		game_events.ev_alert.emit()
+		if game_events:
+			game_events.ev_alert.emit()
 
 	if (bomb_alive_time - bomb_duration) <= 0.0:
 		bomb_is_exploded = true
@@ -157,7 +158,8 @@ func next_card() -> bool:
 			return false
 
 	current_card = cards.pop_front()
-	game_events.ev_card_changed.emit(current_card)
+	if game_events:
+		game_events.ev_card_changed.emit(current_card)
 	return true
 
 
@@ -183,7 +185,7 @@ func tick_countdown() -> void:
 		last_second = current_second
 		var countdown_time := int(game_config.countdown_time)
 		var count := countdown_time - last_second
-		if count > 0:
+		if count > 0 and game_events:
 			game_events.ev_countdown_tick_changed.emit(count)
 
 
@@ -192,6 +194,6 @@ func advance_time(delta: float) -> void:
 
 
 func _emit_current_player() -> void:
-	if players.is_empty():
+	if players.is_empty() or not game_events:
 		return
 	game_events.ev_current_player_changed.emit(get_current_player())
