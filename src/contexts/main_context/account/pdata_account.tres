@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="PDataAccount" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/contexts/main_context/account/pdata_account.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+data = {
+"version": 1,
+"players": [],
+"game_time_minutes": 5
+}

@@ -1,0 +1,28 @@
+[gd_scene load_steps=2 format=3 uid="uid://loading_screen_godbomb"]
+
+[ext_resource type="Script" path="res://src/ui/loading_screen/loading_screen.gd" id="1"]
+
+[node name="LoadingScreen" type="CanvasLayer" node_paths=PackedStringArray("progress_bar", "background")]
+script = ExtResource("1")
+progress_bar = NodePath("Background/ProgressBar")
+background = NodePath("Background")
+
+[node name="Background" type="CanvasGroup" parent="."]
+
+[node name="ColorRect" type="ColorRect" parent="Background"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.08, 0.08, 0.1, 0.92)
+
+[node name="ProgressBar" type="ProgressBar" parent="Background"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -240.0
+offset_top = -16.0
+offset_right = 240.0
+offset_bottom = 16.0
+show_percentage = false

@@ -1,0 +1,42 @@
+[gd_scene load_steps=10 format=3 uid="uid://main_godbomb"]
+
+[ext_resource type="Script" path="res://src/contexts/main_context/main_context.gd" id="1"]
+[ext_resource type="PackedScene" path="res://src/ui/loading_screen/loading_screen.tscn" id="2"]
+[ext_resource type="Script" path="res://src/contexts/main_context/account/persisten_data_controller.gd" id="3"]
+[ext_resource type="Resource" path="res://src/contexts/main_context/account/pdata_account.tres" id="4"]
+[ext_resource type="Resource" path="res://src/common/game_config_default.tres" id="5"]
+[ext_resource type="Resource" path="res://src/contexts/main_context/main_events.tres" id="6"]
+[ext_resource type="PackedScene" path="res://src/contexts/menu_context/menu_context.tscn" id="7"]
+[ext_resource type="AudioStream" path="res://assets/audio/music/Myuu - Metamorphosis.mp3" id="8"]
+
+[node name="MainContext" type="Node" node_paths=PackedStringArray("current_context")]
+script = ExtResource("1")
+game_context_path = "res://src/contexts/game_context/game_context.tscn"
+menu_context_path = "res://src/contexts/menu_context/menu_context.tscn"
+loading_screen_scene = ExtResource("2")
+main_events = ExtResource("6")
+account = ExtResource("4")
+current_context = NodePath("UI/MenuContext")
+
+[node name="Account" type="Node" parent="."]
+
+[node name="PersistentDataController" type="Node" parent="Account"]
+script = ExtResource("3")
+account = ExtResource("4")
+account_default = ExtResource("4")
+game_config = ExtResource("5")
+
+[node name="MusicPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("8")
+volume_db = -8.0
+autoplay = true
+bus = &"Music"
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="MenuContext" parent="UI" instance=ExtResource("7")]
+account = ExtResource("4")
+
+[node name="PlayerSelection" parent="UI/MenuContext" index="2"]
+account = ExtResource("4")
+pdata_controller = NodePath("../../../Account/PersistentDataController")
