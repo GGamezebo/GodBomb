@@ -30,7 +30,7 @@ func _on_game_state_changed(_from_state: String, to_state: String) -> void:
 
 func _on_alert() -> void:
 	if lava_layer:
-		_pulse_layer(lava_layer, 1.08, Color(1.2, 0.7, 0.5, 1.0))
+		_pulse_layer(lava_layer, 1.03, Color(1.2, 0.7, 0.5, 1.0))
 
 
 func _apply_state(state: String) -> void:

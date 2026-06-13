@@ -58,11 +58,9 @@ lava_layer = NodePath("Lava")
 mask_layer = NodePath("Mask")
 
 [node name="Stone" type="Sprite2D" parent="GameArea/Background"]
-scale = Vector2(1.1, 1.1)
 texture = ExtResource("26")
 
 [node name="Lava" type="Sprite2D" parent="GameArea/Background"]
-scale = Vector2(1.08, 1.08)
 texture = ExtResource("27")
 
 [node name="Mask" type="Sprite2D" parent="GameArea/Background"]
@@ -75,7 +73,7 @@ game_events = ExtResource("15")
 bomb_sprite = NodePath("BombSprite")
 
 [node name="BombSprite" type="Sprite2D" parent="GameArea/BombRoot"]
-scale = Vector2(0.5, 0.5)
+scale = Vector2(0.88, 0.88)
 texture = ExtResource("16")
 
 [node name="ExplosionEffect" type="Node2D" parent="GameArea" node_paths=PackedStringArray("particles")]
