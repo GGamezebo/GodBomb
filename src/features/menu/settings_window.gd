@@ -12,6 +12,7 @@ extends Control
 @export var music_value_label: Label
 @export var sfx_slider: HSlider
 @export var sfx_value_label: Label
+@export var haptics_check: CheckBox
 @export var reset_button: Button
 @export var close_button: Button
 
@@ -28,6 +29,8 @@ func _ready() -> void:
 		music_slider.value_changed.connect(_on_music_volume_changed)
 	if sfx_slider:
 		sfx_slider.value_changed.connect(_on_sfx_volume_changed)
+	if haptics_check:
+		haptics_check.toggled.connect(_on_haptics_toggled)
 	if reset_button:
 		reset_button.pressed.connect(_on_reset_pressed)
 	if close_button:
@@ -75,6 +78,8 @@ func _sync_from_account() -> void:
 	if sfx_slider:
 		sfx_slider.value = account.get_sfx_volume() * 100.0
 		_update_sfx_label(account.get_sfx_volume())
+	if haptics_check:
+		haptics_check.button_pressed = account.get_haptics_enabled()
 
 
 func _on_game_time_changed(value: float) -> void:
@@ -113,6 +118,12 @@ func _on_sfx_volume_changed(value: float) -> void:
 	_save_account()
 
 
+func _on_haptics_toggled(enabled: bool) -> void:
+	if account:
+		account.set_haptics_enabled(enabled)
+	_save_account()
+
+
 func _on_reset_pressed() -> void:
 	if not account:
 		return
@@ -125,6 +136,14 @@ func _on_reset_pressed() -> void:
 	if reset_button:
 		reset_button.text = "Сбросить прогресс"
 	account.reset_progress()
+	_sync_from_account()
+	if menu_events:
+		menu_events.ev_game_time_changed.emit(account.get_game_time_minutes())
+	var audio := _get_audio_controller()
+	if audio:
+		audio.set_music_enabled(account.get_music_enabled())
+		audio.set_music_volume(account.get_music_volume())
+		audio.set_sfx_volume(account.get_sfx_volume())
 	_save_account()
 	if player_selection_widget:
 		player_selection_widget.reload_from_account()

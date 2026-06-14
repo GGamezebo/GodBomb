@@ -396,7 +396,7 @@ func _update_hold_visuals() -> void:
 
 	if progress >= 0.75 and not _hold_vibrated:
 		_hold_vibrated = true
-		Input.vibrate_handheld(18)
+		Haptics.vibrate(18)
 
 
 func _update_drag_stretch() -> void:

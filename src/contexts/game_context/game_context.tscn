@@ -61,10 +61,11 @@ script = ExtResource("7")
 [node name="ResultState" type="Node" parent="GameManager" unique_id=652645902]
 script = ExtResource("8")
 
-[node name="HapticsManager" type="Node" parent="." unique_id=1545768573 node_paths=PackedStringArray("game_manager")]
+[node name="HapticsManager" type="Node" parent="." unique_id=1545768573 node_paths=PackedStringArray("game_manager", "account")]
 script = ExtResource("25")
 game_events = ExtResource("15")
 game_manager = NodePath("../GameManager")
+account = ExtResource("13")
 
 [node name="GameSound" type="Node" parent="." unique_id=960212167]
 script = ExtResource("11")

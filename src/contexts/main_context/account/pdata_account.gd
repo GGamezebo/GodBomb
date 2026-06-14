@@ -8,6 +8,9 @@ const SWAP_HINT_GAMES_MAX := 5
 const HOLD_EDIT_HINT_MAX_VIEWS := 2
 const DEFAULT_MUSIC_VOLUME := 0.6
 const DEFAULT_SFX_VOLUME := 1.0
+const DEFAULT_GAME_TIME_MINUTES := 5
+const DEFAULT_MUSIC_ENABLED := true
+const DEFAULT_HAPTICS_ENABLED := true
 
 const DEFAULT_FUNNY_NAMES: Array[String] = [
 	"Котлетка-O'Бомба",
@@ -154,11 +157,25 @@ func set_sfx_volume(linear: float) -> void:
 	emit_changed()
 
 
+func get_haptics_enabled() -> bool:
+	return bool(data.get("haptics_enabled", true))
+
+
+func set_haptics_enabled(enabled: bool) -> void:
+	data["haptics_enabled"] = enabled
+	emit_changed()
+
+
 func reset_progress() -> void:
 	data["games_played"] = 0
 	data["recent_player_names"] = DEFAULT_FUNNY_NAMES.duplicate()
 	data.erase("has_edited_player")
 	data["hints_seen"] = {}
+	data["game_time_minutes"] = DEFAULT_GAME_TIME_MINUTES
+	data["music_enabled"] = DEFAULT_MUSIC_ENABLED
+	data["music_volume"] = DEFAULT_MUSIC_VOLUME
+	data["sfx_volume"] = DEFAULT_SFX_VOLUME
+	data["haptics_enabled"] = DEFAULT_HAPTICS_ENABLED
 	emit_changed()
 
 

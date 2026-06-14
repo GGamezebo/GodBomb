@@ -12,6 +12,7 @@ const INTERVAL_ALERT_MIN := 0.52
 
 @export var game_events: GameEvents
 @export var game_manager: GameManager
+@export var account: PDataAccount
 
 var listener: EventListener = EventListener.new()
 var _play_tick_timer: float = 0.0
@@ -89,7 +90,4 @@ func _on_touch_prev_player() -> void:
 
 
 func _vibrate(duration_ms: int) -> void:
-	if duration_ms <= 0:
-		return
-	if OS.has_feature("mobile") or OS.has_feature("android") or OS.has_feature("ios"):
-		Input.vibrate_handheld(duration_ms)
+	Haptics.vibrate(duration_ms, account)
