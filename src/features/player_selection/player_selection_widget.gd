@@ -22,14 +22,22 @@ extends Control
 @export var chair_size: Vector2 = Vector2(100, 100)
 @export var chair_facing_offset: float = -PI * 0.5
 
+const BOMB_TEXTURE_PATH := "res://assets/textures/Bomb/cartoonBomb1.png"
+
 var _player_icons: Array[PlayerIcon] = []
 var _chairs: Array[TextureRect] = []
 var _is_remove_mode: bool = false
 var _dragging_icon: PlayerIcon
+var _highlighted_chair_index: int = -1
+var _start_pulse_tween: Tween
+var _add_pulse_tween: Tween
+var _start_bomb_preview: TextureRect
+var _is_start_preview_playing: bool = false
 var listener: EventListener = EventListener.new()
 
 
 func _ready() -> void:
+	_setup_start_bomb_preview()
 	if add_player_button:
 		add_player_button.pressed.connect(_on_add_player_button_pressed)
 	if edit_player_window:
@@ -47,7 +55,25 @@ func _sync_edit_window_refs() -> void:
 
 
 func _exit_tree() -> void:
+	_kill_start_pulse_tween()
+	_kill_add_pulse_tween()
 	listener.deinit()
+
+
+func _setup_start_bomb_preview() -> void:
+	if not table_area:
+		return
+	_start_bomb_preview = TextureRect.new()
+	_start_bomb_preview.visible = false
+	_start_bomb_preview.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_start_bomb_preview.z_index = 4
+	_start_bomb_preview.custom_minimum_size = Vector2(96, 96)
+	_start_bomb_preview.size = Vector2(96, 96)
+	_start_bomb_preview.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_start_bomb_preview.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	_start_bomb_preview.texture = load(BOMB_TEXTURE_PATH)
+	_start_bomb_preview.pivot_offset = Vector2(48, 48)
+	table_area.add_child(_start_bomb_preview)
 
 
 func reload_from_account() -> void:
@@ -80,6 +106,7 @@ func _clear_icons() -> void:
 
 func _create_player_icon(info: PlayerInfo) -> PlayerIcon:
 	var icon: PlayerIcon = player_icon_scene.instantiate()
+	icon.lobby_phase_offset = randf() * TAU
 	icon.set_player_data(info, _player_icons.size())
 	icon.drag_started.connect(_on_icon_drag_started.bind(icon))
 	icon.drag_ended.connect(_on_icon_drag_ended.bind(icon))
@@ -147,10 +174,13 @@ func _update_add_button() -> void:
 	if not add_player_button or not game_config:
 		return
 	var count := account.get_players().size() if account else 0
+	var min_players := game_config.min_players if game_config else 2
 	if _is_remove_mode:
 		add_player_button.disabled = count <= min_players_for_remove
+		_kill_add_pulse_tween()
 	else:
 		add_player_button.disabled = count >= game_config.max_players
+		_update_add_button_animation(count < min_players)
 
 
 func _update_start_button() -> void:
@@ -159,6 +189,48 @@ func _update_start_button() -> void:
 	var min_players := game_config.min_players if game_config else 2
 	var count := _player_icons.size()
 	start_button.disabled = count < min_players
+	_update_start_button_animation(count >= min_players)
+
+
+func _update_start_button_animation(can_start: bool) -> void:
+	if not start_button:
+		return
+	_kill_start_pulse_tween()
+	start_button.scale = Vector2.ONE
+	if can_start:
+		start_button.modulate = Color(1.05, 1.02, 0.95, 1)
+		start_button.pivot_offset = start_button.size * 0.5
+		_start_pulse_tween = create_tween().set_loops()
+		_start_pulse_tween.tween_property(start_button, "scale", Vector2(1.05, 1.05), 0.5).set_trans(Tween.TRANS_SINE)
+		_start_pulse_tween.tween_property(start_button, "scale", Vector2.ONE, 0.5).set_trans(Tween.TRANS_SINE)
+	else:
+		start_button.modulate = Color(0.88, 0.88, 0.88, 1)
+
+
+func _update_add_button_animation(need_more_players: bool) -> void:
+	if not add_player_button:
+		return
+	_kill_add_pulse_tween()
+	add_player_button.scale = Vector2.ONE
+	if need_more_players and not _is_remove_mode:
+		add_player_button.modulate = Color(1.05, 1.05, 1.05, 1)
+		_add_pulse_tween = create_tween().set_loops()
+		_add_pulse_tween.tween_property(add_player_button, "modulate", Color(1.15, 1.1, 0.92, 1), 0.55).set_trans(Tween.TRANS_SINE)
+		_add_pulse_tween.tween_property(add_player_button, "modulate", Color(1.05, 1.05, 1.05, 1), 0.55).set_trans(Tween.TRANS_SINE)
+	else:
+		add_player_button.modulate = Color.WHITE
+
+
+func _kill_start_pulse_tween() -> void:
+	if _start_pulse_tween:
+		_start_pulse_tween.kill()
+		_start_pulse_tween = null
+
+
+func _kill_add_pulse_tween() -> void:
+	if _add_pulse_tween:
+		_add_pulse_tween.kill()
+		_add_pulse_tween = null
 
 
 func _set_remove_mode(enabled: bool) -> void:
@@ -166,6 +238,7 @@ func _set_remove_mode(enabled: bool) -> void:
 	if add_player_button:
 		add_player_button.texture_normal = remove_player_texture if enabled else add_player_texture
 	if enabled:
+		_kill_add_pulse_tween()
 		menu_events.ev_player_move_begin.emit()
 	else:
 		menu_events.ev_player_move_end.emit()
@@ -191,9 +264,50 @@ func _on_icon_drag_started(icon: PlayerIcon) -> void:
 				other.set_drag_state(PlayerIcon.DragState.RETURNING)
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	if _dragging_icon:
 		_update_swap_preview(_dragging_icon)
+	else:
+		_update_lobby_animations(delta)
+
+
+func _update_lobby_animations(delta: float) -> void:
+	if _player_icons.is_empty() or not table_area:
+		return
+	var min_players := game_config.min_players if game_config else 2
+	var can_start := _player_icons.size() >= min_players
+	var table_center := _get_table_center_global()
+	for i in _player_icons.size():
+		var icon := _player_icons[i]
+		var look_target := table_center
+		if can_start and _player_icons.size() > 1:
+			var next_index := (i + 1) % _player_icons.size()
+			look_target = _player_icons[next_index].home_position
+		icon.update_lobby_visuals(delta, look_target, can_start)
+
+
+func _get_table_center_global() -> Vector2:
+	if table_area:
+		return table_area.global_position + table_area.size * 0.5
+	return Vector2.ZERO
+
+
+func _get_add_button_center_global() -> Vector2:
+	return _get_table_center_global()
+
+
+func _set_chair_highlight(index: int, enabled: bool) -> void:
+	if index < 0 or index >= _chairs.size():
+		return
+	var chair := _chairs[index]
+	chair.modulate = Color(1.2, 1.1, 0.72, 1) if enabled else Color.WHITE
+	chair.scale = Vector2(1.08, 1.08) if enabled else Vector2.ONE
+
+
+func _clear_chair_highlights() -> void:
+	for i in _chairs.size():
+		_set_chair_highlight(i, false)
+	_highlighted_chair_index = -1
 
 
 func _update_swap_preview(dragging: PlayerIcon) -> void:
@@ -201,13 +315,23 @@ func _update_swap_preview(dragging: PlayerIcon) -> void:
 		for other in _player_icons:
 			if other != dragging and other.swap_target == dragging:
 				other.cancel_swap_preview()
+		_clear_chair_highlights()
 		return
 
 	var overlap_target: PlayerIcon = null
-	for other in _player_icons:
+	var overlap_index := -1
+	for i in _player_icons.size():
+		var other := _player_icons[i]
 		if other != dragging and dragging.is_slime_over_seat(other, chair_size):
 			overlap_target = other
+			overlap_index = i
 			break
+
+	if overlap_index != _highlighted_chair_index:
+		_clear_chair_highlights()
+		if overlap_index >= 0:
+			_set_chair_highlight(overlap_index, true)
+			_highlighted_chair_index = overlap_index
 
 	for other in _player_icons:
 		if other == dragging:
@@ -221,6 +345,7 @@ func _update_swap_preview(dragging: PlayerIcon) -> void:
 
 func _on_icon_drag_ended(icon: PlayerIcon) -> void:
 	_set_remove_mode(false)
+	_clear_chair_highlights()
 
 	if add_player_button and _rect_overlaps(icon, add_player_button) and icon == _dragging_icon:
 		_remove_player(icon)
@@ -336,8 +461,55 @@ func _swap_players(icon_a: PlayerIcon, icon_b: PlayerIcon) -> void:
 		preset_storage.rebuild_locks(players)
 	menu_events.ev_player_swapped.emit(index_a, index_b)
 	_save_account()
-	_schedule_position_update()
+	_play_swap_whoosh(icon_a, icon_b, index_a, index_b)
 	_update_start_button()
+
+
+func _play_swap_whoosh(icon_a: PlayerIcon, icon_b: PlayerIcon, index_a: int, index_b: int) -> void:
+	if not table_area:
+		return
+	var player_count := _player_icons.size()
+	for i in player_count:
+		var seat_local := _seat_local_for_index(i, player_count)
+		_apply_chair_transform(_chairs[i], seat_local)
+
+	var seat_a := table_area.global_position + _seat_local_for_index(index_b, player_count)
+	var seat_b := table_area.global_position + _seat_local_for_index(index_a, player_count)
+	icon_a.animate_arc_to(seat_a)
+	icon_b.animate_arc_to(seat_b)
+
+	for i in player_count:
+		if _player_icons[i] == icon_a or _player_icons[i] == icon_b:
+			continue
+		var seat_global := table_area.global_position + _seat_local_for_index(i, player_count)
+		_player_icons[i].reset_home_position(seat_global, true)
+
+
+func play_start_preview(on_complete: Callable) -> void:
+	if _is_start_preview_playing:
+		return
+	if not _start_bomb_preview or not table_area:
+		on_complete.call()
+		return
+
+	_is_start_preview_playing = true
+	var center := table_area.size * 0.5
+	_start_bomb_preview.position = center - Vector2(48, 48)
+	_start_bomb_preview.scale = Vector2.ZERO
+	_start_bomb_preview.modulate = Color.WHITE
+	_start_bomb_preview.visible = true
+
+	var tween := create_tween()
+	tween.tween_property(_start_bomb_preview, "scale", Vector2(1.12, 1.12), 0.18).set_trans(Tween.TRANS_BACK)
+	tween.tween_property(_start_bomb_preview, "scale", Vector2.ONE, 0.12).set_trans(Tween.TRANS_SINE)
+	tween.tween_interval(0.08)
+	tween.tween_property(_start_bomb_preview, "modulate:a", 0.0, 0.15)
+	tween.tween_callback(func() -> void:
+		_start_bomb_preview.visible = false
+		_start_bomb_preview.modulate = Color.WHITE
+		_is_start_preview_playing = false
+		on_complete.call()
+	)
 
 
 func _rect_overlaps(icon: PlayerIcon, button: Control) -> bool:

@@ -96,4 +96,13 @@ func _update_start_button() -> void:
 func _on_start_pressed() -> void:
 	if not account or account.get_players().size() < game_config.min_players:
 		return
+	if start_button:
+		start_button.disabled = true
+	if player_selection_widget:
+		player_selection_widget.play_start_preview(_begin_game)
+	else:
+		_begin_game()
+
+
+func _begin_game() -> void:
 	main_events.ev_start_game.emit({})
