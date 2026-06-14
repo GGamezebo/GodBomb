@@ -24,6 +24,13 @@ extends Control
 
 const BOMB_TEXTURE_PATH := "res://assets/textures/Bomb/cartoonBomb1.png"
 const SWAP_HINT_MIN_PLAYERS := 3
+const HINT_SWAP_IDLE := "Перетащи на другое место — поменяетесь"
+const HINT_SWAP_DRAG := "Отпусти — поменяетесь местами"
+const HINT_REMOVE := "Отпусти — игрок будет удалён"
+const SWAP_IDLE_HINT_DURATION := 5.0
+const HINT_BANNER_PAD_BELOW_TOP_BAR := 10.0
+const HINT_BANNER_PAD_ABOVE_TABLE := 10.0
+const TOP_BAR_BOTTOM_FALLBACK := 160.0
 
 var _player_icons: Array[PlayerIcon] = []
 var _chairs: Array[TextureRect] = []
@@ -36,8 +43,11 @@ var _add_pulse_tween: Tween
 var _start_bomb_preview: TextureRect
 var _is_start_preview_playing: bool = false
 var _turn_order_arrows: TurnOrderArrowsLayer
-var _swap_idle_label: Label
-var _swap_drag_label: Label
+var _table_hint_banner: TableHintBanner
+var _swap_drag_hint_active: bool = false
+var _remove_hint_active: bool = false
+var _swap_idle_intro_played: bool = false
+var _swap_idle_hint_showing: bool = false
 var listener: EventListener = EventListener.new()
 
 
@@ -102,35 +112,19 @@ func _setup_turn_order_arrows() -> void:
 
 
 func _setup_swap_hints() -> void:
-	if not table_area:
-		return
-
-	_swap_idle_label = _make_swap_label("Перетащи на другое место — поменяетесь")
-	_swap_idle_label.visible = false
-	table_area.add_child(_swap_idle_label)
-
-	_swap_drag_label = _make_swap_label("Отпусти — поменяетесь местами")
-	_swap_drag_label.visible = false
-	table_area.add_child(_swap_drag_label)
-
-
-func _make_swap_label(text: String) -> Label:
-	var label := Label.new()
-	label.text = text
-	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	label.add_theme_font_size_override("font_size", 22)
-	label.add_theme_color_override("font_color", Color(0.2, 0.15, 0.11, 1))
-	label.add_theme_color_override("font_outline_color", Color(1, 0.99, 0.97, 0.95))
-	label.add_theme_constant_override("outline_size", 4)
-	return label
+	_table_hint_banner = TableHintBanner.new()
+	_table_hint_banner.z_index = 12
+	add_child(_table_hint_banner)
+	_update_hint_banner_layout()
 
 
 func reload_from_account() -> void:
 	_sync_edit_window_refs()
 	_clear_icons()
+	_swap_idle_intro_played = false
+	_swap_idle_hint_showing = false
+	_remove_hint_active = false
+	_swap_drag_hint_active = false
 	_load_from_account()
 	call_deferred("_play_swap_hint_intro_if_needed")
 
@@ -231,9 +225,9 @@ func _update_positions() -> void:
 
 	call_deferred("_layout_all_order_badges")
 
-	_update_swap_hint_layout()
+	_update_hint_banner_layout()
 	_refresh_turn_order()
-	_update_swap_idle_visibility()
+	_refresh_table_hint()
 
 
 func _layout_all_order_badges() -> void:
@@ -244,19 +238,36 @@ func _layout_all_order_badges() -> void:
 		icon.layout_order_badge(table_center_global)
 
 
-func _update_swap_hint_layout() -> void:
-	if not table_area:
+func _update_hint_banner_layout() -> void:
+	if not _table_hint_banner or not table_area:
 		return
-	var width := table_area.size.x - 48.0
-	var center_x := 24.0
-	if _swap_idle_label:
-		_swap_idle_label.position = Vector2(center_x, table_area.size.y - 64.0)
-		_swap_idle_label.size = Vector2(width, 48.0)
-		_swap_idle_label.z_index = 6
-	if _swap_drag_label:
-		_swap_drag_label.position = Vector2(center_x, 12.0)
-		_swap_drag_label.size = Vector2(width, 48.0)
-		_swap_drag_label.z_index = 6
+	var banner_width := maxf(TableHintBanner.MIN_WIDTH, table_area.size.x - 96.0)
+	_table_hint_banner.custom_minimum_size = Vector2(banner_width, 0)
+	_table_hint_banner.reset_size()
+	var banner_size := _table_hint_banner.get_combined_minimum_size()
+	_table_hint_banner.size = banner_size
+	_table_hint_banner.position = Vector2(
+		table_area.position.x + (table_area.size.x - banner_size.x) * 0.5,
+		_get_hint_banner_y(banner_size)
+	)
+
+
+func _get_top_bar_bottom_local_y() -> float:
+	if get_parent():
+		var top_bar := get_parent().find_child("TopBar", true, false) as Control
+		if top_bar:
+			var bottom_global: Vector2 = top_bar.global_position + Vector2(0.0, top_bar.size.y)
+			return (get_global_transform_with_canvas().affine_inverse() * bottom_global).y
+	return TOP_BAR_BOTTOM_FALLBACK
+
+
+func _get_hint_banner_y(banner_size: Vector2) -> float:
+	var gap_top := _get_top_bar_bottom_local_y() + HINT_BANNER_PAD_BELOW_TOP_BAR
+	var gap_bottom := table_area.position.y - HINT_BANNER_PAD_ABOVE_TABLE
+	var max_y := gap_bottom - banner_size.y
+	if max_y <= gap_top:
+		return gap_top
+	return gap_top + (max_y - gap_top) * 0.5
 
 
 func _refresh_turn_order() -> void:
@@ -275,30 +286,44 @@ func _should_show_swap_hints() -> bool:
 	return account != null and account.should_show_swap_hints()
 
 
-func _update_swap_idle_visibility() -> void:
-	var show_idle := (
-		_player_icons.size() >= SWAP_HINT_MIN_PLAYERS
-		and _should_show_swap_hints()
-		and _dragging_icon == null
-	)
-	if _swap_idle_label:
-		_swap_idle_label.visible = show_idle
+func _refresh_table_hint() -> void:
+	if not _table_hint_banner:
+		return
+	if _remove_hint_active:
+		_table_hint_banner.show_message(HINT_REMOVE, false, true)
+		return
+	if _swap_drag_hint_active:
+		_table_hint_banner.show_message(HINT_SWAP_DRAG, false, true)
+		return
+	if _swap_idle_hint_showing:
+		return
+	_table_hint_banner.hide_message()
 
 
 func _play_swap_hint_intro_if_needed() -> void:
+	if _swap_idle_intro_played:
+		return
 	if not _should_show_swap_hints() or _player_icons.size() < SWAP_HINT_MIN_PLAYERS:
 		return
-	_update_swap_hint_layout()
-	_update_swap_idle_visibility()
-	if _swap_idle_label:
-		_swap_idle_label.modulate.a = 0.0
-		var label_tween := create_tween()
-		label_tween.tween_property(_swap_idle_label, "modulate:a", 1.0, 0.4)
+	_swap_idle_intro_played = true
+	_swap_idle_hint_showing = true
+	_update_hint_banner_layout()
+	_table_hint_banner.show_message(HINT_SWAP_IDLE, true, false)
+	get_tree().create_timer(SWAP_IDLE_HINT_DURATION).timeout.connect(_on_swap_idle_hint_timeout, CONNECT_ONE_SHOT)
 
 
-func _update_swap_drag_hint(show_hint: bool) -> void:
-	if _swap_drag_label:
-		_swap_drag_label.visible = show_hint
+func _on_swap_idle_hint_timeout() -> void:
+	if _dragging_icon or _swap_drag_hint_active or _remove_hint_active:
+		return
+	_dismiss_swap_idle_hint()
+
+
+func _dismiss_swap_idle_hint(animate: bool = true) -> void:
+	if not _swap_idle_hint_showing:
+		return
+	_swap_idle_hint_showing = false
+	if _table_hint_banner:
+		_table_hint_banner.hide_message(animate)
 
 
 func _update_add_button() -> void:
@@ -395,7 +420,8 @@ func _on_add_player_button_pressed() -> void:
 func _on_icon_drag_started(icon: PlayerIcon) -> void:
 	_dragging_icon = icon
 	_set_remove_mode(true)
-	_update_swap_idle_visibility()
+	_dismiss_swap_idle_hint()
+	_refresh_table_hint()
 	if _turn_order_arrows:
 		_turn_order_arrows.set_dimmed(true)
 	for other in _player_icons:
@@ -451,15 +477,37 @@ func _clear_chair_highlights() -> void:
 	for i in _chairs.size():
 		_set_chair_highlight(i, false)
 	_highlighted_chair_index = -1
-	_update_swap_drag_hint(false)
+
+
+func _is_icon_over_remove_button(icon: PlayerIcon) -> bool:
+	return (
+		_is_remove_mode
+		and add_player_button
+		and add_player_button.visible
+		and _rect_overlaps(icon, add_player_button)
+	)
 
 
 func _update_swap_preview(dragging: PlayerIcon) -> void:
+	if _is_icon_over_remove_button(dragging):
+		for other in _player_icons:
+			if other != dragging and other.swap_target == dragging:
+				other.cancel_swap_preview()
+		_clear_chair_highlights()
+		_remove_hint_active = true
+		_swap_drag_hint_active = false
+		_refresh_table_hint()
+		return
+
+	_remove_hint_active = false
+
 	if not dragging.has_moved_for_swap():
 		for other in _player_icons:
 			if other != dragging and other.swap_target == dragging:
 				other.cancel_swap_preview()
 		_clear_chair_highlights()
+		_swap_drag_hint_active = false
+		_refresh_table_hint()
 		return
 
 	var overlap_target: PlayerIcon = null
@@ -477,7 +525,7 @@ func _update_swap_preview(dragging: PlayerIcon) -> void:
 			_set_chair_highlight(overlap_index, true)
 			_highlighted_chair_index = overlap_index
 
-	_update_swap_drag_hint(overlap_index >= 0 and dragging.has_moved_for_swap())
+	_swap_drag_hint_active = overlap_index >= 0
 
 	for other in _player_icons:
 		if other == dragging:
@@ -488,18 +536,22 @@ func _update_swap_preview(dragging: PlayerIcon) -> void:
 		elif other.swap_target == dragging:
 			other.cancel_swap_preview()
 
+	_refresh_table_hint()
+
 
 func _on_icon_drag_ended(icon: PlayerIcon) -> void:
 	_set_remove_mode(false)
+	_remove_hint_active = false
+	_swap_drag_hint_active = false
 	if _turn_order_arrows:
 		_turn_order_arrows.set_dimmed(false)
 		_refresh_turn_order()
 	_clear_chair_highlights()
-	_update_swap_idle_visibility()
 
 	if add_player_button and _rect_overlaps(icon, add_player_button) and icon == _dragging_icon:
 		_remove_player(icon)
 		_dragging_icon = null
+		_refresh_table_hint()
 		return
 
 	var release_center := icon.get_release_slime_center()
@@ -511,6 +563,7 @@ func _on_icon_drag_ended(icon: PlayerIcon) -> void:
 			_swap_players(icon, other)
 			icon.stop_motion()
 			_dragging_icon = null
+			_refresh_table_hint()
 			return
 
 	for other in _player_icons:
@@ -519,6 +572,7 @@ func _on_icon_drag_ended(icon: PlayerIcon) -> void:
 
 	icon.set_drag_state(PlayerIcon.DragState.RETURNING)
 	_dragging_icon = null
+	_refresh_table_hint()
 
 
 func _on_icon_hold_edit(index: int) -> void:
@@ -617,7 +671,7 @@ func _swap_players(icon_a: PlayerIcon, icon_b: PlayerIcon) -> void:
 		_player_icons[i].set_order_index(i, _player_icons.size())
 	_refresh_turn_order()
 	_play_swap_whoosh(icon_a, icon_b, index_a, index_b)
-	_update_swap_idle_visibility()
+	_refresh_table_hint()
 	_update_start_button()
 
 
@@ -693,3 +747,4 @@ func _resolve_pdata_controller() -> Node:
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_RESIZED:
 		_schedule_position_update()
+		_update_hint_banner_layout()
