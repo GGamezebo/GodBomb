@@ -122,7 +122,6 @@ vertical_alignment = 1
 
 [node name="ModalLayer" type="CanvasLayer" parent="." unique_id=1308098573]
 layer = 30
-visible = false
 
 [node name="SettingsWindow" parent="ModalLayer" unique_id=1666640120 instance=ExtResource("10")]
 

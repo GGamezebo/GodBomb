@@ -32,6 +32,7 @@ func _ready() -> void:
 		reset_button.pressed.connect(_on_reset_pressed)
 	if close_button:
 		close_button.pressed.connect(close)
+	call_deferred("_update_modal_layer_visibility")
 
 
 func open() -> void:
@@ -42,10 +43,12 @@ func open() -> void:
 	if account and not account.changed.is_connected(_sync_from_account):
 		account.changed.connect(_sync_from_account)
 	visible = true
+	_show_modal_layer()
 
 
 func close() -> void:
 	visible = false
+	_update_modal_layer_visibility()
 
 
 func _input(event: InputEvent) -> void:
@@ -152,3 +155,19 @@ func _save_account() -> void:
 		controller = get_tree().get_first_node_in_group(PersistentDataController.PERSISTENCE_GROUP)
 	if controller and controller.has_method("save_account"):
 		controller.save_account()
+
+
+func _show_modal_layer() -> void:
+	if get_parent() is CanvasLayer:
+		(get_parent() as CanvasLayer).visible = true
+
+
+func _update_modal_layer_visibility() -> void:
+	var layer := get_parent() as CanvasLayer
+	if not layer:
+		return
+	for child in layer.get_children():
+		if child is Control and child.visible:
+			layer.visible = true
+			return
+	layer.visible = false
