@@ -95,7 +95,8 @@ stretch_mode = 5
 [node name="NameEdit" type="LineEdit" parent="Panel/Margin/VBox"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
-placeholder_text = "Имя игрока"
+placeholder_text = "Имя игрока (до 16 символов)"
+max_length = 16
 
 [node name="NameHistoryHint" type="Label" parent="Panel/Margin/VBox"]
 layout_mode = 2

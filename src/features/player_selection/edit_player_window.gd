@@ -38,6 +38,7 @@ func _ready() -> void:
 	if cancel_button:
 		cancel_button.pressed.connect(_on_cancel_pressed)
 	if name_edit:
+		name_edit.max_length = PlayerInfo.MAX_NAME_LENGTH
 		name_edit.text_changed.connect(_on_name_changed)
 		name_edit.text_submitted.connect(_on_name_submitted)
 	_build_color_buttons()
@@ -71,7 +72,7 @@ func _show_window(player_name: String) -> void:
 	if get_parent() is CanvasLayer:
 		(get_parent() as CanvasLayer).visible = true
 	if name_edit:
-		name_edit.text = player_name
+		name_edit.text = PlayerInfo.sanitize_name(player_name)
 		name_edit.grab_focus()
 	_refresh_all_swatches()
 	_sort_color_grid()
@@ -134,10 +135,11 @@ func _refresh_name_history() -> void:
 func _on_history_name_pressed(player_name: String) -> void:
 	if not name_edit:
 		return
-	name_edit.text = player_name
-	name_edit.caret_column = player_name.length()
+	var safe_name := PlayerInfo.sanitize_name(player_name)
+	name_edit.text = safe_name
+	name_edit.caret_column = safe_name.length()
 	name_edit.grab_focus()
-	_on_name_changed(player_name)
+	_on_name_changed(safe_name)
 
 
 func _build_color_buttons() -> void:
@@ -334,7 +336,7 @@ func _close_window() -> void:
 
 
 func _on_ok_pressed() -> void:
-	var player_name := name_edit.text.strip_edges() if name_edit else ""
+	var player_name := _read_player_name()
 	if player_name.is_empty() or _is_preset_held(_selected_preset_id):
 		return
 	_close_window()
@@ -342,11 +344,17 @@ func _on_ok_pressed() -> void:
 
 
 func _on_apply_pressed() -> void:
-	var player_name := name_edit.text.strip_edges() if name_edit else ""
+	var player_name := _read_player_name()
 	if player_name.is_empty() or _player_index < 0 or _is_preset_held(_selected_preset_id):
 		return
 	_close_window()
 	player_applied.emit(_player_index, player_name, _selected_preset_id)
+
+
+func _read_player_name() -> String:
+	if not name_edit:
+		return ""
+	return PlayerInfo.sanitize_name(name_edit.text)
 
 
 func _on_cancel_pressed() -> void:

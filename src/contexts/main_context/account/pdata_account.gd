@@ -52,7 +52,7 @@ func get_recent_names() -> Array[String]:
 
 
 func remember_removed_player(player_name: String) -> void:
-	var trimmed := player_name.strip_edges()
+	var trimmed := PlayerInfo.sanitize_name(player_name)
 	if trimmed.is_empty():
 		return
 	ensure_recent_names_initialized()
@@ -73,18 +73,21 @@ func ensure_recent_names_initialized() -> void:
 
 
 func player_info_from_dict(entry: Dictionary) -> PlayerInfo:
-	return PlayerInfo.new(str(entry.get("name", "")), int(entry.get("preset_id", 0)))
+	return PlayerInfo.new(
+		PlayerInfo.sanitize_name(str(entry.get("name", ""))),
+		int(entry.get("preset_id", 0))
+	)
 
 
 func dict_from_player_info(info: PlayerInfo) -> Dictionary:
-	return {"name": info.name, "preset_id": info.preset_id}
+	return {"name": PlayerInfo.sanitize_name(info.name), "preset_id": info.preset_id}
 
 
 func _to_string_array(source: Variant) -> Array[String]:
 	var result: Array[String] = []
 	if source is Array:
 		for item in source:
-			var text := str(item).strip_edges()
+			var text := PlayerInfo.sanitize_name(str(item))
 			if not text.is_empty():
 				result.append(text)
 	return result
