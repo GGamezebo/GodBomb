@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://main_godbomb"]
+[gd_scene load_steps=11 format=3 uid="uid://main_godbomb"]
 
 [ext_resource type="Script" path="res://src/contexts/main_context/main_context.gd" id="1"]
 [ext_resource type="PackedScene" path="res://src/ui/loading_screen/loading_screen.tscn" id="2"]
@@ -9,6 +9,7 @@
 [ext_resource type="Resource" path="res://src/common/menu_events.tres" id="9"]
 [ext_resource type="PackedScene" path="res://src/contexts/menu_context/menu_context.tscn" id="7"]
 [ext_resource type="AudioStream" path="res://assets/audio/music/Myuu - Metamorphosis.mp3" id="8"]
+[ext_resource type="Script" path="res://src/contexts/main_context/audio/game_audio_controller.gd" id="10"]
 
 [node name="MainContext" type="Node" node_paths=PackedStringArray("current_context")]
 script = ExtResource("1")
@@ -31,6 +32,11 @@ stream = ExtResource("8")
 volume_db = -8.0
 autoplay = true
 bus = &"Music"
+
+[node name="GameAudio" type="Node" parent="."]
+script = ExtResource("10")
+music_player = NodePath("../MusicPlayer")
+account = ExtResource("4")
 
 [node name="UI" type="CanvasLayer" parent="."]
 

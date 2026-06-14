@@ -5,6 +5,8 @@ const SAVE_PATH := "user://account.tres"
 const CURRENT_VERSION := 1
 const RECENT_NAMES_MAX := 12
 const SWAP_HINT_GAMES_MAX := 5
+const DEFAULT_MUSIC_VOLUME := 0.6
+const DEFAULT_SFX_VOLUME := 1.0
 
 const DEFAULT_FUNNY_NAMES: Array[String] = [
 	"Котлетка-O'Бомба",
@@ -92,6 +94,39 @@ func has_seen_swap_hint() -> bool:
 
 func mark_swap_hint_seen() -> void:
 	pass
+
+
+func get_music_enabled() -> bool:
+	return bool(data.get("music_enabled", true))
+
+
+func set_music_enabled(enabled: bool) -> void:
+	data["music_enabled"] = enabled
+	emit_changed()
+
+
+func get_music_volume() -> float:
+	return clampf(float(data.get("music_volume", DEFAULT_MUSIC_VOLUME)), 0.0, 1.0)
+
+
+func set_music_volume(linear: float) -> void:
+	data["music_volume"] = clampf(linear, 0.0, 1.0)
+	emit_changed()
+
+
+func get_sfx_volume() -> float:
+	return clampf(float(data.get("sfx_volume", DEFAULT_SFX_VOLUME)), 0.0, 1.0)
+
+
+func set_sfx_volume(linear: float) -> void:
+	data["sfx_volume"] = clampf(linear, 0.0, 1.0)
+	emit_changed()
+
+
+func reset_progress() -> void:
+	data["games_played"] = 0
+	data["recent_player_names"] = DEFAULT_FUNNY_NAMES.duplicate()
+	emit_changed()
 
 
 func player_info_from_dict(entry: Dictionary) -> PlayerInfo:

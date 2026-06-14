@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://wcp2ufiuf4an"]
+[gd_scene load_steps=16 format=3 uid="uid://wcp2ufiuf4an"]
 
 [ext_resource type="Script" uid="uid://bbkkoj6f7bb4r" path="res://src/contexts/menu_context/menu_context.gd" id="1"]
 [ext_resource type="Resource" path="res://src/contexts/main_context/main_events.tres" id="2"]
@@ -9,8 +9,14 @@
 [ext_resource type="Texture2D" path="res://assets/party_kitchen/background_menu.svg" id="7"]
 [ext_resource type="Texture2D" path="res://assets/party_kitchen/buttons/start_active.svg" id="8"]
 [ext_resource type="Texture2D" path="res://assets/party_kitchen/buttons/start_inactive.svg" id="9"]
+[ext_resource type="PackedScene" path="res://src/features/menu/settings_window.tscn" id="10"]
+[ext_resource type="PackedScene" path="res://src/features/menu/rules_window.tscn" id="11"]
+[ext_resource type="Texture2D" path="res://assets/party_kitchen/buttons/icon_settings.svg" id="12"]
+[ext_resource type="Texture2D" path="res://assets/party_kitchen/buttons/icon_music_on.svg" id="13"]
+[ext_resource type="Texture2D" path="res://assets/party_kitchen/buttons/icon_music_off.svg" id="14"]
+[ext_resource type="Texture2D" path="res://assets/party_kitchen/buttons/icon_rules.svg" id="15"]
 
-[node name="MenuContext" type="Control" unique_id=1137190925 node_paths=PackedStringArray("start_button", "player_selection_widget", "game_time_slider", "game_time_label")]
+[node name="MenuContext" type="Control" unique_id=1137190925 node_paths=PackedStringArray("start_button", "player_selection_widget", "settings_button", "music_button", "rules_button", "settings_window", "rules_window")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -24,8 +30,13 @@ account = ExtResource("4")
 menu_events = ExtResource("5")
 start_button = NodePath("StartButton")
 player_selection_widget = NodePath("PlayerSelectionWidget")
-game_time_slider = NodePath("SettingsPanel/GameTimeSlider")
-game_time_label = NodePath("SettingsPanel/GameTimeLabel")
+settings_button = NodePath("TopBarLayer/TopBar/SettingsButton")
+music_button = NodePath("TopBarLayer/TopBar/MusicButton")
+rules_button = NodePath("TopBarLayer/TopBar/RulesButton")
+settings_window = NodePath("ModalLayer/SettingsWindow")
+rules_window = NodePath("ModalLayer/RulesWindow")
+music_on_texture = ExtResource("13")
+music_off_texture = ExtResource("14")
 
 [node name="Background" type="TextureRect" parent="." unique_id=893368180]
 layout_mode = 1
@@ -40,30 +51,44 @@ stretch_mode = 6
 
 [node name="PlayerSelectionWidget" parent="." unique_id=972041160 instance=ExtResource("6")]
 layout_mode = 1
+mouse_filter = 2
 start_button = NodePath("../StartButton")
 
-[node name="SettingsPanel" type="VBoxContainer" parent="." unique_id=2025901683]
-layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
+[node name="TopBarLayer" type="CanvasLayer" parent="."]
+layer = 15
+
+[node name="TopBar" type="HBoxContainer" parent="TopBarLayer"]
+layout_mode = 3
+anchors_preset = 10
 anchor_right = 1.0
-offset_left = -360.0
-offset_top = 120.0
+offset_left = 40.0
+offset_top = 40.0
 offset_right = -40.0
-offset_bottom = 220.0
-grow_horizontal = 0
+offset_bottom = 160.0
+grow_horizontal = 2
+theme_override_constants/separation = 20
+alignment = 1
 
-[node name="GameTimeLabel" type="Label" parent="SettingsPanel" unique_id=1419372322]
+[node name="SettingsButton" type="TextureButton" parent="TopBarLayer/TopBar"]
+custom_minimum_size = Vector2(112, 112)
 layout_mode = 2
-theme_override_font_sizes/font_size = 24
-text = "Длительность: 5 мин"
-horizontal_alignment = 2
+texture_normal = ExtResource("12")
+ignore_texture_size = true
+stretch_mode = 5
 
-[node name="GameTimeSlider" type="HSlider" parent="SettingsPanel" unique_id=882637277]
+[node name="MusicButton" type="TextureButton" parent="TopBarLayer/TopBar"]
+custom_minimum_size = Vector2(112, 112)
 layout_mode = 2
-min_value = 1.0
-max_value = 30.0
-value = 5.0
+texture_normal = ExtResource("13")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="RulesButton" type="TextureButton" parent="TopBarLayer/TopBar"]
+custom_minimum_size = Vector2(112, 112)
+layout_mode = 2
+texture_normal = ExtResource("15")
+ignore_texture_size = true
+stretch_mode = 5
 
 [node name="StartButton" type="TextureButton" parent="." unique_id=157967625]
 layout_mode = 1
@@ -83,3 +108,10 @@ texture_normal = ExtResource("8")
 texture_disabled = ExtResource("9")
 ignore_texture_size = true
 stretch_mode = 5
+
+[node name="ModalLayer" type="CanvasLayer" parent="."]
+layer = 30
+
+[node name="SettingsWindow" parent="ModalLayer" instance=ExtResource("10")]
+
+[node name="RulesWindow" parent="ModalLayer" instance=ExtResource("11")]

@@ -7,8 +7,13 @@ extends IContext
 @export var menu_events: MenuEvents
 @export var start_button: BaseButton
 @export var player_selection_widget: PlayerSelectionWidget
-@export var game_time_slider: HSlider
-@export var game_time_label: Label
+@export var settings_button: BaseButton
+@export var music_button: TextureButton
+@export var rules_button: BaseButton
+@export var settings_window: SettingsWindow
+@export var rules_window: RulesWindow
+@export var music_on_texture: Texture2D
+@export var music_off_texture: Texture2D
 
 var listener: EventListener = EventListener.new()
 
@@ -16,8 +21,12 @@ var listener: EventListener = EventListener.new()
 func _ready() -> void:
 	if start_button:
 		start_button.pressed.connect(_on_start_pressed)
-	if game_time_slider:
-		game_time_slider.value_changed.connect(_on_game_time_changed)
+	if settings_button:
+		settings_button.pressed.connect(_on_settings_pressed)
+	if music_button:
+		music_button.pressed.connect(_on_music_pressed)
+	if rules_button:
+		rules_button.pressed.connect(_on_rules_pressed)
 	if menu_events:
 		listener.add(menu_events.ev_player_added, _on_player_list_changed)
 		listener.add(menu_events.ev_player_removed, _on_player_list_changed)
@@ -37,6 +46,12 @@ func initialize(data: Dictionary) -> void:
 	if passed_controller:
 		pdata_controller = passed_controller
 
+	if settings_window:
+		settings_window.account = account
+		settings_window.pdata_controller = pdata_controller
+		settings_window.menu_events = menu_events
+		settings_window.player_selection_widget = player_selection_widget
+
 	if player_selection_widget:
 		player_selection_widget.account = account
 		player_selection_widget.game_config = game_config
@@ -45,8 +60,10 @@ func initialize(data: Dictionary) -> void:
 			player_selection_widget.pdata_controller = passed_controller
 		player_selection_widget.reload_from_account()
 
-	_load_game_time_from_account()
+	_update_music_button_icon()
 	_update_start_button()
+	if account and not account.changed.is_connected(_update_music_button_icon):
+		account.changed.connect(_update_music_button_icon)
 
 
 func _on_player_list_changed(..._args) -> void:
@@ -57,32 +74,45 @@ func deinit() -> void:
 	pass
 
 
-func _load_game_time_from_account() -> void:
-	if not account or not game_time_slider:
-		return
-	game_time_slider.min_value = 1
-	game_time_slider.max_value = 30
-	game_time_slider.value = account.get_game_time_minutes()
-	_update_game_time_label(int(game_time_slider.value))
+func _on_settings_pressed() -> void:
+	if settings_window:
+		settings_window.open()
 
 
-func _on_game_time_changed(value: float) -> void:
-	if not account:
+func _on_rules_pressed() -> void:
+	if rules_window:
+		rules_window.open()
+
+
+func _on_music_pressed() -> void:
+	var audio := _get_audio_controller()
+	if not audio or not account:
 		return
-	var minutes := int(value)
-	account.set_game_time_minutes(minutes)
-	_update_game_time_label(minutes)
-	menu_events.ev_game_time_changed.emit(minutes)
+	var enabled := audio.toggle_music()
+	_update_music_button_icon()
+	_save_account()
+
+
+func _update_music_button_icon() -> void:
+	if not music_button or not account:
+		return
+	var enabled := account.get_music_enabled()
+	if enabled and music_on_texture:
+		music_button.texture_normal = music_on_texture
+	elif music_off_texture:
+		music_button.texture_normal = music_off_texture
+
+
+func _get_audio_controller() -> GameAudioController:
+	return get_tree().get_first_node_in_group(GameAudioController.GROUP) as GameAudioController
+
+
+func _save_account() -> void:
 	var controller := pdata_controller
 	if not controller:
-		controller = get_tree().get_first_node_in_group("account_persistence")
+		controller = get_tree().get_first_node_in_group(PersistentDataController.PERSISTENCE_GROUP)
 	if controller and controller.has_method("save_account"):
 		controller.save_account()
-
-
-func _update_game_time_label(minutes: int) -> void:
-	if game_time_label:
-		game_time_label.text = "Длительность: %d мин" % minutes
 
 
 func _update_start_button() -> void:
