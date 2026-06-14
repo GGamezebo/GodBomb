@@ -293,8 +293,15 @@ func _rect_overlaps(icon: PlayerIcon, button: Control) -> bool:
 
 
 func _save_account() -> void:
-	if pdata_controller and pdata_controller.has_method("save_account"):
-		pdata_controller.save_account()
+	var controller := _resolve_pdata_controller()
+	if controller and controller.has_method("save_account"):
+		controller.save_account()
+
+
+func _resolve_pdata_controller() -> Node:
+	if pdata_controller:
+		return pdata_controller
+	return get_tree().get_first_node_in_group("account_persistence")
 
 
 func _notification(what: int) -> void:

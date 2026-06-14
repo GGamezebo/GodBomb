@@ -12,11 +12,12 @@ const CURRENT_VERSION := 1
 
 
 func get_players() -> Array:
-	return data.get("players", [])
+	return data.get("players", []).duplicate(true)
 
 
 func set_players(players: Array) -> void:
-	data["players"] = players
+	data["players"] = players.duplicate(true)
+	emit_changed()
 
 
 func get_game_time_minutes() -> int:
@@ -25,6 +26,7 @@ func get_game_time_minutes() -> int:
 
 func set_game_time_minutes(minutes: int) -> void:
 	data["game_time_minutes"] = minutes
+	emit_changed()
 
 
 func player_info_from_dict(entry: Dictionary) -> PlayerInfo:

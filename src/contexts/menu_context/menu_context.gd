@@ -20,10 +20,19 @@ func _ready() -> void:
 
 func initialize(data: Dictionary) -> void:
 	var passed_account: PDataAccount = data.get("account")
-	if passed_account and account:
-		ResourceUtils.update_resource(account, passed_account)
+	if passed_account:
+		account = passed_account
+
+	var passed_controller: Node = data.get("pdata_controller")
+	if passed_controller:
+		pdata_controller = passed_controller
+
 	if player_selection_widget:
+		player_selection_widget.account = account
+		if passed_controller:
+			player_selection_widget.pdata_controller = passed_controller
 		player_selection_widget.reload_from_account()
+
 	_load_game_time_from_account()
 
 
@@ -47,8 +56,11 @@ func _on_game_time_changed(value: float) -> void:
 	account.set_game_time_minutes(minutes)
 	_update_game_time_label(minutes)
 	menu_events.ev_game_time_changed.emit(minutes)
-	if pdata_controller and pdata_controller.has_method("save_account"):
-		pdata_controller.save_account()
+	var controller := pdata_controller
+	if not controller:
+		controller = get_tree().get_first_node_in_group("account_persistence")
+	if controller and controller.has_method("save_account"):
+		controller.save_account()
 
 
 func _update_game_time_label(minutes: int) -> void:

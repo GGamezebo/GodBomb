@@ -16,13 +16,23 @@ var target_path: String = ""
 var listener: EventListener = EventListener.new()
 
 
+@onready var _pdata_controller: Node = $Account/PersistentDataController
+
+
 func _ready() -> void:
 	listener.add(main_events.ev_start_game, _on_start_game)
 	listener.add(main_events.ev_return_to_menu, _return_to_menu)
 
 	var menu_context: IContext = current_context as IContext
 	if menu_context:
-		menu_context.initialize({})
+		menu_context.initialize(_session_data())
+
+
+func _session_data() -> Dictionary:
+	return {
+		"account": account,
+		"pdata_controller": _pdata_controller,
+	}
 
 
 func _exit_tree() -> void:
@@ -31,16 +41,12 @@ func _exit_tree() -> void:
 
 
 func _on_start_game(data: Dictionary) -> void:
-	if account:
-		data["account"] = account
+	data.merge(_session_data())
 	switch_game_context(game_context_path, true, data)
 
 
 func _return_to_menu() -> void:
-	var data: Dictionary = {}
-	if account:
-		data["account"] = account
-	switch_game_context(menu_context_path, false, data)
+	switch_game_context(menu_context_path, false, _session_data())
 
 
 func _release_current_context() -> void:

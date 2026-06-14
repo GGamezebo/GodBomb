@@ -28,11 +28,6 @@ func setup(p_config: GameConfig, p_events: GameEvents, account: PDataAccount) ->
 	cards.clear()
 
 	var account_players: Array = account.get_players()
-	if account_players.is_empty():
-		account_players = [
-			account.dict_from_player_info(PlayerInfo.new("Игрок 1", 0)),
-			account.dict_from_player_info(PlayerInfo.new("Игрок 2", 1)),
-		]
 	for i in account_players.size():
 		var entry: Dictionary = account_players[i]
 		var info := account.player_info_from_dict(entry)
