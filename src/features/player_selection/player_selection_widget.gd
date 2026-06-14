@@ -28,6 +28,7 @@ const HINT_SWAP_DRAG := "Отпусти — поменяетесь местам�
 const HINT_REMOVE := "Отпусти — игрок будет удалён"
 const HINT_MIN_PLAYERS := "Для игры нужно минимум 2 игрока"
 const HINT_HOLD_EDIT := "Удержи 2 сек — изменить имя и цвет"
+const HINT_BATTLE_EDIT := "Здесь можно редактировать состав игры, не заканчивая партию."
 const HOLD_EDIT_HINT_DURATION := 5.0
 const SWAP_IDLE_HINT_DURATION := 5.0
 const BADGE_GAP_AFTER_ARROWS := 16.0
@@ -278,8 +279,11 @@ func reload_from_account() -> void:
 	_remove_hint_active = false
 	_swap_drag_hint_active = false
 	_load_from_account()
-	call_deferred("_play_swap_hint_intro_if_needed")
-	call_deferred("_play_hold_edit_hint_if_needed")
+	if _battle_mode:
+		call_deferred("_show_battle_edit_hint")
+	else:
+		call_deferred("_play_swap_hint_intro_if_needed")
+		call_deferred("_play_hold_edit_hint_if_needed")
 
 
 func _load_from_account() -> void:
@@ -502,6 +506,10 @@ func _refresh_table_hint() -> void:
 		return
 	if _hold_edit_hint_showing:
 		return
+	if _battle_mode:
+		_update_hint_banner_layout()
+		_table_hint_banner.show_message(HINT_BATTLE_EDIT, true, false)
+		return
 	if _needs_min_players_hint():
 		_update_hint_banner_layout()
 		_table_hint_banner.show_message(HINT_MIN_PLAYERS, true, false)
@@ -509,7 +517,16 @@ func _refresh_table_hint() -> void:
 	_table_hint_banner.hide_message()
 
 
+func _show_battle_edit_hint() -> void:
+	if not _battle_mode or not _table_hint_banner:
+		return
+	_update_hint_banner_layout()
+	_table_hint_banner.show_message(HINT_BATTLE_EDIT, true, false)
+
+
 func _play_swap_hint_intro_if_needed() -> void:
+	if _battle_mode:
+		return
 	if _swap_idle_intro_played:
 		return
 	if not _should_show_swap_hints() or _player_icons.size() < SWAP_HINT_MIN_PLAYERS:
@@ -536,6 +553,9 @@ func _dismiss_swap_idle_hint(animate: bool = true) -> void:
 
 
 func _play_hold_edit_hint_if_needed() -> void:
+	if _battle_mode:
+		_sync_hold_idle_hints()
+		return
 	if not account or not account.should_show_hold_edit_hint() or _player_icons.is_empty():
 		_sync_hold_idle_hints()
 		return
@@ -566,7 +586,12 @@ func _dismiss_hold_edit_hint(animate: bool = true) -> void:
 
 
 func _sync_hold_idle_hints() -> void:
-	var show_corner := account != null and account.should_show_hold_edit_hint() and _dragging_icon == null
+	var show_corner := (
+		not _battle_mode
+		and account != null
+		and account.should_show_hold_edit_hint()
+		and _dragging_icon == null
+	)
 	for i in _player_icons.size():
 		_player_icons[i].set_idle_hold_hint_visible(show_corner and i == 0)
 

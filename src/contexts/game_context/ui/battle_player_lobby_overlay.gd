@@ -4,6 +4,8 @@ extends CanvasLayer
 signal closed
 
 const NEUTRAL_BG := Color(0.06, 0.05, 0.04, 1.0)
+const LOBBY_BLUR_SHADER := preload("res://assets/shaders/bomb_background_blur.gdshader")
+const LOBBY_BLUR_STRENGTH := 1.25
 
 @export var game_manager: GameManager
 @export var game_config: GameConfig
@@ -11,16 +13,19 @@ const NEUTRAL_BG := Color(0.06, 0.05, 0.04, 1.0)
 @export var account: PDataAccount
 @export var pdata_controller: Node
 @export var background_color: ColorRect
+@export var background_bomb: TextureRect
 @export var player_selection_widget: PlayerSelectionWidget
 @export var done_button: TextureButton
 
 var listener: EventListener = EventListener.new()
 var _menu_listeners_bound: bool = false
+var _blur_material: ShaderMaterial
 
 
 func _ready() -> void:
 	layer = 12
 	visible = false
+	_setup_blur_material()
 	if done_button:
 		done_button.pressed.connect(_on_done_pressed)
 	if player_selection_widget:
@@ -29,6 +34,7 @@ func _ready() -> void:
 
 
 func _exit_tree() -> void:
+	_set_bomb_blur(false)
 	listener.deinit()
 
 
@@ -49,6 +55,7 @@ func open() -> void:
 		background_color.color = NEUTRAL_BG
 	if player_selection_widget:
 		player_selection_widget.reload_from_account()
+	_set_bomb_blur(true)
 	visible = true
 
 
@@ -56,8 +63,21 @@ func close_overlay() -> void:
 	if not visible:
 		return
 	_apply_roster_to_game()
+	_set_bomb_blur(false)
 	visible = false
 	closed.emit()
+
+
+func _setup_blur_material() -> void:
+	_blur_material = ShaderMaterial.new()
+	_blur_material.shader = LOBBY_BLUR_SHADER
+	_blur_material.set_shader_parameter("blur_strength", LOBBY_BLUR_STRENGTH)
+
+
+func _set_bomb_blur(enabled: bool) -> void:
+	if not background_bomb:
+		return
+	background_bomb.material = _blur_material if enabled else null
 
 
 func _bind_widget_account() -> void:

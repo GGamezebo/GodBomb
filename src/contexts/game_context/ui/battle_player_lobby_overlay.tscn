@@ -6,10 +6,11 @@
 [ext_resource type="PackedScene" uid="uid://duug5w0r0cqrv" path="res://src/features/player_selection/player_selection_widget.tscn" id="4"]
 [ext_resource type="Texture2D" uid="uid://b27y0jjb7mmmy" path="res://assets/party_kitchen/buttons/start_active.svg" id="5"]
 
-[node name="BattlePlayerLobbyOverlay" type="CanvasLayer" node_paths=PackedStringArray("background_color", "player_selection_widget", "done_button")]
+[node name="BattlePlayerLobbyOverlay" type="CanvasLayer" node_paths=PackedStringArray("background_color", "background_bomb", "player_selection_widget", "done_button")]
 layer = 12
 script = ExtResource("1")
 background_color = NodePath("Root/BackgroundColor")
+background_bomb = NodePath("Root/BackgroundBomb")
 player_selection_widget = NodePath("Root/BackgroundBomb/ScaledContent/PlayerSelectionWidget")
 done_button = NodePath("Root/BackgroundBomb/ScaledContent/DoneButton")
 
@@ -20,7 +21,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
+mouse_filter = 0
 
 [node name="BackgroundColor" type="ColorRect" parent="Root"]
 layout_mode = 1
@@ -51,7 +52,7 @@ hint_marker = NodePath("ScaledContent/Marker2D")
 anchors_preset = 0
 offset_right = 1080.0
 offset_bottom = 1920.0
-mouse_filter = 2
+mouse_filter = 0
 
 [node name="Marker2D" type="Marker2D" parent="Root/BackgroundBomb/ScaledContent"]
 position = Vector2(528, 483)
