@@ -27,19 +27,21 @@ func _ready() -> void:
 	_condition_label = Label.new()
 	_condition_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_condition_label.add_theme_font_size_override("font_size", 26)
-	_condition_label.add_theme_color_override("font_color", Color(0.45, 0.32, 0.22, 1))
+	_condition_label.add_theme_color_override("font_color", Color(0.88, 0.72, 0.52, 0.95))
 	col.add_child(_condition_label)
 
 	_syllable_label = Label.new()
 	_syllable_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_syllable_label.add_theme_font_size_override("font_size", 96)
-	_syllable_label.add_theme_color_override("font_color", Color(0.12, 0.08, 0.06, 1))
+	_syllable_label.add_theme_color_override("font_color", Color(1, 0.97, 0.92, 1))
+	_syllable_label.add_theme_color_override("font_outline_color", Color(0.06, 0.04, 0.02, 0.85))
+	_syllable_label.add_theme_constant_override("outline_size", 4)
 	col.add_child(_syllable_label)
 
 	_pattern_label = Label.new()
 	_pattern_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_pattern_label.add_theme_font_size_override("font_size", 36)
-	_pattern_label.add_theme_color_override("font_color", Color(0.35, 0.28, 0.22, 0.85))
+	_pattern_label.add_theme_color_override("font_color", Color(0.82, 0.68, 0.5, 0.9))
 	col.add_child(_pattern_label)
 
 
@@ -68,11 +70,11 @@ func pulse_next_turn() -> void:
 
 func _apply_panel_style() -> void:
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(1, 0.995, 0.98, 0.97)
-	style.border_color = ACCENT.lightened(0.15)
+	style.bg_color = Color(0.08, 0.06, 0.05, 0.78)
+	style.border_color = ACCENT.lightened(0.05)
 	style.set_border_width_all(3)
 	style.set_corner_radius_all(28)
-	style.shadow_color = Color(0.96, 0.28, 0.05, 0.12)
-	style.shadow_size = 12
+	style.shadow_color = Color(0, 0, 0, 0.4)
+	style.shadow_size = 14
 	style.shadow_offset = Vector2(0, 5)
 	add_theme_stylebox_override("panel", style)

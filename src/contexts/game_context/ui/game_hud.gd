@@ -1,5 +1,7 @@
 extends Control
 
+const DESIGN_SIZE := MenuBombLayout.DESIGN_SIZE
+
 @export var game_manager: GameManager
 @export var game_events: GameEvents
 @export var result_panel: Control
@@ -36,66 +38,91 @@ func _exit_tree() -> void:
 	listener.deinit()
 
 
+func _find_bomb_layout() -> MenuBombLayout:
+	var ui := get_parent()
+	if ui:
+		return ui.get_node_or_null("BackgroundBomb") as MenuBombLayout
+	return null
+
+
+func _get_design_root() -> Control:
+	var layout := _find_bomb_layout()
+	if layout and layout.scaled_content:
+		return layout.scaled_content
+	return self
+
+
 func _build_ui() -> void:
+	var design_root := _get_design_root()
+
 	_vignette = GameBattleVignette.new()
 	_vignette.game_events = game_events
-	add_child(_vignette)
+	_vignette.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	_vignette.size = DESIGN_SIZE
+	_vignette.z_index = 1
+	design_root.add_child(_vignette)
 
 	_battle_layer = Control.new()
-	_battle_layer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_battle_layer.name = "BattleLayer"
 	_battle_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(_battle_layer)
+	_battle_layer.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	_battle_layer.size = DESIGN_SIZE
+	_battle_layer.z_index = 2
+	design_root.add_child(_battle_layer)
 
 	_player_strip = GamePlayerStrip.new()
-	_player_strip.set_anchors_preset(Control.PRESET_CENTER_TOP)
-	_player_strip.offset_left = -460.0
-	_player_strip.offset_top = 130.0
-	_player_strip.offset_right = 460.0
-	_player_strip.offset_bottom = 262.0
+	_player_strip.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	_player_strip.offset_left = 80.0
+	_player_strip.offset_top = 520.0
+	_player_strip.offset_right = 1000.0
+	_player_strip.offset_bottom = 652.0
 	_battle_layer.add_child(_player_strip)
 
 	_syllable_card = GameSyllableCard.new()
-	_syllable_card.set_anchors_preset(Control.PRESET_CENTER)
-	_syllable_card.offset_left = -440.0
-	_syllable_card.offset_top = -220.0
-	_syllable_card.offset_right = 440.0
-	_syllable_card.offset_bottom = 120.0
+	_syllable_card.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	_syllable_card.offset_left = 100.0
+	_syllable_card.offset_top = 720.0
+	_syllable_card.offset_right = 980.0
+	_syllable_card.offset_bottom = 1060.0
 	_battle_layer.add_child(_syllable_card)
 
 	_action_hints = GameActionHints.new()
 	_action_hints.game_events = game_events
-	_action_hints.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-	_action_hints.offset_left = -460.0
-	_action_hints.offset_top = -420.0
-	_action_hints.offset_right = 460.0
-	_action_hints.offset_bottom = -300.0
+	_action_hints.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	_action_hints.offset_left = 80.0
+	_action_hints.offset_top = 1120.0
+	_action_hints.offset_right = 1000.0
+	_action_hints.offset_bottom = 1240.0
 	_battle_layer.add_child(_action_hints)
 
 	_countdown_label = Label.new()
-	_countdown_label.set_anchors_preset(Control.PRESET_CENTER)
-	_countdown_label.offset_left = -160.0
-	_countdown_label.offset_top = -160.0
-	_countdown_label.offset_right = 160.0
-	_countdown_label.offset_bottom = 160.0
+	_countdown_label.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	_countdown_label.offset_left = 380.0
+	_countdown_label.offset_top = 760.0
+	_countdown_label.offset_right = 700.0
+	_countdown_label.offset_bottom = 1080.0
 	_countdown_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_countdown_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_countdown_label.add_theme_font_size_override("font_size", 140)
 	_countdown_label.add_theme_color_override("font_color", TurnOrderArrowsLayer.ACCENT)
-	_countdown_label.add_theme_color_override("font_outline_color", Color(1, 0.99, 0.97, 0.9))
-	_countdown_label.add_theme_constant_override("outline_size", 8)
-	add_child(_countdown_label)
+	_countdown_label.add_theme_color_override("font_outline_color", Color(0.08, 0.05, 0.03, 0.95))
+	_countdown_label.add_theme_constant_override("outline_size", 10)
+	_countdown_label.z_index = 3
+	design_root.add_child(_countdown_label)
 
-	_build_explosion_overlay()
+	_build_explosion_overlay(design_root)
 
 
-func _build_explosion_overlay() -> void:
+func _build_explosion_overlay(design_root: Control) -> void:
 	_explosion_panel = PanelContainer.new()
-	_explosion_panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_explosion_panel.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	_explosion_panel.size = DESIGN_SIZE
 	_explosion_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.08, 0.03, 0.02, 0.55)
+	style.bg_color = Color(0.06, 0.03, 0.02, 0.62)
 	_explosion_panel.add_theme_stylebox_override("panel", style)
-	add_child(_explosion_panel)
+	_explosion_panel.z_index = 4
+	design_root.add_child(_explosion_panel)
 
 	var center := CenterContainer.new()
 	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -108,7 +135,9 @@ func _build_explosion_overlay() -> void:
 	_explosion_title = Label.new()
 	_explosion_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_explosion_title.add_theme_font_size_override("font_size", 72)
-	_explosion_title.add_theme_color_override("font_color", Color(1, 0.92, 0.86, 1))
+	_explosion_title.add_theme_color_override("font_color", Color(1, 0.94, 0.88, 1))
+	_explosion_title.add_theme_color_override("font_outline_color", Color(0.08, 0.04, 0.02, 0.9))
+	_explosion_title.add_theme_constant_override("outline_size", 6)
 	col.add_child(_explosion_title)
 
 	_explosion_subtitle = Label.new()
@@ -241,11 +270,11 @@ func _show_result() -> void:
 		return
 	result_panel.visible = true
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(1, 0.98, 0.95, 0.97)
+	style.bg_color = Color(0.08, 0.06, 0.05, 0.88)
 	result_panel.add_theme_stylebox_override("panel", style)
 	var lines: PackedStringArray = PackedStringArray()
 	var sorted := game_manager.session.get_sorted_results()
 	for i in sorted.size():
 		var player: GamePlayer = sorted[i]
 		lines.append("%d. %s — %d" % [i + 1, player.info.name, player.score])
-	result_label.text = "[center][font_size=52][color=#5C4033]Результаты[/color][/font_size]\n[font_size=38]%s[/font_size]\n\n[font_size=28][color=#8B6914]Нажми, чтобы вернуться в меню[/color][/font_size][/center]" % "\n".join(lines)
+	result_label.text = "[center][font_size=52][color=#F5E6D3]Результаты[/color][/font_size]\n[font_size=38][color=#FFF8F0]%s[/color][/font_size]\n\n[font_size=28][color=#E8A04A]Нажми, чтобы вернуться в меню[/color][/font_size][/center]" % "\n".join(lines)

@@ -6,7 +6,7 @@ const DEFAULT_GAME_CONFIG := preload("res://src/common/game_config_default.tres"
 @export var game_events: GameEvents
 @export var main_events: MainEvents
 @export var game_config: GameConfig
-@export var start_round_button: Button
+@export var start_round_button: BaseButton
 
 var listener: EventListener = EventListener.new()
 var touch_start_position: Vector2 = Vector2.ZERO

@@ -30,7 +30,9 @@ func _ready() -> void:
 	_tap_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_tap_label.text = "Нажми экран — передать ход →"
 	_tap_label.add_theme_font_size_override("font_size", 26)
-	_tap_label.add_theme_color_override("font_color", Color(0.22, 0.16, 0.12, 0.92))
+	_tap_label.add_theme_color_override("font_color", Color(0.96, 0.9, 0.82, 0.95))
+	_tap_label.add_theme_color_override("font_outline_color", Color(0.05, 0.03, 0.02, 0.7))
+	_tap_label.add_theme_constant_override("outline_size", 2)
 	col.add_child(_tap_label)
 
 	_swipe_label = Label.new()
@@ -62,10 +64,10 @@ func _apply_prev_blocked(blocked: bool) -> void:
 		return
 	if blocked:
 		_swipe_label.text = "Свайп назад ← (уже использован)"
-		_swipe_label.add_theme_color_override("font_color", Color(0.35, 0.3, 0.28, 0.45))
+		_swipe_label.add_theme_color_override("font_color", Color(0.75, 0.68, 0.6, 0.45))
 	else:
 		_swipe_label.text = "Свайп назад ← (1 раз за раунд)"
-		_swipe_label.add_theme_color_override("font_color", ACCENT.lightened(0.1))
+		_swipe_label.add_theme_color_override("font_color", ACCENT.lightened(0.18))
 
 
 func _on_tap_next() -> void:

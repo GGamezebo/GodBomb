@@ -39,12 +39,12 @@ func _ready() -> void:
 	_turn_label = Label.new()
 	_turn_label.text = "Сейчас ходит"
 	_turn_label.add_theme_font_size_override("font_size", 22)
-	_turn_label.add_theme_color_override("font_color", TurnOrderArrowsLayer.ACCENT)
+	_turn_label.add_theme_color_override("font_color", TurnOrderArrowsLayer.ACCENT.lightened(0.08))
 	text_col.add_child(_turn_label)
 
 	_name_label = Label.new()
 	_name_label.add_theme_font_size_override("font_size", 44)
-	_name_label.add_theme_color_override("font_color", Color(0.18, 0.13, 0.1, 1))
+	_name_label.add_theme_color_override("font_color", Color(0.98, 0.94, 0.88, 1))
 	_name_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	text_col.add_child(_name_label)
 
@@ -80,11 +80,11 @@ func pulse_choice_tick() -> void:
 
 func _apply_panel_style() -> void:
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(1, 0.99, 0.96, 0.94)
-	style.border_color = Color(0.88, 0.62, 0.38, 0.55)
+	style.bg_color = Color(0.1, 0.07, 0.05, 0.82)
+	style.border_color = Color(0.92, 0.52, 0.14, 0.75)
 	style.set_border_width_all(2)
 	style.set_corner_radius_all(22)
-	style.shadow_color = Color(0.14, 0.08, 0.04, 0.16)
-	style.shadow_size = 8
+	style.shadow_color = Color(0, 0, 0, 0.35)
+	style.shadow_size = 10
 	style.shadow_offset = Vector2(0, 4)
 	add_theme_stylebox_override("panel", style)

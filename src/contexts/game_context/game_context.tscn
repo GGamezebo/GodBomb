@@ -15,19 +15,16 @@
 [ext_resource type="Resource" path="res://src/contexts/main_context/account/pdata_account.tres" id="13"]
 [ext_resource type="Resource" path="res://src/contexts/main_context/main_events.tres" id="14"]
 [ext_resource type="Resource" path="res://src/common/game_events.tres" id="15"]
-[ext_resource type="Texture2D" uid="uid://behk4ukivinm2" path="res://assets/textures/Bomb/cartoonBomb1.png" id="16"]
 [ext_resource type="AudioStream" uid="uid://d1y4xnkqph511" path="res://assets/audio/sfx/Countdown.wav" id="17"]
 [ext_resource type="AudioStream" path="res://assets/audio/music/game_sound.mp3" id="18"]
 [ext_resource type="AudioStream" uid="uid://h2poc2nqkyng" path="res://assets/audio/sfx/Explosion.mp3" id="19"]
 [ext_resource type="AudioStream" uid="uid://dqfhupfbmeido" path="res://assets/audio/sfx/SlowTick.mp3" id="20"]
 [ext_resource type="AudioStream" uid="uid://7yrpfgssj2v0" path="res://assets/audio/sfx/FastTick.mp3" id="21"]
-[ext_resource type="Script" uid="uid://cutnc1vmh5hyj" path="res://src/features/bomb/bomb_visual.gd" id="22"]
-[ext_resource type="Script" uid="uid://c2c616jwcqchy" path="res://src/features/background/game_background.gd" id="23"]
 [ext_resource type="Script" uid="uid://d26o15jgt3s4y" path="res://src/features/explosion/explosion_effect.gd" id="24"]
 [ext_resource type="Script" uid="uid://qjkbatpnhuo" path="res://core/systems/haptics/haptics_manager.gd" id="25"]
-[ext_resource type="Texture2D" uid="uid://00ax7ojqa8q" path="res://assets/textures/Background/background_stone.jpg" id="26"]
-[ext_resource type="Texture2D" uid="uid://cxjdfc1pny7t5" path="res://assets/textures/Background/background_lava.jpg" id="27"]
-[ext_resource type="Texture2D" uid="uid://cn3ppodscucwj" path="res://assets/textures/Background/background_mask.png" id="28"]
+[ext_resource type="Texture2D" uid="uid://de4n5e1fxki8i" path="res://assets/textures/Background/Background.png" id="26"]
+[ext_resource type="Script" path="res://src/features/background/game_bomb_background.gd" id="27"]
+[ext_resource type="Texture2D" uid="uid://b27y0jjb7mmmy" path="res://assets/party_kitchen/buttons/start_active.svg" id="28"]
 
 [node name="GameContext" type="Control" unique_id=1610270397 node_paths=PackedStringArray("game_manager")]
 layout_mode = 3
@@ -42,61 +39,6 @@ account = ExtResource("13")
 main_events = ExtResource("14")
 game_events = ExtResource("15")
 game_manager = NodePath("GameManager")
-
-[node name="GameArea" type="Control" parent="." unique_id=443250207]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="Background" type="Node2D" parent="GameArea" unique_id=1327014356 node_paths=PackedStringArray("stone_layer", "lava_layer", "mask_layer")]
-position = Vector2(540, 960)
-script = ExtResource("23")
-game_events = ExtResource("15")
-stone_layer = NodePath("Stone")
-lava_layer = NodePath("Lava")
-mask_layer = NodePath("Mask")
-
-[node name="Stone" type="Sprite2D" parent="GameArea/Background" unique_id=1347014571]
-texture = ExtResource("26")
-
-[node name="Lava" type="Sprite2D" parent="GameArea/Background" unique_id=963230193]
-texture = ExtResource("27")
-
-[node name="Mask" type="Sprite2D" parent="GameArea/Background" unique_id=166656985]
-texture = ExtResource("28")
-
-[node name="BombRoot" type="Node2D" parent="GameArea" unique_id=45212818 node_paths=PackedStringArray("bomb_sprite")]
-position = Vector2(540, 1780)
-script = ExtResource("22")
-game_events = ExtResource("15")
-bomb_sprite = NodePath("BombSprite")
-
-[node name="BombSprite" type="Sprite2D" parent="GameArea/BombRoot" unique_id=1882068123]
-scale = Vector2(0.52, 0.52)
-texture = ExtResource("16")
-
-[node name="ExplosionEffect" type="Node2D" parent="GameArea" unique_id=1230183710 node_paths=PackedStringArray("particles")]
-position = Vector2(540, 1780)
-script = ExtResource("24")
-game_events = ExtResource("15")
-particles = NodePath("Particles")
-
-[node name="Particles" type="CPUParticles2D" parent="GameArea/ExplosionEffect" unique_id=1757993458]
-emitting = false
-amount = 48
-lifetime = 0.8
-one_shot = true
-explosiveness = 0.95
-spread = 180.0
-gravity = Vector2(0, 280)
-initial_velocity_min = 180.0
-initial_velocity_max = 420.0
-scale_amount_min = 2.0
-scale_amount_max = 6.0
-color = Color(1, 0.45, 0.15, 1)
 
 [node name="GameManager" type="Node" parent="." unique_id=2103439218]
 script = ExtResource("2")
@@ -133,6 +75,72 @@ tick_streams = Array[AudioStream]([ExtResource("20"), ExtResource("21")])
 
 [node name="UI" type="CanvasLayer" parent="." unique_id=1341470968]
 
+[node name="BackgroundBomb" type="TextureRect" parent="UI" unique_id=226861383 node_paths=PackedStringArray("scaled_content")]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("26")
+expand_mode = 1
+stretch_mode = 6
+script = ExtResource("27")
+game_events = ExtResource("15")
+scaled_content = NodePath("ScaledContent")
+
+[node name="ScaledContent" type="Control" parent="UI/BackgroundBomb" unique_id=628158409]
+anchors_preset = 0
+offset_right = 1080.0
+offset_bottom = 1920.0
+mouse_filter = 2
+
+[node name="ExplosionEffect" type="Node2D" parent="UI/BackgroundBomb/ScaledContent" unique_id=1230183710 node_paths=PackedStringArray("particles")]
+z_index = 6
+position = Vector2(540, 1050)
+script = ExtResource("24")
+game_events = ExtResource("15")
+particles = NodePath("Particles")
+
+[node name="Particles" type="CPUParticles2D" parent="UI/BackgroundBomb/ScaledContent/ExplosionEffect" unique_id=1757993458]
+emitting = false
+amount = 48
+lifetime = 0.8
+one_shot = true
+explosiveness = 0.95
+spread = 180.0
+gravity = Vector2(0, 280)
+initial_velocity_min = 180.0
+initial_velocity_max = 420.0
+scale_amount_min = 2.0
+scale_amount_max = 6.0
+color = Color(1, 0.45, 0.15, 1)
+
+[node name="StartRoundButton" type="TextureButton" parent="UI/BackgroundBomb/ScaledContent" unique_id=1748637859]
+visible = false
+z_index = 5
+layout_mode = 0
+offset_left = 325.0
+offset_top = 1388.0
+offset_right = 765.0
+offset_bottom = 1508.0
+texture_normal = ExtResource("28")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="StartLabel" type="Label" parent="UI/BackgroundBomb/ScaledContent/StartRoundButton" unique_id=129669063]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 42
+text = "Начать раунд"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="HUD" type="Control" parent="UI" unique_id=2094817371 node_paths=PackedStringArray("game_manager", "result_panel", "result_label")]
 layout_mode = 3
 anchors_preset = 15
@@ -161,20 +169,6 @@ bbcode_enabled = true
 fit_content = true
 horizontal_alignment = 1
 
-[node name="StartRoundButton" type="Button" parent="UI" unique_id=1748637859]
-visible = false
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -280.0
-offset_top = -220.0
-offset_right = 280.0
-offset_bottom = -120.0
-theme_override_font_sizes/font_size = 32
-text = "Начать раунд"
-
 [node name="InputLayer" type="Control" parent="UI" unique_id=784988468 node_paths=PackedStringArray("game_manager", "start_round_button")]
 layout_mode = 3
 anchors_preset = 15
@@ -185,4 +179,4 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("10")
 game_manager = NodePath("../../GameManager")
-start_round_button = NodePath("../StartRoundButton")
+start_round_button = NodePath("../BackgroundBomb/ScaledContent/StartRoundButton")

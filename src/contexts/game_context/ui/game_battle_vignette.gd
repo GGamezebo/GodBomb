@@ -16,7 +16,6 @@ var _explosion_active: bool = false
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	z_index = -1
 	if not game_events:
 		game_events = load("res://src/common/game_events.tres") as GameEvents
 	if game_events:

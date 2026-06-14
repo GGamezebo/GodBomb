@@ -22,7 +22,6 @@ extends Control
 @export var chair_size: Vector2 = Vector2(100, 100)
 @export var chair_facing_offset: float = -PI * 0.5
 
-const BOMB_TEXTURE_PATH := "res://assets/textures/Bomb/cartoonBomb1.png"
 const SWAP_HINT_MIN_PLAYERS := 3
 const HINT_SWAP_IDLE := "Перетащи на другое место — поменяетесь"
 const HINT_SWAP_DRAG := "Отпусти — поменяетесь местами"
@@ -44,7 +43,6 @@ var _dragging_icon: PlayerIcon
 var _highlighted_chair_index: int = -1
 var _start_pulse_tween: Tween
 var _add_pulse_tween: Tween
-var _start_bomb_preview: TextureRect
 var _is_start_preview_playing: bool = false
 var _turn_order_arrows: TurnOrderArrowsLayer
 var _order_badges_layer: Control
@@ -62,7 +60,6 @@ var listener: EventListener = EventListener.new()
 func _ready() -> void:
 	_setup_turn_order_arrows()
 	_setup_order_badges()
-	_setup_start_bomb_preview()
 	_setup_remove_button_ring()
 	_setup_swap_hints()
 	if add_player_button:
@@ -130,22 +127,6 @@ func _exit_tree() -> void:
 	_kill_start_pulse_tween()
 	_kill_add_pulse_tween()
 	listener.deinit()
-
-
-func _setup_start_bomb_preview() -> void:
-	if not table_area:
-		return
-	_start_bomb_preview = TextureRect.new()
-	_start_bomb_preview.visible = false
-	_start_bomb_preview.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_start_bomb_preview.z_index = 4
-	_start_bomb_preview.custom_minimum_size = Vector2(96, 96)
-	_start_bomb_preview.size = Vector2(96, 96)
-	_start_bomb_preview.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	_start_bomb_preview.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	_start_bomb_preview.texture = load(BOMB_TEXTURE_PATH)
-	_start_bomb_preview.pivot_offset = Vector2(48, 48)
-	table_area.add_child(_start_bomb_preview)
 
 
 func _setup_remove_button_ring() -> void:
@@ -939,29 +920,14 @@ func _play_swap_whoosh(icon_a: PlayerIcon, icon_b: PlayerIcon, index_a: int, ind
 func play_start_preview(on_complete: Callable) -> void:
 	if _is_start_preview_playing:
 		return
-	if not _start_bomb_preview or not table_area:
-		on_complete.call()
-		return
 
 	_is_start_preview_playing = true
-	var center := table_area.size * 0.5
-	_start_bomb_preview.position = center - Vector2(48, 48)
-	_start_bomb_preview.scale = Vector2.ZERO
-	_start_bomb_preview.modulate = Color.WHITE
-	_start_bomb_preview.visible = true
+	if _turn_order_arrows:
+		_turn_order_arrows.play_start_pulse()
 
 	var tween := create_tween()
-	tween.tween_property(_start_bomb_preview, "scale", Vector2(1.12, 1.12), 0.18).set_trans(Tween.TRANS_BACK)
-	tween.tween_property(_start_bomb_preview, "scale", Vector2.ONE, 0.12).set_trans(Tween.TRANS_SINE)
-	tween.tween_callback(func() -> void:
-		if _turn_order_arrows:
-			_turn_order_arrows.play_start_pulse()
-	)
 	tween.tween_interval(0.45)
-	tween.tween_property(_start_bomb_preview, "modulate:a", 0.0, 0.15)
 	tween.tween_callback(func() -> void:
-		_start_bomb_preview.visible = false
-		_start_bomb_preview.modulate = Color.WHITE
 		_is_start_preview_playing = false
 		on_complete.call()
 	)
