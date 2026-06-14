@@ -19,6 +19,8 @@ extends Control
 @export var remove_player_texture: Texture2D
 @export var min_players_for_remove: int = 1
 @export var table_radius_coeff: float = 0.45
+@export var chair_size: Vector2 = Vector2(80, 80)
+@export var chair_facing_offset: float = -PI * 0.5
 
 var _player_icons: Array[PlayerIcon] = []
 var _chairs: Array[TextureRect] = []
@@ -53,7 +55,7 @@ func _load_from_account() -> void:
 		_create_player_icon(info)
 	if preset_storage:
 		preset_storage.rebuild_locks(account.get_players())
-	_update_positions()
+	_schedule_position_update()
 	_update_add_button()
 	_update_start_button()
 
@@ -80,28 +82,56 @@ func _create_player_icon(info: PlayerInfo) -> PlayerIcon:
 	chair.texture = load("res://assets/sprites/Chair.png")
 	chair.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	chair.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	chair.custom_minimum_size = Vector2(80, 80)
+	chair.custom_minimum_size = chair_size
+	chair.size = chair_size
+	chair.pivot_offset = chair_size * 0.5
 	chair.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	chairs_layer.add_child(chair)
 	_chairs.append(chair)
+
 	return icon
+
+
+func _schedule_position_update() -> void:
+	if is_inside_tree():
+		call_deferred("_update_positions")
+
+
+func _seat_local_for_index(index: int, player_count: int) -> Vector2:
+	var center := table_area.size * 0.5
+	var radius := minf(table_area.size.x, table_area.size.y) * table_radius_coeff
+	var angle := -index * TAU / player_count
+	return center + Vector2(cos(angle), sin(angle)) * radius
+
+
+func _chair_rotation_for_seat(seat_local: Vector2) -> float:
+	var to_center := table_area.size * 0.5 - seat_local
+	if to_center.length_squared() < 0.001:
+		return 0.0
+	return to_center.angle() + chair_facing_offset
+
+
+func _apply_chair_transform(chair: TextureRect, seat_local: Vector2) -> void:
+	chair.custom_minimum_size = chair_size
+	chair.size = chair_size
+	chair.pivot_offset = chair_size * 0.5
+	chair.rotation = _chair_rotation_for_seat(seat_local)
+	chair.position = seat_local - chair_size * 0.5
 
 
 func _update_positions() -> void:
 	if _player_icons.is_empty() or not table_area:
 		return
+	if _chairs.size() != _player_icons.size():
+		return
 
-	var center := table_area.global_position + table_area.size * 0.5
-	var radius := minf(table_area.size.x, table_area.size.y) * table_radius_coeff
-	var angle_step := TAU / _player_icons.size()
+	var player_count := _player_icons.size()
 
-	for i in _player_icons.size():
-		var angle := -i * angle_step
-		var pos := center + Vector2(cos(angle), sin(angle)) * radius
-		_player_icons[i].reset_home_position(pos)
-		if i < _chairs.size():
-			_chairs[i].global_position = pos - _chairs[i].size * 0.5
-			_chairs[i].rotation = angle - PI * 0.5
+	for i in player_count:
+		var seat_local := _seat_local_for_index(i, player_count)
+		var seat_global := table_area.global_position + seat_local
+		_apply_chair_transform(_chairs[i], seat_local)
+		_player_icons[i].reset_home_position(seat_global, true)
 
 
 func _update_add_button() -> void:
@@ -186,7 +216,7 @@ func _on_player_added_from_window(player_name: String, preset_id: int) -> void:
 	players.append(account.dict_from_player_info(info))
 	account.set_players(players)
 	_create_player_icon(info)
-	_update_positions()
+	_schedule_position_update()
 	if preset_storage:
 		preset_storage.rebuild_locks(players)
 	menu_events.ev_player_added.emit(info)
@@ -227,7 +257,7 @@ func _remove_player(icon: PlayerIcon) -> void:
 		var player_info := account.player_info_from_dict(players[i])
 		_player_icons[i].set_player_data(player_info, i)
 
-	_update_positions()
+	_schedule_position_update()
 	if preset_storage:
 		preset_storage.rebuild_locks(players)
 	menu_events.ev_player_removed.emit(info, index)
@@ -251,17 +281,11 @@ func _swap_players(icon_a: PlayerIcon, icon_b: PlayerIcon) -> void:
 	players[index_b] = temp_entry
 	account.set_players(players)
 
-	var home_a := icon_a.home_position
-	icon_a.home_position = icon_b.home_position
-	icon_b.home_position = home_a
-	icon_a.reset_home_position(icon_a.home_position)
-	icon_b.reset_home_position(icon_b.home_position)
-
 	if preset_storage:
 		preset_storage.rebuild_locks(players)
 	menu_events.ev_player_swapped.emit(index_a, index_b)
 	_save_account()
-	_update_positions()
+	_schedule_position_update()
 
 
 func _rect_overlaps(icon: PlayerIcon, button: Control) -> bool:
@@ -275,4 +299,4 @@ func _save_account() -> void:
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_RESIZED:
-		_update_positions()
+		_schedule_position_update()

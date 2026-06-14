@@ -25,6 +25,11 @@ var _hold_timer: float = 0.0
 var _holding: bool = false
 var _drag_state: DragState = DragState.NONE
 var _move_tween: Tween
+var _seat_offset: Vector2 = Vector2.ZERO
+
+
+func _ready() -> void:
+	call_deferred("refresh_seat_offset")
 
 
 func set_player_data(info: PlayerInfo, index: int) -> void:
@@ -35,10 +40,39 @@ func set_player_data(info: PlayerInfo, index: int) -> void:
 		slime_rect.texture = load("res://assets/slimes/%d.png" % info.preset_id)
 
 
-func reset_home_position(center: Vector2) -> void:
-	home_position = center
-	if not _dragging and _drag_state == DragState.NONE:
-		global_position = center - size * 0.5
+func refresh_seat_offset() -> void:
+	_seat_offset = _compute_seat_offset()
+
+
+func _compute_seat_offset() -> Vector2:
+	if slime_rect:
+		return slime_rect.global_position + slime_rect.size * 0.5 - global_position
+	return size * 0.5
+
+
+func _position_for_seat(seat_center: Vector2) -> Vector2:
+	return seat_center - _seat_offset
+
+
+func _apply_home_position() -> void:
+	if not is_inside_tree():
+		return
+	refresh_seat_offset()
+	global_position = _position_for_seat(home_position)
+
+
+func reset_home_position(seat_center: Vector2, force: bool = false) -> void:
+	home_position = seat_center
+	if force:
+		if _move_tween:
+			_move_tween.kill()
+			_move_tween = null
+		_dragging = false
+		_holding = false
+		_drag_state = DragState.NONE
+		z_index = 0
+	if force or (not _dragging and _drag_state == DragState.NONE):
+		call_deferred("_apply_home_position")
 
 
 func get_world_rect() -> Rect2:
@@ -50,7 +84,7 @@ func overlaps_icon(other: PlayerIcon) -> bool:
 
 
 func get_home_rect() -> Rect2:
-	return Rect2(home_position - size * 0.5, size)
+	return Rect2(_position_for_seat(home_position), size)
 
 
 func set_drag_state(state: DragState) -> void:
@@ -113,7 +147,7 @@ func _end_drag() -> void:
 
 
 func _check_hold_cancel() -> void:
-	if global_position.distance_to(home_position - size * 0.5) > 8.0:
+	if global_position.distance_to(_position_for_seat(home_position)) > 8.0:
 		_holding = false
 
 
@@ -121,13 +155,13 @@ func _animate_to_target() -> void:
 	if _move_tween:
 		_move_tween.kill()
 	_move_tween = create_tween()
-	var target := home_position - size * 0.5
+	var target := _position_for_seat(home_position)
 	if _drag_state == DragState.SWAPPING and swap_target:
-		target = swap_target.home_position - size * 0.5
+		target = _position_for_seat(swap_target.home_position)
 	_move_tween.tween_property(self, "global_position", target, 0.2).set_trans(Tween.TRANS_QUAD)
 	_move_tween.finished.connect(func() -> void:
 		if _drag_state == DragState.SWAPPING:
-			global_position = home_position - size * 0.5
+			global_position = _position_for_seat(home_position)
 		_drag_state = DragState.NONE
 		swap_target = null
 	)

@@ -1,17 +1,17 @@
-[gd_scene load_steps=11 format=3 uid="uid://player_selection_widget_godbomb"]
+[gd_scene format=3 uid="uid://duug5w0r0cqrv"]
 
-[ext_resource type="Script" path="res://src/features/player_selection/player_selection_widget.gd" id="1"]
-[ext_resource type="Script" path="res://src/features/player_selection/player_preset_storage.gd" id="2"]
+[ext_resource type="Script" uid="uid://bjj4g3ci1tbso" path="res://src/features/player_selection/player_selection_widget.gd" id="1"]
+[ext_resource type="Script" uid="uid://dj5ppmnmqwair" path="res://src/features/player_selection/player_preset_storage.gd" id="2"]
 [ext_resource type="PackedScene" path="res://src/features/player_selection/player_icon.tscn" id="3"]
 [ext_resource type="PackedScene" path="res://src/features/player_selection/edit_player_window.tscn" id="4"]
 [ext_resource type="Resource" path="res://src/common/game_config_default.tres" id="5"]
 [ext_resource type="Resource" path="res://src/contexts/main_context/account/pdata_account.tres" id="6"]
 [ext_resource type="Resource" path="res://src/common/menu_events.tres" id="7"]
-[ext_resource type="Texture2D" path="res://assets/sprites/AddPlayer.png" id="8"]
-[ext_resource type="Texture2D" path="res://assets/sprites/RemovePlayer.png" id="9"]
-[ext_resource type="Texture2D" path="res://assets/sprites/EditPlayerModelWindow/Table.png" id="10"]
+[ext_resource type="Texture2D" uid="uid://ddv23yhjs6cba" path="res://assets/sprites/AddPlayer.png" id="8"]
+[ext_resource type="Texture2D" uid="uid://caca5t1ugblkb" path="res://assets/sprites/RemovePlayer.png" id="9"]
+[ext_resource type="Texture2D" uid="uid://bdbql2pbvktyp" path="res://assets/sprites/EditPlayerModelWindow/Table.png" id="10"]
 
-[node name="PlayerSelectionWidget" type="Control" node_paths=PackedStringArray("table_area", "icons_layer", "chairs_layer", "add_player_button", "edit_player_window", "preset_storage")]
+[node name="PlayerSelectionWidget" type="Control" unique_id=282943105 node_paths=PackedStringArray("preset_storage", "table_area", "icons_layer", "chairs_layer", "add_player_button", "edit_player_window")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -22,17 +22,17 @@ script = ExtResource("1")
 account = ExtResource("6")
 game_config = ExtResource("5")
 menu_events = ExtResource("7")
+preset_storage = NodePath("PresetStorage")
 player_icon_scene = ExtResource("3")
+table_area = NodePath("TableArea")
+icons_layer = NodePath("TableArea/IconsLayer")
+chairs_layer = NodePath("TableArea/ChairsLayer")
+add_player_button = NodePath("TableArea/AddPlayerButton")
+edit_player_window = NodePath("EditPlayerWindow")
 add_player_texture = ExtResource("8")
 remove_player_texture = ExtResource("9")
-table_area = NodePath("TableArea")
-icons_layer = NodePath("IconsLayer")
-chairs_layer = NodePath("ChairsLayer")
-add_player_button = NodePath("AddPlayerButton")
-edit_player_window = NodePath("EditPlayerWindow")
-preset_storage = NodePath("PresetStorage")
 
-[node name="TableArea" type="Control" parent="."]
+[node name="TableArea" type="Control" parent="." unique_id=1947324374]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -43,55 +43,67 @@ offset_left = -320.0
 offset_top = -320.0
 offset_right = 320.0
 offset_bottom = 320.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="Table" type="TextureRect" parent="TableArea"]
+[node name="Table" type="TextureRect" parent="TableArea" unique_id=1694545373]
+z_index = 0
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 texture = ExtResource("10")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="IconsLayer" type="Control" parent="."]
+[node name="ChairsLayer" type="Control" parent="TableArea" unique_id=1921242137]
+z_index = 1
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 
-[node name="ChairsLayer" type="Control" parent="."]
+[node name="IconsLayer" type="Control" parent="TableArea" unique_id=1930959323]
+z_index = 2
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 
-[node name="AddPlayerButton" type="TextureButton" parent="."]
+[node name="AddPlayerButton" type="TextureButton" parent="TableArea" unique_id=300689132]
+z_index = 3
 layout_mode = 1
-anchors_preset = 7
+anchors_preset = 8
 anchor_left = 0.5
-anchor_top = 1.0
+anchor_top = 0.5
 anchor_right = 0.5
-anchor_bottom = 1.0
+anchor_bottom = 0.5
 offset_left = -72.0
-offset_top = -760.0
+offset_top = -72.0
 offset_right = 72.0
-offset_bottom = -616.0
+offset_bottom = 72.0
+grow_horizontal = 2
+grow_vertical = 2
 texture_normal = ExtResource("8")
 ignore_texture_size = true
 stretch_mode = 5
 
-[node name="PresetStorage" type="Node" parent="."]
+[node name="PresetStorage" type="Node" parent="." unique_id=1088746652]
 script = ExtResource("2")
 game_config = ExtResource("5")
 menu_events = ExtResource("7")
 
-[node name="EditPlayerWindow" parent="." instance=ExtResource("4")]
+[node name="EditPlayerWindow" parent="." unique_id=1947908710 instance=ExtResource("4")]
+visible = false
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 preset_storage = NodePath("../PresetStorage")
