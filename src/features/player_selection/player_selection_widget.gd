@@ -33,6 +33,7 @@ const HINT_BANNER_PAD_ABOVE_TABLE := 10.0
 const TOP_BAR_BOTTOM_FALLBACK := 160.0
 const BADGE_GAP_AFTER_ARROWS := 16.0
 const BADGE_MIN_FROM_SEAT := 72.0
+const DRAG_ORDER_ALPHA := 0.75
 
 var _player_icons: Array[PlayerIcon] = []
 var _chairs: Array[TextureRect] = []
@@ -254,6 +255,14 @@ func _center_button_radius() -> float:
 	if add_player_button:
 		button_radius = maxf(add_player_button.size.x, add_player_button.size.y) * 0.5
 	return button_radius
+
+
+func _set_order_markers_drag_dimmed(dimmed: bool) -> void:
+	var alpha := DRAG_ORDER_ALPHA if dimmed else 1.0
+	if _turn_order_arrows:
+		_turn_order_arrows.set_drag_alpha(alpha)
+	if _order_badges_layer:
+		_order_badges_layer.modulate = Color(1, 1, 1, alpha)
 
 
 func _seat_badge_local_for_index(index: int, player_count: int) -> Vector2:
@@ -478,8 +487,7 @@ func _on_icon_drag_started(icon: PlayerIcon) -> void:
 	_set_remove_mode(true)
 	_dismiss_swap_idle_hint()
 	_refresh_table_hint()
-	if _turn_order_arrows:
-		_turn_order_arrows.set_dimmed(true)
+	_set_order_markers_drag_dimmed(true)
 	for other in _player_icons:
 		if other != icon:
 			other.swap_target = null
@@ -599,9 +607,8 @@ func _on_icon_drag_ended(icon: PlayerIcon) -> void:
 	_set_remove_mode(false)
 	_remove_hint_active = false
 	_swap_drag_hint_active = false
-	if _turn_order_arrows:
-		_turn_order_arrows.set_dimmed(false)
-		_refresh_turn_order()
+	_set_order_markers_drag_dimmed(false)
+	_refresh_turn_order()
 	_clear_chair_highlights()
 
 	if add_player_button and _rect_overlaps(icon, add_player_button) and icon == _dragging_icon:

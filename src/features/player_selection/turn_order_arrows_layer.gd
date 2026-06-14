@@ -1,21 +1,26 @@
 class_name TurnOrderArrowsLayer
 extends Control
 
+const ACCENT := Color(0.96, 0.28, 0.05, 1.0)
 const SEGMENTS := 28
 const RING_MARGIN := 42.0
 const GAP_ANGLE := 0.42
-const STROKE := 5.0
-const HIGHLIGHT_STROKE := 2.0
+const STROKE := 6.0
+const HEAD_LENGTH := 20.0
+const HEAD_WIDTH := 14.0
+const TAIL_LENGTH := 7.0
+const TAIL_WIDTH := 5.0
 
 var _table_size: Vector2 = Vector2.ZERO
 var _center_button_radius: float = 72.0
-var _alpha_scale: float = 0.4
+var _alpha_scale: float = 1.0
 var _pulse_boost: float = 1.0
-var _dimmed: bool = false
+var _drag_alpha: float = 1.0
+var _show_arrows: bool = false
 
 
 static func min_clearance_radius(center_button_radius: float) -> float:
-	return center_button_radius + RING_MARGIN + STROKE + 3.0
+	return center_button_radius + RING_MARGIN + STROKE + 4.0
 
 
 func _ready() -> void:
@@ -31,18 +36,21 @@ func update_state(
 ) -> void:
 	_table_size = table_size
 	_center_button_radius = center_button_radius
-	_alpha_scale = 0.85 if can_start else 0.45
+	_alpha_scale = 1.0 if can_start else 0.85
 	_pulse_boost = 1.0
-	visible = show and not _dimmed
+	_show_arrows = show
+	visible = show
 	queue_redraw()
 
 
 func set_dimmed(dimmed: bool) -> void:
-	_dimmed = dimmed
-	if _dimmed:
-		visible = false
-	else:
-		queue_redraw()
+	set_drag_alpha(0.75 if dimmed else 1.0)
+
+
+func set_drag_alpha(alpha: float) -> void:
+	_drag_alpha = clampf(alpha, 0.0, 1.0)
+	visible = _show_arrows
+	queue_redraw()
 
 
 func play_start_pulse() -> void:
@@ -65,45 +73,41 @@ func _draw() -> void:
 
 	var center := _table_size * 0.5
 	var radius := (_center_button_radius + RING_MARGIN) * _pulse_boost
-	var alpha := clampf(_alpha_scale * _pulse_boost, 0.0, 1.0)
-	var shadow := Color(0.12, 0.08, 0.06, alpha * 0.16)
-	var track := Color(0.72, 0.68, 0.64, alpha * 0.55)
-	var main := Color(0.94, 0.52, 0.3, alpha) if alpha > 0.55 else Color(0.58, 0.55, 0.52, alpha)
-	var shine := Color(1.0, 0.78, 0.55, alpha * 0.95)
+	var alpha := clampf(_alpha_scale * _pulse_boost * _drag_alpha, 0.0, 1.0)
+	var color := Color(ACCENT.r, ACCENT.g, ACCENT.b, ACCENT.a * alpha)
 
-	# Two symmetric clockwise chevrons around the center button; gaps at bottom.
 	var arc_span := (TAU - GAP_ANGLE * 2.0) * 0.5
 	var arc_a_start := PI * 0.5 + GAP_ANGLE
 	var arc_a_end := arc_a_start + arc_span
 	var arc_b_start := arc_a_end + GAP_ANGLE
 	var arc_b_end := arc_b_start + arc_span
 
-	_draw_modern_arc(center, radius + 2.0, arc_a_start, arc_a_end, shadow, STROKE + 2.0, false)
-	_draw_modern_arc(center, radius + 2.0, arc_b_start, arc_b_end, shadow, STROKE + 2.0, false)
-	_draw_modern_arc(center, radius, arc_a_start, arc_a_end, track, STROKE + 1.0, false)
-	_draw_modern_arc(center, radius, arc_b_start, arc_b_end, track, STROKE + 1.0, false)
-	_draw_modern_arc(center, radius, arc_a_start, arc_a_end, main, STROKE, true)
-	_draw_modern_arc(center, radius, arc_b_start, arc_b_end, main, STROKE, true)
-	_draw_modern_arc(center, radius - 1.5, arc_a_start, arc_a_end, shine, HIGHLIGHT_STROKE, false)
-	_draw_modern_arc(center, radius - 1.5, arc_b_start, arc_b_end, shine, HIGHLIGHT_STROKE, false)
+	_draw_arrow_arc(center, radius, arc_a_start, arc_a_end, color, STROKE)
+	_draw_arrow_arc(center, radius, arc_b_start, arc_b_end, color, STROKE)
 
 
-func _draw_modern_arc(
+func _draw_arrow_arc(
 	center: Vector2,
 	radius: float,
 	angle_from: float,
 	angle_to: float,
 	color: Color,
-	width: float,
-	with_head: bool
+	width: float
 ) -> void:
 	var points := _arc_points(center, radius, angle_from, angle_to)
 	if points.size() < 2:
 		return
+
+	var forward_start := (points[1] - points[0]).normalized()
+	var forward_end := (points[-1] - points[-2]).normalized()
+	var head_trim := HEAD_LENGTH * 0.55
+	var tail_trim := TAIL_LENGTH * 0.55
+	points[0] = points[0] + forward_start * tail_trim
+	points[-1] = points[-1] - forward_end * head_trim
+
 	draw_polyline(points, color, width, true)
-	if with_head:
-		var tip_dir := (points[-1] - points[-2]).normalized()
-		_draw_chevron_head(points[-1], tip_dir, color, width)
+	_draw_sharp_tip(points[-1], forward_end, color, HEAD_LENGTH, HEAD_WIDTH)
+	_draw_sharp_tip(points[0], -forward_start, color, TAIL_LENGTH, TAIL_WIDTH)
 
 
 func _arc_points(center: Vector2, radius: float, angle_from: float, angle_to: float) -> PackedVector2Array:
@@ -116,13 +120,17 @@ func _arc_points(center: Vector2, radius: float, angle_from: float, angle_to: fl
 	return points
 
 
-func _draw_chevron_head(tip: Vector2, direction: Vector2, color: Color, width: float) -> void:
+func _draw_sharp_tip(tip: Vector2, direction: Vector2, color: Color, tip_length: float, tip_width: float) -> void:
 	if direction.length_squared() < 0.001:
 		return
-	var size := 10.0 + width * 1.6
-	var depth := 14.0 + width * 1.2
+	direction = direction.normalized()
 	var ortho := direction.orthogonal()
-	var base := tip - direction * depth
-	var wing := ortho * size
-	var notch := base - direction * (depth * 0.42)
-	draw_colored_polygon(PackedVector2Array([tip, base + wing, notch, base - wing]), color)
+	var base := tip - direction * tip_length
+	draw_colored_polygon(
+		PackedVector2Array([
+			tip,
+			base + ortho * tip_width * 0.5,
+			base - ortho * tip_width * 0.5,
+		]),
+		color
+	)
