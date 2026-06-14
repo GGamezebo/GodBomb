@@ -6,13 +6,14 @@
 [ext_resource type="PackedScene" uid="uid://duug5w0r0cqrv" path="res://src/features/player_selection/player_selection_widget.tscn" id="4"]
 [ext_resource type="Texture2D" uid="uid://b27y0jjb7mmmy" path="res://assets/party_kitchen/buttons/start_active.svg" id="5"]
 
-[node name="BattlePlayerLobbyOverlay" type="CanvasLayer" node_paths=PackedStringArray("background_color", "background_bomb", "player_selection_widget", "done_button")]
+[node name="BattlePlayerLobbyOverlay" type="CanvasLayer" node_paths=PackedStringArray("background_color", "layout_host", "bomb_art", "player_selection_widget", "done_button")]
 layer = 12
 script = ExtResource("1")
 background_color = NodePath("Root/BackgroundColor")
-background_bomb = NodePath("Root/BackgroundBomb")
-player_selection_widget = NodePath("Root/BackgroundBomb/ScaledContent/PlayerSelectionWidget")
-done_button = NodePath("Root/BackgroundBomb/ScaledContent/DoneButton")
+layout_host = NodePath("Root/LayoutHost")
+bomb_art = NodePath("Root/LayoutHost/BombArt")
+player_selection_widget = NodePath("Root/LayoutHost/ScaledContent/PlayerSelectionWidget")
+done_button = NodePath("Root/LayoutHost/ScaledContent/DoneButton")
 
 [node name="Root" type="Control" parent="."]
 layout_mode = 3
@@ -33,7 +34,7 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(0.06, 0.05, 0.04, 1)
 
-[node name="BackgroundBomb" type="TextureRect" parent="Root" node_paths=PackedStringArray("scaled_content")]
+[node name="LayoutHost" type="TextureRect" parent="Root" node_paths=PackedStringArray("scaled_content")]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -41,26 +42,35 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-texture = ExtResource("2")
 expand_mode = 1
 stretch_mode = 6
 script = ExtResource("3")
 scaled_content = NodePath("ScaledContent")
 hint_marker = NodePath("ScaledContent/Marker2D")
 
-[node name="ScaledContent" type="Control" parent="Root/BackgroundBomb"]
+[node name="BombArt" type="TextureRect" parent="Root/LayoutHost"]
+z_index = -1
+layout_mode = 0
+offset_right = 1080.0
+offset_bottom = 1920.0
+mouse_filter = 2
+texture = ExtResource("2")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ScaledContent" type="Control" parent="Root/LayoutHost"]
 anchors_preset = 0
 offset_right = 1080.0
 offset_bottom = 1920.0
 mouse_filter = 0
 
-[node name="Marker2D" type="Marker2D" parent="Root/BackgroundBomb/ScaledContent"]
+[node name="Marker2D" type="Marker2D" parent="Root/LayoutHost/ScaledContent"]
 position = Vector2(528, 483)
 
-[node name="PlayerSelectionWidget" parent="Root/BackgroundBomb/ScaledContent" instance=ExtResource("4")]
+[node name="PlayerSelectionWidget" parent="Root/LayoutHost/ScaledContent" instance=ExtResource("4")]
 layout_mode = 1
 
-[node name="DoneButton" type="TextureButton" parent="Root/BackgroundBomb/ScaledContent"]
+[node name="DoneButton" type="TextureButton" parent="Root/LayoutHost/ScaledContent"]
 z_index = 4
 layout_mode = 0
 offset_left = 325.0
@@ -71,7 +81,7 @@ texture_normal = ExtResource("5")
 ignore_texture_size = true
 stretch_mode = 5
 
-[node name="DoneLabel" type="Label" parent="Root/BackgroundBomb/ScaledContent/DoneButton"]
+[node name="DoneLabel" type="Label" parent="Root/LayoutHost/ScaledContent/DoneButton"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0

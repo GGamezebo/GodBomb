@@ -5,7 +5,7 @@ signal closed
 
 const NEUTRAL_BG := Color(0.06, 0.05, 0.04, 1.0)
 const LOBBY_BLUR_SHADER := preload("res://assets/shaders/bomb_background_blur.gdshader")
-const LOBBY_BLUR_STRENGTH := 1.25
+const LOBBY_BLUR_RADIUS := 14.0
 
 @export var game_manager: GameManager
 @export var game_config: GameConfig
@@ -13,7 +13,8 @@ const LOBBY_BLUR_STRENGTH := 1.25
 @export var account: PDataAccount
 @export var pdata_controller: Node
 @export var background_color: ColorRect
-@export var background_bomb: TextureRect
+@export var layout_host: MenuBombLayout
+@export var bomb_art: TextureRect
 @export var player_selection_widget: PlayerSelectionWidget
 @export var done_button: TextureButton
 
@@ -26,6 +27,7 @@ func _ready() -> void:
 	layer = 12
 	visible = false
 	_setup_blur_material()
+	_connect_layout()
 	if done_button:
 		done_button.pressed.connect(_on_done_pressed)
 	if player_selection_widget:
@@ -55,6 +57,7 @@ func open() -> void:
 		background_color.color = NEUTRAL_BG
 	if player_selection_widget:
 		player_selection_widget.reload_from_account()
+	_sync_bomb_art_layout()
 	_set_bomb_blur(true)
 	visible = true
 
@@ -68,16 +71,40 @@ func close_overlay() -> void:
 	closed.emit()
 
 
+func _connect_layout() -> void:
+	if layout_host and not layout_host.layout_applied.is_connected(_sync_bomb_art_layout):
+		layout_host.layout_applied.connect(_sync_bomb_art_layout)
+	call_deferred("_sync_bomb_art_layout")
+
+
+func _sync_bomb_art_layout() -> void:
+	if not bomb_art or not layout_host:
+		return
+	var scale_factor := layout_host.get_cover_scale()
+	var scaled_size := MenuBombLayout.DESIGN_SIZE * scale_factor
+	var offset := (layout_host.size - scaled_size) * 0.5
+	bomb_art.scale = Vector2.ONE * scale_factor
+	bomb_art.position = offset
+	bomb_art.size = MenuBombLayout.DESIGN_SIZE
+
+
 func _setup_blur_material() -> void:
 	_blur_material = ShaderMaterial.new()
 	_blur_material.shader = LOBBY_BLUR_SHADER
-	_blur_material.set_shader_parameter("blur_strength", LOBBY_BLUR_STRENGTH)
+	_blur_material.set_shader_parameter("blur_radius", LOBBY_BLUR_RADIUS)
+	if bomb_art and bomb_art.texture:
+		_blur_material.set_shader_parameter("source_tex", bomb_art.texture)
 
 
 func _set_bomb_blur(enabled: bool) -> void:
-	if not background_bomb:
+	if not bomb_art:
 		return
-	background_bomb.material = _blur_material if enabled else null
+	if enabled:
+		if bomb_art.texture and _blur_material:
+			_blur_material.set_shader_parameter("source_tex", bomb_art.texture)
+		bomb_art.material = _blur_material
+	else:
+		bomb_art.material = null
 
 
 func _bind_widget_account() -> void:
