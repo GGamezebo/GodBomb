@@ -6,7 +6,7 @@
 [ext_resource type="Resource" path="res://src/contexts/main_context/account/pdata_account.tres" id="4"]
 [ext_resource type="Resource" path="res://src/contexts/main_context/main_events.tres" id="6"]
 [ext_resource type="PackedScene" uid="uid://wcp2ufiuf4an" path="res://src/contexts/menu_context/menu_context.tscn" id="7"]
-[ext_resource type="AudioStream" uid="uid://dv8uia21j7gcl" path="res://assets/audio/music/Myuu - Metamorphosis.mp3" id="8"]
+[ext_resource type="AudioStream" uid="uid://dv8uia21j7gcl" path="res://assets/audio/music/background.mp3" id="8"]
 [ext_resource type="Script" uid="uid://buwrgl58owt40" path="res://src/contexts/main_context/audio/game_audio_controller.gd" id="10"]
 
 [node name="MainContext" type="Node" unique_id=2117372034 node_paths=PackedStringArray("current_context")]
@@ -28,7 +28,6 @@ account_default = ExtResource("4")
 [node name="MusicPlayer" type="AudioStreamPlayer" parent="." unique_id=1437474602]
 stream = ExtResource("8")
 volume_db = -8.0
-autoplay = true
 bus = &"Music"
 
 [node name="GameAudio" type="Node" parent="." unique_id=190100249]

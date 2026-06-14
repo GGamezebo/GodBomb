@@ -1,35 +1,35 @@
-[gd_scene load_steps=28 format=3 uid="uid://game_context_godbomb"]
+[gd_scene format=3 uid="uid://oblfn13f4k2n"]
 
-[ext_resource type="Script" path="res://src/contexts/game_context/game_context.gd" id="1"]
-[ext_resource type="Script" path="res://src/contexts/game_context/game_logic/game_manager/game_manager.gd" id="2"]
-[ext_resource type="Script" path="res://src/contexts/game_context/game_logic/game_manager/game_states/player_choice_state.gd" id="3"]
-[ext_resource type="Script" path="res://src/contexts/game_context/game_logic/game_manager/game_states/ready_to_start_state.gd" id="4"]
-[ext_resource type="Script" path="res://src/contexts/game_context/game_logic/game_manager/game_states/countdown_state.gd" id="5"]
-[ext_resource type="Script" path="res://src/contexts/game_context/game_logic/game_manager/game_states/play_state.gd" id="6"]
-[ext_resource type="Script" path="res://src/contexts/game_context/game_logic/game_manager/game_states/explosion_state.gd" id="7"]
-[ext_resource type="Script" path="res://src/contexts/game_context/game_logic/game_manager/game_states/result_state.gd" id="8"]
-[ext_resource type="Script" path="res://src/contexts/game_context/ui/game_hud.gd" id="9"]
-[ext_resource type="Script" path="res://src/contexts/game_context/ui/game_input.gd" id="10"]
-[ext_resource type="Script" path="res://src/contexts/game_context/audio/game_sound.gd" id="11"]
+[ext_resource type="Script" uid="uid://d3whf8cfpsahw" path="res://src/contexts/game_context/game_context.gd" id="1"]
+[ext_resource type="Script" uid="uid://d1s4eh88b3pck" path="res://src/contexts/game_context/game_logic/game_manager/game_manager.gd" id="2"]
+[ext_resource type="Script" uid="uid://qn1cmfh1o26g" path="res://src/contexts/game_context/game_logic/game_manager/game_states/player_choice_state.gd" id="3"]
+[ext_resource type="Script" uid="uid://dlkrxdpd41iq2" path="res://src/contexts/game_context/game_logic/game_manager/game_states/ready_to_start_state.gd" id="4"]
+[ext_resource type="Script" uid="uid://c4xi0oschjukw" path="res://src/contexts/game_context/game_logic/game_manager/game_states/countdown_state.gd" id="5"]
+[ext_resource type="Script" uid="uid://cnv3bx0ttyixa" path="res://src/contexts/game_context/game_logic/game_manager/game_states/play_state.gd" id="6"]
+[ext_resource type="Script" uid="uid://4srknm4lm8r3" path="res://src/contexts/game_context/game_logic/game_manager/game_states/explosion_state.gd" id="7"]
+[ext_resource type="Script" uid="uid://ctlmhyclsjy5t" path="res://src/contexts/game_context/game_logic/game_manager/game_states/result_state.gd" id="8"]
+[ext_resource type="Script" uid="uid://41hmhua8b10j" path="res://src/contexts/game_context/ui/game_hud.gd" id="9"]
+[ext_resource type="Script" uid="uid://6uxprqata65" path="res://src/contexts/game_context/ui/game_input.gd" id="10"]
+[ext_resource type="Script" uid="uid://b7le7cc7w0n13" path="res://src/contexts/game_context/audio/game_sound.gd" id="11"]
 [ext_resource type="Resource" path="res://src/common/game_config_default.tres" id="12"]
 [ext_resource type="Resource" path="res://src/contexts/main_context/account/pdata_account.tres" id="13"]
 [ext_resource type="Resource" path="res://src/contexts/main_context/main_events.tres" id="14"]
 [ext_resource type="Resource" path="res://src/common/game_events.tres" id="15"]
-[ext_resource type="Texture2D" path="res://assets/textures/Bomb/cartoonBomb1.png" id="16"]
-[ext_resource type="AudioStream" path="res://assets/audio/sfx/Countdown.wav" id="17"]
-[ext_resource type="AudioStream" path="res://assets/audio/sfx/Play.mp3" id="18"]
-[ext_resource type="AudioStream" path="res://assets/audio/sfx/Explosion.mp3" id="19"]
-[ext_resource type="AudioStream" path="res://assets/audio/sfx/Tick1.mp3" id="20"]
-[ext_resource type="AudioStream" path="res://assets/audio/sfx/Tick2.mp3" id="21"]
-[ext_resource type="Script" path="res://src/features/bomb/bomb_visual.gd" id="22"]
-[ext_resource type="Script" path="res://src/features/background/game_background.gd" id="23"]
-[ext_resource type="Script" path="res://src/features/explosion/explosion_effect.gd" id="24"]
-[ext_resource type="Script" path="res://core/systems/haptics/haptics_manager.gd" id="25"]
-[ext_resource type="Texture2D" path="res://assets/textures/Background/background_stone.jpg" id="26"]
-[ext_resource type="Texture2D" path="res://assets/textures/Background/background_lava.jpg" id="27"]
-[ext_resource type="Texture2D" path="res://assets/textures/Background/background_mask.png" id="28"]
+[ext_resource type="Texture2D" uid="uid://behk4ukivinm2" path="res://assets/textures/Bomb/cartoonBomb1.png" id="16"]
+[ext_resource type="AudioStream" uid="uid://d1y4xnkqph511" path="res://assets/audio/sfx/Countdown.wav" id="17"]
+[ext_resource type="AudioStream" path="res://assets/audio/music/game_sound.mp3" id="18"]
+[ext_resource type="AudioStream" uid="uid://h2poc2nqkyng" path="res://assets/audio/sfx/Explosion.mp3" id="19"]
+[ext_resource type="AudioStream" uid="uid://dqfhupfbmeido" path="res://assets/audio/sfx/SlowTick.mp3" id="20"]
+[ext_resource type="AudioStream" uid="uid://7yrpfgssj2v0" path="res://assets/audio/sfx/FastTick.mp3" id="21"]
+[ext_resource type="Script" uid="uid://cutnc1vmh5hyj" path="res://src/features/bomb/bomb_visual.gd" id="22"]
+[ext_resource type="Script" uid="uid://c2c616jwcqchy" path="res://src/features/background/game_background.gd" id="23"]
+[ext_resource type="Script" uid="uid://d26o15jgt3s4y" path="res://src/features/explosion/explosion_effect.gd" id="24"]
+[ext_resource type="Script" uid="uid://qjkbatpnhuo" path="res://core/systems/haptics/haptics_manager.gd" id="25"]
+[ext_resource type="Texture2D" uid="uid://00ax7ojqa8q" path="res://assets/textures/Background/background_stone.jpg" id="26"]
+[ext_resource type="Texture2D" uid="uid://cxjdfc1pny7t5" path="res://assets/textures/Background/background_lava.jpg" id="27"]
+[ext_resource type="Texture2D" uid="uid://cn3ppodscucwj" path="res://assets/textures/Background/background_mask.png" id="28"]
 
-[node name="GameContext" type="Control" node_paths=PackedStringArray("game_manager")]
+[node name="GameContext" type="Control" unique_id=1610270397 node_paths=PackedStringArray("game_manager")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -43,13 +43,15 @@ main_events = ExtResource("14")
 game_events = ExtResource("15")
 game_manager = NodePath("GameManager")
 
-[node name="GameArea" type="Control" parent="."]
+[node name="GameArea" type="Control" parent="." unique_id=443250207]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="Background" type="Node2D" parent="GameArea" node_paths=PackedStringArray("stone_layer", "lava_layer", "mask_layer")]
+[node name="Background" type="Node2D" parent="GameArea" unique_id=1327014356 node_paths=PackedStringArray("stone_layer", "lava_layer", "mask_layer")]
 position = Vector2(540, 960)
 script = ExtResource("23")
 game_events = ExtResource("15")
@@ -57,32 +59,32 @@ stone_layer = NodePath("Stone")
 lava_layer = NodePath("Lava")
 mask_layer = NodePath("Mask")
 
-[node name="Stone" type="Sprite2D" parent="GameArea/Background"]
+[node name="Stone" type="Sprite2D" parent="GameArea/Background" unique_id=1347014571]
 texture = ExtResource("26")
 
-[node name="Lava" type="Sprite2D" parent="GameArea/Background"]
+[node name="Lava" type="Sprite2D" parent="GameArea/Background" unique_id=963230193]
 texture = ExtResource("27")
 
-[node name="Mask" type="Sprite2D" parent="GameArea/Background"]
+[node name="Mask" type="Sprite2D" parent="GameArea/Background" unique_id=166656985]
 texture = ExtResource("28")
 
-[node name="BombRoot" type="Node2D" parent="GameArea" node_paths=PackedStringArray("bomb_sprite")]
+[node name="BombRoot" type="Node2D" parent="GameArea" unique_id=45212818 node_paths=PackedStringArray("bomb_sprite")]
 position = Vector2(540, 1780)
 script = ExtResource("22")
 game_events = ExtResource("15")
 bomb_sprite = NodePath("BombSprite")
 
-[node name="BombSprite" type="Sprite2D" parent="GameArea/BombRoot"]
+[node name="BombSprite" type="Sprite2D" parent="GameArea/BombRoot" unique_id=1882068123]
 scale = Vector2(0.52, 0.52)
 texture = ExtResource("16")
 
-[node name="ExplosionEffect" type="Node2D" parent="GameArea" node_paths=PackedStringArray("particles")]
+[node name="ExplosionEffect" type="Node2D" parent="GameArea" unique_id=1230183710 node_paths=PackedStringArray("particles")]
 position = Vector2(540, 1780)
 script = ExtResource("24")
 game_events = ExtResource("15")
 particles = NodePath("Particles")
 
-[node name="Particles" type="CPUParticles2D" parent="GameArea/ExplosionEffect"]
+[node name="Particles" type="CPUParticles2D" parent="GameArea/ExplosionEffect" unique_id=1757993458]
 emitting = false
 amount = 48
 lifetime = 0.8
@@ -96,43 +98,42 @@ scale_amount_min = 2.0
 scale_amount_max = 6.0
 color = Color(1, 0.45, 0.15, 1)
 
-[node name="GameManager" type="Node" parent="." node_paths=PackedStringArray("game_events")]
+[node name="GameManager" type="Node" parent="." unique_id=2103439218]
 script = ExtResource("2")
-game_events = ExtResource("15")
 
-[node name="PlayerChoiceState" type="Node" parent="GameManager"]
+[node name="PlayerChoiceState" type="Node" parent="GameManager" unique_id=1469560953]
 script = ExtResource("3")
 
-[node name="ReadyToStartState" type="Node" parent="GameManager"]
+[node name="ReadyToStartState" type="Node" parent="GameManager" unique_id=1106557268]
 script = ExtResource("4")
 
-[node name="CountdownState" type="Node" parent="GameManager"]
+[node name="CountdownState" type="Node" parent="GameManager" unique_id=486142510]
 script = ExtResource("5")
 
-[node name="PlayState" type="Node" parent="GameManager"]
+[node name="PlayState" type="Node" parent="GameManager" unique_id=1073636327]
 script = ExtResource("6")
 
-[node name="ExplosionState" type="Node" parent="GameManager"]
+[node name="ExplosionState" type="Node" parent="GameManager" unique_id=1879540108]
 script = ExtResource("7")
 
-[node name="ResultState" type="Node" parent="GameManager"]
+[node name="ResultState" type="Node" parent="GameManager" unique_id=652645902]
 script = ExtResource("8")
 
-[node name="HapticsManager" type="Node" parent="."]
+[node name="HapticsManager" type="Node" parent="." unique_id=1545768573]
 script = ExtResource("25")
 game_events = ExtResource("15")
 
-[node name="GameSound" type="Node" parent="." node_paths=PackedStringArray("game_events")]
+[node name="GameSound" type="Node" parent="." unique_id=960212167]
 script = ExtResource("11")
 game_events = ExtResource("15")
 countdown_stream = ExtResource("17")
-play_stream = ExtResource("18")
+round_music_stream = ExtResource("18")
 explosion_stream = ExtResource("19")
-tick_streams = [ExtResource("20"), ExtResource("21")]
+tick_streams = Array[AudioStream]([ExtResource("20"), ExtResource("21")])
 
-[node name="UI" type="CanvasLayer" parent="."]
+[node name="UI" type="CanvasLayer" parent="." unique_id=1341470968]
 
-[node name="HUD" type="Control" parent="UI" node_paths=PackedStringArray("game_manager", "game_events", "result_panel", "result_label")]
+[node name="HUD" type="Control" parent="UI" unique_id=2094817371 node_paths=PackedStringArray("game_manager", "result_panel", "result_label")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -142,24 +143,26 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("9")
 game_manager = NodePath("../../GameManager")
-game_events = ExtResource("15")
 result_panel = NodePath("ResultPanel")
 result_label = NodePath("ResultPanel/ResultLabel")
 
-[node name="ResultPanel" type="PanelContainer" parent="UI/HUD"]
+[node name="ResultPanel" type="PanelContainer" parent="UI/HUD" unique_id=930996598]
 visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="ResultLabel" type="RichTextLabel" parent="UI/HUD/ResultPanel"]
+[node name="ResultLabel" type="RichTextLabel" parent="UI/HUD/ResultPanel" unique_id=1837425222]
 layout_mode = 2
 bbcode_enabled = true
 fit_content = true
 horizontal_alignment = 1
 
-[node name="StartRoundButton" type="Button" parent="UI"]
+[node name="StartRoundButton" type="Button" parent="UI" unique_id=1748637859]
+visible = false
 anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0
@@ -170,10 +173,9 @@ offset_top = -220.0
 offset_right = 280.0
 offset_bottom = -120.0
 theme_override_font_sizes/font_size = 32
-visible = false
 text = "Начать раунд"
 
-[node name="InputLayer" type="Control" parent="UI" node_paths=PackedStringArray("game_manager", "game_events", "main_events", "game_config", "start_round_button")]
+[node name="InputLayer" type="Control" parent="UI" unique_id=784988468 node_paths=PackedStringArray("game_manager", "start_round_button")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -183,7 +185,4 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("10")
 game_manager = NodePath("../../GameManager")
-game_events = ExtResource("15")
-main_events = ExtResource("14")
-game_config = ExtResource("12")
 start_round_button = NodePath("../StartRoundButton")

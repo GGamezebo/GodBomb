@@ -17,6 +17,7 @@ var listener: EventListener = EventListener.new()
 
 
 @onready var _pdata_controller: Node = $Account/PersistentDataController
+@onready var _game_audio: GameAudioController = $GameAudio
 
 
 func _ready() -> void:
@@ -26,6 +27,8 @@ func _ready() -> void:
 	var menu_context: IContext = current_context as IContext
 	if menu_context:
 		menu_context.initialize(_session_data())
+
+	call_deferred("_apply_context_music", true)
 
 
 func _session_data() -> Dictionary:
@@ -41,6 +44,7 @@ func _exit_tree() -> void:
 
 
 func _on_start_game(data: Dictionary) -> void:
+	_apply_context_music(false)
 	data.merge(_session_data())
 	switch_game_context(game_context_path, true, data)
 
@@ -113,9 +117,19 @@ func _on_loading_complete(scene: PackedScene, data: Dictionary) -> void:
 	current_context = scene.instantiate()
 	current_context.initialize(data)
 	add_child(current_context)
+	_apply_context_music(target_path == menu_context_path)
 
 	if current_loading_screen:
 		current_loading_screen.fade_out()
+
+
+func _apply_context_music(in_menu: bool) -> void:
+	if _game_audio:
+		_game_audio.set_in_battle(not in_menu)
+
+
+func _get_audio_controller() -> GameAudioController:
+	return _game_audio
 
 
 func _update_progress(progress: float) -> void:

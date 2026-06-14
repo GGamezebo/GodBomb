@@ -9,19 +9,36 @@ const SFX_BUS := &"SFX"
 @export var music_player: AudioStreamPlayer
 @export var account: PDataAccount
 
+var _in_battle: bool = false
+
 
 func _ready() -> void:
 	add_to_group(GROUP)
+	if not music_player:
+		music_player = get_node_or_null("../MusicPlayer") as AudioStreamPlayer
+	_prepare_music_stream()
 	if account:
 		account.changed.connect(_apply_from_account)
 	_apply_from_account()
 
 
+func set_in_battle(in_battle: bool) -> void:
+	_in_battle = in_battle
+	_sync_music_player()
+
+
+func _prepare_music_stream() -> void:
+	if not music_player or not music_player.stream:
+		return
+	if music_player.stream is AudioStreamMP3:
+		(music_player.stream as AudioStreamMP3).loop = true
+	elif music_player.stream is AudioStreamOggVorbis:
+		(music_player.stream as AudioStreamOggVorbis).loop = true
+
+
 func _apply_from_account() -> void:
 	if not account:
 		return
-	if music_player:
-		music_player.volume_db = 0.0
 	_apply_bus(MUSIC_BUS, account.get_music_volume(), account.get_music_enabled())
 	_apply_bus(SFX_BUS, account.get_sfx_volume(), true)
 	_sync_music_player()
@@ -36,14 +53,18 @@ func _apply_bus(bus_name: StringName, linear_volume: float, enabled: bool) -> vo
 	AudioServer.set_bus_mute(bus_index, not enabled)
 
 
+func _can_play_menu_music() -> bool:
+	return not _in_battle and account.get_music_enabled()
+
+
 func _sync_music_player() -> void:
 	if not music_player or not account:
 		return
-	if account.get_music_enabled():
+	if _can_play_menu_music():
 		if not music_player.playing:
 			music_player.play()
 	else:
-		music_player.stream_paused = false
+		music_player.stop()
 
 
 func toggle_music() -> bool:
