@@ -21,6 +21,8 @@ var _color_buttons: Array[Button] = []
 
 func _ready() -> void:
 	visible = false
+	if get_parent() is CanvasLayer:
+		(get_parent() as CanvasLayer).visible = false
 	if ok_button:
 		ok_button.pressed.connect(_on_ok_pressed)
 	if apply_button:
@@ -29,6 +31,7 @@ func _ready() -> void:
 		cancel_button.pressed.connect(_on_cancel_pressed)
 	if name_edit:
 		name_edit.text_changed.connect(_on_name_changed)
+		name_edit.text_submitted.connect(_on_name_submitted)
 	_build_color_buttons()
 
 
@@ -56,11 +59,33 @@ func open_edit_window(index: int, player_name: String, preset_id: int) -> void:
 
 func _show_window(player_name: String) -> void:
 	visible = true
+	z_index = 1
+	if get_parent() is CanvasLayer:
+		(get_parent() as CanvasLayer).visible = true
 	if name_edit:
 		name_edit.text = player_name
 		name_edit.grab_focus()
 	_update_color_availability()
 	_on_name_changed(player_name)
+
+
+func _input(event: InputEvent) -> void:
+	if not visible:
+		return
+	if event is InputEventKey:
+		var key_event := event as InputEventKey
+		if not key_event.pressed or key_event.echo:
+			return
+		if key_event.keycode == KEY_ESCAPE:
+			_on_cancel_pressed()
+			get_viewport().set_input_as_handled()
+		elif key_event.keycode in [KEY_ENTER, KEY_KP_ENTER]:
+			if _try_confirm():
+				get_viewport().set_input_as_handled()
+
+
+func _on_name_submitted(_text: String) -> void:
+	_try_confirm()
 
 
 func _build_color_buttons() -> void:
@@ -112,15 +137,34 @@ func _on_color_pressed(preset_id: int) -> void:
 
 
 func _on_name_changed(text: String) -> void:
+	var is_empty := text.strip_edges().is_empty()
 	if ok_button:
-		ok_button.disabled = text.strip_edges().is_empty()
+		ok_button.disabled = is_empty
+	if apply_button:
+		apply_button.disabled = is_empty
+
+
+func _try_confirm() -> bool:
+	if ok_button and ok_button.visible and not ok_button.disabled:
+		_on_ok_pressed()
+		return true
+	if apply_button and apply_button.visible and not apply_button.disabled:
+		_on_apply_pressed()
+		return true
+	return false
+
+
+func _close_window() -> void:
+	visible = false
+	if get_parent() is CanvasLayer:
+		(get_parent() as CanvasLayer).visible = false
 
 
 func _on_ok_pressed() -> void:
 	var player_name := name_edit.text.strip_edges() if name_edit else ""
 	if player_name.is_empty():
 		return
-	visible = false
+	_close_window()
 	player_added.emit(player_name, _selected_preset_id)
 
 
@@ -128,9 +172,9 @@ func _on_apply_pressed() -> void:
 	var player_name := name_edit.text.strip_edges() if name_edit else ""
 	if player_name.is_empty() or _player_index < 0:
 		return
-	visible = false
+	_close_window()
 	player_applied.emit(_player_index, player_name, _selected_preset_id)
 
 
 func _on_cancel_pressed() -> void:
-	visible = false
+	_close_window()
