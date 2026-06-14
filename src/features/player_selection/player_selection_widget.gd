@@ -23,9 +23,11 @@ extends Control
 @export var chair_facing_offset: float = -PI * 0.5
 
 const BOMB_TEXTURE_PATH := "res://assets/textures/Bomb/cartoonBomb1.png"
+const SWAP_HINT_MIN_PLAYERS := 3
 
 var _player_icons: Array[PlayerIcon] = []
 var _chairs: Array[TextureRect] = []
+var _chair_rings: Array[ChairSwapRing] = []
 var _is_remove_mode: bool = false
 var _dragging_icon: PlayerIcon
 var _highlighted_chair_index: int = -1
@@ -33,11 +35,16 @@ var _start_pulse_tween: Tween
 var _add_pulse_tween: Tween
 var _start_bomb_preview: TextureRect
 var _is_start_preview_playing: bool = false
+var _swap_arrows_layer: SwapArrowsLayer
+var _swap_idle_label: Label
+var _swap_drag_label: Label
+var _swap_flash_label: Label
 var listener: EventListener = EventListener.new()
 
 
 func _ready() -> void:
 	_setup_start_bomb_preview()
+	_setup_swap_hints()
 	if add_player_button:
 		add_player_button.pressed.connect(_on_add_player_button_pressed)
 	if edit_player_window:
@@ -76,10 +83,54 @@ func _setup_start_bomb_preview() -> void:
 	table_area.add_child(_start_bomb_preview)
 
 
+func _setup_swap_hints() -> void:
+	if not table_area:
+		return
+
+	_swap_arrows_layer = SwapArrowsLayer.new()
+	_swap_arrows_layer.z_index = 1
+	table_area.add_child(_swap_arrows_layer)
+
+	_swap_idle_label = _make_swap_label("Перетащи на другое место — поменяетесь")
+	_swap_idle_label.visible = false
+	table_area.add_child(_swap_idle_label)
+
+	_swap_drag_label = _make_swap_label("Отпусти — поменяетесь местами")
+	_swap_drag_label.visible = false
+	table_area.add_child(_swap_drag_label)
+
+	_swap_flash_label = Label.new()
+	_swap_flash_label.text = "↔"
+	_swap_flash_label.visible = false
+	_swap_flash_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_swap_flash_label.z_index = 5
+	_swap_flash_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_swap_flash_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_swap_flash_label.add_theme_font_size_override("font_size", 56)
+	_swap_flash_label.add_theme_color_override("font_color", Color(0.95, 0.65, 0.22, 1))
+	_swap_flash_label.custom_minimum_size = Vector2(64, 64)
+	_swap_flash_label.size = _swap_flash_label.custom_minimum_size
+	_swap_flash_label.pivot_offset = _swap_flash_label.size * 0.5
+	table_area.add_child(_swap_flash_label)
+
+
+func _make_swap_label(text: String) -> Label:
+	var label := Label.new()
+	label.text = text
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	label.add_theme_font_size_override("font_size", 20)
+	label.add_theme_color_override("font_color", Color(0.45, 0.32, 0.2, 0.95))
+	return label
+
+
 func reload_from_account() -> void:
 	_sync_edit_window_refs()
 	_clear_icons()
 	_load_from_account()
+	call_deferred("_play_swap_hint_intro_if_needed")
 
 
 func _load_from_account() -> void:
@@ -102,6 +153,7 @@ func _clear_icons() -> void:
 		chair.queue_free()
 	_player_icons.clear()
 	_chairs.clear()
+	_chair_rings.clear()
 
 
 func _create_player_icon(info: PlayerInfo) -> PlayerIcon:
@@ -124,6 +176,11 @@ func _create_player_icon(info: PlayerInfo) -> PlayerIcon:
 	chair.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	chairs_layer.add_child(chair)
 	_chairs.append(chair)
+
+	var ring := ChairSwapRing.new()
+	ring.position = chair_size * 0.5 - Vector2(ring.ring_radius, ring.ring_radius)
+	chair.add_child(ring)
+	_chair_rings.append(ring)
 
 	return icon
 
@@ -168,6 +225,68 @@ func _update_positions() -> void:
 		var seat_global := table_area.global_position + seat_local
 		_apply_chair_transform(_chairs[i], seat_local)
 		_player_icons[i].reset_home_position(seat_global, true)
+
+	_update_swap_hint_layout()
+	_refresh_swap_arrows()
+	_update_swap_idle_visibility()
+
+
+func _update_swap_hint_layout() -> void:
+	if not table_area:
+		return
+	var width := table_area.size.x - 32.0
+	if _swap_idle_label:
+		_swap_idle_label.position = Vector2(16, table_area.size.y - 52)
+		_swap_idle_label.size = Vector2(width, 40)
+	if _swap_drag_label:
+		_swap_drag_label.position = Vector2(16, 8)
+		_swap_drag_label.size = Vector2(width, 40)
+	if _swap_flash_label:
+		_swap_flash_label.position = table_area.size * 0.5 - _swap_flash_label.size * 0.5
+
+
+func _refresh_swap_arrows() -> void:
+	if not _swap_arrows_layer:
+		return
+	var seat_locals: Array[Vector2] = []
+	for i in _player_icons.size():
+		seat_locals.append(_seat_local_for_index(i, _player_icons.size()))
+	_swap_arrows_layer.update_seats(seat_locals)
+	_update_swap_idle_visibility()
+
+
+func _should_show_swap_hints() -> bool:
+	return account != null and account.should_show_swap_hints()
+
+
+func _update_swap_idle_visibility() -> void:
+	var show_idle := (
+		_player_icons.size() >= SWAP_HINT_MIN_PLAYERS
+		and _should_show_swap_hints()
+		and _dragging_icon == null
+	)
+	if _swap_idle_label:
+		_swap_idle_label.visible = show_idle
+	if _swap_arrows_layer:
+		_swap_arrows_layer.set_enabled(show_idle)
+
+
+func _play_swap_hint_intro_if_needed() -> void:
+	if not _should_show_swap_hints() or _player_icons.size() < SWAP_HINT_MIN_PLAYERS:
+		return
+	_update_swap_hint_layout()
+	_update_swap_idle_visibility()
+	if _swap_idle_label:
+		_swap_idle_label.modulate.a = 0.0
+		var label_tween := create_tween()
+		label_tween.tween_property(_swap_idle_label, "modulate:a", 1.0, 0.4)
+	if _swap_arrows_layer:
+		_swap_arrows_layer.play_intro()
+
+
+func _update_swap_drag_hint(show_hint: bool) -> void:
+	if _swap_drag_label:
+		_swap_drag_label.visible = show_hint
 
 
 func _update_add_button() -> void:
@@ -257,6 +376,9 @@ func _on_add_player_button_pressed() -> void:
 func _on_icon_drag_started(icon: PlayerIcon) -> void:
 	_dragging_icon = icon
 	_set_remove_mode(true)
+	_update_swap_idle_visibility()
+	if _swap_arrows_layer:
+		_swap_arrows_layer.set_enabled(false)
 	for other in _player_icons:
 		if other != icon:
 			other.swap_target = null
@@ -302,12 +424,15 @@ func _set_chair_highlight(index: int, enabled: bool) -> void:
 	var chair := _chairs[index]
 	chair.modulate = Color(1.2, 1.1, 0.72, 1) if enabled else Color.WHITE
 	chair.scale = Vector2(1.08, 1.08) if enabled else Vector2.ONE
+	if index < _chair_rings.size():
+		_chair_rings[index].visible_ring = enabled
 
 
 func _clear_chair_highlights() -> void:
 	for i in _chairs.size():
 		_set_chair_highlight(i, false)
 	_highlighted_chair_index = -1
+	_update_swap_drag_hint(false)
 
 
 func _update_swap_preview(dragging: PlayerIcon) -> void:
@@ -333,6 +458,8 @@ func _update_swap_preview(dragging: PlayerIcon) -> void:
 			_set_chair_highlight(overlap_index, true)
 			_highlighted_chair_index = overlap_index
 
+	_update_swap_drag_hint(overlap_index >= 0 and dragging.has_moved_for_swap())
+
 	for other in _player_icons:
 		if other == dragging:
 			continue
@@ -346,14 +473,16 @@ func _update_swap_preview(dragging: PlayerIcon) -> void:
 func _on_icon_drag_ended(icon: PlayerIcon) -> void:
 	_set_remove_mode(false)
 	_clear_chair_highlights()
+	_update_swap_idle_visibility()
 
 	if add_player_button and _rect_overlaps(icon, add_player_button) and icon == _dragging_icon:
 		_remove_player(icon)
 		_dragging_icon = null
 		return
 
+	var release_center := icon.get_release_slime_center()
 	for other in _player_icons:
-		if other != icon and icon.has_moved_for_swap() and icon.is_slime_over_seat(other, chair_size):
+		if other != icon and icon.has_moved_for_swap_at(release_center) and icon.is_slime_over_seat_at(other, chair_size, release_center):
 			for reset_icon in _player_icons:
 				if reset_icon != icon:
 					reset_icon.stop_motion()
@@ -428,6 +557,7 @@ func _remove_player(icon: PlayerIcon) -> void:
 	_chairs[index].queue_free()
 	_player_icons.remove_at(index)
 	_chairs.remove_at(index)
+	_chair_rings.remove_at(index)
 
 	for i in _player_icons.size():
 		var player_info := account.player_info_from_dict(players[i])
@@ -462,6 +592,8 @@ func _swap_players(icon_a: PlayerIcon, icon_b: PlayerIcon) -> void:
 	menu_events.ev_player_swapped.emit(index_a, index_b)
 	_save_account()
 	_play_swap_whoosh(icon_a, icon_b, index_a, index_b)
+	_play_swap_flash()
+	_update_swap_idle_visibility()
 	_update_start_button()
 
 
@@ -483,6 +615,23 @@ func _play_swap_whoosh(icon_a: PlayerIcon, icon_b: PlayerIcon, index_a: int, ind
 			continue
 		var seat_global := table_area.global_position + _seat_local_for_index(i, player_count)
 		_player_icons[i].reset_home_position(seat_global, true)
+
+
+func _play_swap_flash() -> void:
+	if not _swap_flash_label or not table_area:
+		return
+	_update_swap_hint_layout()
+	_swap_flash_label.visible = true
+	_swap_flash_label.modulate = Color(1, 1, 1, 1)
+	_swap_flash_label.scale = Vector2(0.6, 0.6)
+	var tween := create_tween()
+	tween.tween_property(_swap_flash_label, "scale", Vector2(1.25, 1.25), 0.12).set_trans(Tween.TRANS_BACK)
+	tween.parallel().tween_property(_swap_flash_label, "modulate:a", 0.0, 0.35)
+	tween.tween_callback(func() -> void:
+		_swap_flash_label.visible = false
+		_swap_flash_label.modulate = Color.WHITE
+		_swap_flash_label.scale = Vector2.ONE
+	)
 
 
 func play_start_preview(on_complete: Callable) -> void:

@@ -46,6 +46,10 @@ func _on_start_game(data: Dictionary) -> void:
 
 
 func _return_to_menu() -> void:
+	if account:
+		account.increment_games_played()
+	if _pdata_controller and _pdata_controller.has_method("save_account"):
+		_pdata_controller.save_account()
 	switch_game_context(menu_context_path, false, _session_data())
 
 

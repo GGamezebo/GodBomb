@@ -4,6 +4,7 @@ extends Resource
 const SAVE_PATH := "user://account.tres"
 const CURRENT_VERSION := 1
 const RECENT_NAMES_MAX := 12
+const SWAP_HINT_GAMES_MAX := 5
 
 const DEFAULT_FUNNY_NAMES: Array[String] = [
 	"Котлетка-O'Бомба",
@@ -70,6 +71,19 @@ func ensure_recent_names_initialized() -> void:
 	if stored == null or (stored is Array and stored.is_empty()):
 		data["recent_player_names"] = DEFAULT_FUNNY_NAMES.duplicate()
 		emit_changed()
+
+
+func get_games_played() -> int:
+	return maxi(0, int(data.get("games_played", 0)))
+
+
+func increment_games_played() -> void:
+	data["games_played"] = get_games_played() + 1
+	emit_changed()
+
+
+func should_show_swap_hints() -> bool:
+	return get_games_played() < SWAP_HINT_GAMES_MAX
 
 
 func player_info_from_dict(entry: Dictionary) -> PlayerInfo:

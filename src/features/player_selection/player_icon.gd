@@ -36,6 +36,7 @@ var _base_slime_scale: Vector2 = Vector2.ONE
 var _motion_tween: Tween
 var _edit_hint: Label
 var _last_drag_global: Vector2 = Vector2.ZERO
+var _release_slime_center: Vector2 = Vector2.ZERO
 
 
 func _ready() -> void:
@@ -177,11 +178,23 @@ func has_moved_for_swap() -> bool:
 	return get_slime_center_global().distance_to(home_position) >= swap_activation_distance
 
 
+func has_moved_for_swap_at(center: Vector2) -> bool:
+	return center.distance_to(home_position) >= swap_activation_distance
+
+
 func is_slime_over_seat(other: PlayerIcon, seat_size: Vector2) -> bool:
+	return is_slime_over_seat_at(other, seat_size, get_slime_center_global())
+
+
+func is_slime_over_seat_at(other: PlayerIcon, seat_size: Vector2, center: Vector2) -> bool:
 	if other == self:
 		return false
 	var seat_rect := Rect2(other.home_position - seat_size * 0.5, seat_size)
-	return seat_rect.has_point(get_slime_center_global())
+	return seat_rect.has_point(center)
+
+
+func get_release_slime_center() -> Vector2:
+	return _release_slime_center
 
 
 func set_drag_state(state: DragState) -> void:
@@ -300,18 +313,30 @@ func _begin_drag(global_point: Vector2) -> void:
 	_drag_offset = global_point - global_position
 	_last_drag_global = global_position
 	z_index = 10
+	_apply_drag_lift(true)
 	drag_started.emit()
 
 
 func _end_drag() -> void:
 	if not _dragging:
 		return
+	_release_slime_center = global_position + _compute_seat_offset()
 	_dragging = false
 	_holding = false
 	z_index = 0
+	_apply_drag_lift(false)
 	if _edit_hint:
 		_edit_hint.visible = false
 	drag_ended.emit()
+
+
+func _apply_drag_lift(active: bool) -> void:
+	if not slime_rect:
+		return
+	if active:
+		slime_rect.scale = _base_slime_scale * 1.08
+	elif _drag_state == DragState.NONE:
+		slime_rect.scale = _base_slime_scale
 
 
 func _apply_drag_motion(global_point: Vector2) -> void:
