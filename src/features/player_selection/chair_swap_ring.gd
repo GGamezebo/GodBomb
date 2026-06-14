@@ -1,8 +1,11 @@
 class_name ChairSwapRing
 extends Control
 
-@export var ring_radius: float = 52.0
-@export var ring_color: Color = Color(1.0, 0.82, 0.35, 0.95)
+const DEFAULT_RING_RADIUS := 52.0
+const DEFAULT_RING_COLOR := Color(1.0, 0.82, 0.35, 0.95)
+
+@export var ring_radius: float = DEFAULT_RING_RADIUS
+@export var ring_color: Color = DEFAULT_RING_COLOR
 @export var dash_count: int = 16
 
 var visible_ring: bool = false:
@@ -10,6 +13,19 @@ var visible_ring: bool = false:
 		visible_ring = value
 		visible = value
 		queue_redraw()
+
+
+static func radius_for_half_extent(half_extent: float, reference_half: float = 50.0) -> float:
+	if reference_half <= 0.0:
+		return DEFAULT_RING_RADIUS
+	return half_extent * (DEFAULT_RING_RADIUS / reference_half)
+
+
+func set_ring_radius(radius: float) -> void:
+	ring_radius = radius
+	custom_minimum_size = Vector2(ring_radius * 2.0, ring_radius * 2.0)
+	size = custom_minimum_size
+	queue_redraw()
 
 
 func _ready() -> void:

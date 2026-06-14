@@ -34,6 +34,7 @@ const TOP_BAR_BOTTOM_FALLBACK := 160.0
 const BADGE_GAP_AFTER_ARROWS := 16.0
 const BADGE_MIN_FROM_SEAT := 72.0
 const DRAG_ORDER_ALPHA := 0.75
+const REMOVE_BUTTON_ACTIVE_MODULATE := Color(1.18, 1.14, 0.92, 1.0)
 
 var _player_icons: Array[PlayerIcon] = []
 var _chairs: Array[TextureRect] = []
@@ -48,6 +49,7 @@ var _is_start_preview_playing: bool = false
 var _turn_order_arrows: TurnOrderArrowsLayer
 var _order_badges_layer: Control
 var _order_badges: Array[SeatOrderBadge] = []
+var _remove_button_ring: ChairSwapRing
 var _table_hint_banner: TableHintBanner
 var _swap_drag_hint_active: bool = false
 var _remove_hint_active: bool = false
@@ -60,6 +62,7 @@ func _ready() -> void:
 	_setup_turn_order_arrows()
 	_setup_order_badges()
 	_setup_start_bomb_preview()
+	_setup_remove_button_ring()
 	_setup_swap_hints()
 	if add_player_button:
 		add_player_button.pressed.connect(_on_add_player_button_pressed)
@@ -107,6 +110,78 @@ func _setup_start_bomb_preview() -> void:
 	_start_bomb_preview.texture = load(BOMB_TEXTURE_PATH)
 	_start_bomb_preview.pivot_offset = Vector2(48, 48)
 	table_area.add_child(_start_bomb_preview)
+
+
+func _setup_remove_button_ring() -> void:
+	if not table_area or not add_player_button:
+		return
+	_remove_button_ring = ChairSwapRing.new()
+	_remove_button_ring.ring_color = ChairSwapRing.DEFAULT_RING_COLOR
+	_remove_button_ring.z_index = 4
+	_remove_button_ring.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	table_area.add_child(_remove_button_ring)
+	_apply_remove_ring_radius()
+	_layout_remove_button_ring()
+
+
+func _apply_remove_ring_radius() -> void:
+	if not _remove_button_ring or not add_player_button:
+		return
+	var button_half := minf(add_player_button.size.x, add_player_button.size.y) * 0.5
+	var chair_half := chair_size.x * 0.5
+	_remove_button_ring.set_ring_radius(ChairSwapRing.radius_for_half_extent(button_half, chair_half))
+
+
+func _layout_remove_button_ring() -> void:
+	if not _remove_button_ring or not add_player_button or not table_area:
+		return
+	var button_center := add_player_button.global_position + add_player_button.size * 0.5
+	var local_center := table_area.get_global_transform_with_canvas().affine_inverse() * button_center
+	var ring_radius := _remove_button_ring.ring_radius
+	_remove_button_ring.position = local_center - Vector2(ring_radius, ring_radius)
+
+
+func _remove_ring_radius() -> float:
+	if _remove_button_ring:
+		return _remove_button_ring.ring_radius
+	return ChairSwapRing.DEFAULT_RING_RADIUS
+
+
+func _get_remove_button_center_global() -> Vector2:
+	if not add_player_button:
+		return Vector2.ZERO
+	return add_player_button.global_position + add_player_button.size * 0.5
+
+
+func _is_slime_center_in_remove_ring(slime_center: Vector2) -> bool:
+	if not add_player_button or not add_player_button.visible:
+		return false
+	if add_player_button.disabled:
+		return false
+	var ring_center := _get_remove_button_center_global()
+	return slime_center.distance_to(ring_center) <= _remove_ring_radius()
+
+
+func _is_icon_in_remove_ring(icon: PlayerIcon) -> bool:
+	if not _is_remove_mode:
+		return false
+	return _is_slime_center_in_remove_ring(icon.get_slime_center_global())
+
+
+func _update_remove_button_highlight(in_zone: bool) -> void:
+	if not add_player_button or not _is_remove_mode:
+		return
+	add_player_button.modulate = REMOVE_BUTTON_ACTIVE_MODULATE if in_zone else Color.WHITE
+
+
+func _update_remove_button_ring(dragging: PlayerIcon) -> void:
+	if not _remove_button_ring:
+		return
+	_apply_remove_ring_radius()
+	_layout_remove_button_ring()
+	var in_zone := dragging != null and _is_icon_in_remove_ring(dragging)
+	_remove_button_ring.visible_ring = in_zone
+	_update_remove_button_highlight(in_zone)
 
 
 func _setup_turn_order_arrows() -> void:
@@ -544,16 +619,13 @@ func _clear_chair_highlights() -> void:
 
 
 func _is_icon_over_remove_button(icon: PlayerIcon) -> bool:
-	return (
-		_is_remove_mode
-		and add_player_button
-		and add_player_button.visible
-		and _rect_overlaps(icon, add_player_button)
-	)
+	return _is_icon_in_remove_ring(icon)
 
 
 func _update_swap_preview(dragging: PlayerIcon) -> void:
-	if _is_icon_over_remove_button(dragging):
+	_update_remove_button_ring(dragging)
+
+	if _is_icon_in_remove_ring(dragging):
 		for other in _player_icons:
 			if other != dragging and other.swap_target == dragging:
 				other.cancel_swap_preview()
@@ -604,14 +676,22 @@ func _update_swap_preview(dragging: PlayerIcon) -> void:
 
 
 func _on_icon_drag_ended(icon: PlayerIcon) -> void:
+	var should_remove := (
+		icon == _dragging_icon
+		and _is_slime_center_in_remove_ring(icon.get_release_slime_center())
+	)
+
 	_set_remove_mode(false)
 	_remove_hint_active = false
 	_swap_drag_hint_active = false
 	_set_order_markers_drag_dimmed(false)
 	_refresh_turn_order()
 	_clear_chair_highlights()
+	if _remove_button_ring:
+		_remove_button_ring.visible_ring = false
+	_update_remove_button_highlight(false)
 
-	if add_player_button and _rect_overlaps(icon, add_player_button) and icon == _dragging_icon:
+	if should_remove:
 		_remove_player(icon)
 		_dragging_icon = null
 		_refresh_table_hint()
@@ -811,3 +891,5 @@ func _notification(what: int) -> void:
 	if what == NOTIFICATION_RESIZED:
 		_schedule_position_update()
 		_update_hint_banner_layout()
+		_apply_remove_ring_radius()
+		_layout_remove_button_ring()
