@@ -3,7 +3,7 @@ extends Control
 const DESIGN_SIZE := MenuBombLayout.DESIGN_SIZE
 const PLAYER_NAME_MARKER := &"PlayerName"
 const ROUND_WORD_MARKER := &"RoundWord"
-const FALLBACK_PLAYER_NAME := Vector2(540, 698)
+const FALLBACK_PLAYER_NAME := Vector2(528, 483)
 const FALLBACK_ROUND_WORD := Vector2(540, 928)
 
 @export var game_manager: GameManager
@@ -64,12 +64,22 @@ func _connect_layout_reposition() -> void:
 	call_deferred("_reposition_battle_ui")
 
 
+func _get_player_name_anchor() -> Vector2:
+	var layout := _find_bomb_layout()
+	if layout:
+		return layout.get_hint_marker_design_position()
+	var design_root := _get_design_root()
+	return BombMarkerLayout.get_marker_position(design_root, PLAYER_NAME_MARKER, FALLBACK_PLAYER_NAME)
+
+
 func _reposition_battle_ui() -> void:
 	var design_root := _get_design_root()
 	if _player_strip:
-		BombMarkerLayout.place_control_at_marker(
-			_player_strip, design_root, PLAYER_NAME_MARKER, FALLBACK_PLAYER_NAME
-		)
+		var anchor := _get_player_name_anchor()
+		var size := _player_strip.size
+		if size.x <= 0.0 or size.y <= 0.0:
+			size = _player_strip.custom_minimum_size
+		_player_strip.position = anchor - size * 0.5
 	if _syllable_card:
 		BombMarkerLayout.place_control_at_marker(
 			_syllable_card, design_root, ROUND_WORD_MARKER, FALLBACK_ROUND_WORD
