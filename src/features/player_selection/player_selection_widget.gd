@@ -19,7 +19,7 @@ extends Control
 @export var remove_player_texture: Texture2D
 @export var min_players_for_remove: int = 1
 @export var table_radius_coeff: float = 0.45
-@export var chair_size: Vector2 = Vector2(80, 80)
+@export var chair_size: Vector2 = Vector2(100, 100)
 @export var chair_facing_offset: float = -PI * 0.5
 
 var _player_icons: Array[PlayerIcon] = []
@@ -186,9 +186,15 @@ func _process(_delta: float) -> void:
 
 
 func _update_swap_preview(dragging: PlayerIcon) -> void:
+	if not dragging.has_moved_for_swap():
+		for other in _player_icons:
+			if other != dragging and other.swap_target == dragging:
+				other.cancel_swap_preview()
+		return
+
 	var overlap_target: PlayerIcon = null
 	for other in _player_icons:
-		if other != dragging and dragging.overlaps_icon(other):
+		if other != dragging and dragging.is_slime_over_seat(other, chair_size):
 			overlap_target = other
 			break
 
@@ -211,7 +217,7 @@ func _on_icon_drag_ended(icon: PlayerIcon) -> void:
 		return
 
 	for other in _player_icons:
-		if other != icon and icon.overlaps_icon(other):
+		if other != icon and icon.has_moved_for_swap() and icon.is_slime_over_seat(other, chair_size):
 			for reset_icon in _player_icons:
 				if reset_icon != icon:
 					reset_icon.stop_motion()

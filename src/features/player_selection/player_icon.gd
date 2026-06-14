@@ -15,6 +15,7 @@ enum DragState {
 @export var name_label: Label
 @export var hold_time: float = 2.0
 @export var move_lerp_speed: float = 12.0
+@export var swap_activation_distance: float = 24.0
 
 var home_position: Vector2 = Vector2.ZERO
 var player_index: int = -1
@@ -80,12 +81,21 @@ func get_world_rect() -> Rect2:
 	return Rect2(global_position, size)
 
 
-func overlaps_icon(other: PlayerIcon) -> bool:
-	return get_world_rect().intersects(other.get_home_rect())
+func get_slime_center_global() -> Vector2:
+	if slime_rect and is_inside_tree():
+		return slime_rect.global_position + slime_rect.size * 0.5
+	return home_position
 
 
-func get_home_rect() -> Rect2:
-	return Rect2(_position_for_seat(home_position), size)
+func has_moved_for_swap() -> bool:
+	return get_slime_center_global().distance_to(home_position) >= swap_activation_distance
+
+
+func is_slime_over_seat(other: PlayerIcon, seat_size: Vector2) -> bool:
+	if other == self:
+		return false
+	var seat_rect := Rect2(other.home_position - seat_size * 0.5, seat_size)
+	return seat_rect.has_point(get_slime_center_global())
 
 
 func set_drag_state(state: DragState) -> void:
