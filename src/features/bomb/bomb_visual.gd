@@ -1,6 +1,6 @@
 extends Node2D
 
-const BASE_BOMB_SCALE := 0.88
+const BASE_BOMB_SCALE := 0.52
 
 @export var game_events: GameEvents
 @export var bomb_sprite: Sprite2D

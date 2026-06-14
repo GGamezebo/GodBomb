@@ -67,17 +67,17 @@ texture = ExtResource("27")
 texture = ExtResource("28")
 
 [node name="BombRoot" type="Node2D" parent="GameArea" node_paths=PackedStringArray("bomb_sprite")]
-position = Vector2(540, 1180)
+position = Vector2(540, 1780)
 script = ExtResource("22")
 game_events = ExtResource("15")
 bomb_sprite = NodePath("BombSprite")
 
 [node name="BombSprite" type="Sprite2D" parent="GameArea/BombRoot"]
-scale = Vector2(0.88, 0.88)
+scale = Vector2(0.52, 0.52)
 texture = ExtResource("16")
 
 [node name="ExplosionEffect" type="Node2D" parent="GameArea" node_paths=PackedStringArray("particles")]
-position = Vector2(540, 1180)
+position = Vector2(540, 1780)
 script = ExtResource("24")
 game_events = ExtResource("15")
 particles = NodePath("Particles")
@@ -132,7 +132,7 @@ tick_streams = [ExtResource("20"), ExtResource("21")]
 
 [node name="UI" type="CanvasLayer" parent="."]
 
-[node name="HUD" type="Control" parent="UI" node_paths=PackedStringArray("game_manager", "game_events", "info_label", "player_name_label", "countdown_label", "result_panel", "result_label")]
+[node name="HUD" type="Control" parent="UI" node_paths=PackedStringArray("game_manager", "game_events", "result_panel", "result_label")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -143,52 +143,8 @@ mouse_filter = 2
 script = ExtResource("9")
 game_manager = NodePath("../../GameManager")
 game_events = ExtResource("15")
-info_label = NodePath("InfoLabel")
-player_name_label = NodePath("PlayerNameLabel")
-countdown_label = NodePath("CountdownLabel")
 result_panel = NodePath("ResultPanel")
 result_label = NodePath("ResultPanel/ResultLabel")
-
-[node name="InfoLabel" type="RichTextLabel" parent="UI/HUD"]
-layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -420.0
-offset_top = 120.0
-offset_right = 420.0
-offset_bottom = 420.0
-bbcode_enabled = true
-fit_content = true
-scroll_active = false
-horizontal_alignment = 1
-
-[node name="PlayerNameLabel" type="Label" parent="UI/HUD"]
-layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -300.0
-offset_top = 520.0
-offset_right = 300.0
-offset_bottom = 600.0
-theme_override_font_sizes/font_size = 48
-horizontal_alignment = 1
-
-[node name="CountdownLabel" type="Label" parent="UI/HUD"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -120.0
-offset_top = -120.0
-offset_right = 120.0
-offset_bottom = 120.0
-theme_override_font_sizes/font_size = 120
-horizontal_alignment = 1
-vertical_alignment = 1
 
 [node name="ResultPanel" type="PanelContainer" parent="UI/HUD"]
 visible = false
@@ -224,6 +180,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 script = ExtResource("10")
 game_manager = NodePath("../../GameManager")
 game_events = ExtResource("15")

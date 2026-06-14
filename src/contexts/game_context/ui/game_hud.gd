@@ -2,109 +2,250 @@ extends Control
 
 @export var game_manager: GameManager
 @export var game_events: GameEvents
-@export var info_label: RichTextLabel
-@export var player_name_label: Label
-@export var countdown_label: Label
 @export var result_panel: Control
 @export var result_label: RichTextLabel
 
 var listener: EventListener = EventListener.new()
+var _vignette: GameBattleVignette
+var _player_strip: GamePlayerStrip
+var _syllable_card: GameSyllableCard
+var _action_hints: GameActionHints
+var _battle_layer: Control
+var _countdown_label: Label
+var _explosion_panel: PanelContainer
+var _explosion_title: Label
+var _explosion_subtitle: Label
+var _current_state: String = ""
+var _last_choice_player_index: int = -1
 
 
 func _ready() -> void:
 	if not game_events:
 		game_events = load("res://src/common/game_events.tres") as GameEvents
+	_build_ui()
 	if game_events:
 		listener.add(game_events.ev_game_state_changed, _on_game_state_changed)
 		listener.add(game_events.ev_current_player_changed, _on_current_player_changed)
 		listener.add(game_events.ev_countdown_tick_changed, _on_countdown_tick)
 		listener.add(game_events.ev_card_changed, _on_card_changed)
-	_hide_all()
+		listener.add(game_events.ev_touch_next_player, _on_turn_passed)
+	_sync_to_current_state()
 
 
 func _exit_tree() -> void:
 	listener.deinit()
 
 
+func _build_ui() -> void:
+	_vignette = GameBattleVignette.new()
+	_vignette.game_events = game_events
+	add_child(_vignette)
+
+	_battle_layer = Control.new()
+	_battle_layer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_battle_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_battle_layer)
+
+	_player_strip = GamePlayerStrip.new()
+	_player_strip.set_anchors_preset(Control.PRESET_CENTER_TOP)
+	_player_strip.offset_left = -460.0
+	_player_strip.offset_top = 130.0
+	_player_strip.offset_right = 460.0
+	_player_strip.offset_bottom = 262.0
+	_battle_layer.add_child(_player_strip)
+
+	_syllable_card = GameSyllableCard.new()
+	_syllable_card.set_anchors_preset(Control.PRESET_CENTER)
+	_syllable_card.offset_left = -440.0
+	_syllable_card.offset_top = -220.0
+	_syllable_card.offset_right = 440.0
+	_syllable_card.offset_bottom = 120.0
+	_battle_layer.add_child(_syllable_card)
+
+	_action_hints = GameActionHints.new()
+	_action_hints.game_events = game_events
+	_action_hints.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
+	_action_hints.offset_left = -460.0
+	_action_hints.offset_top = -420.0
+	_action_hints.offset_right = 460.0
+	_action_hints.offset_bottom = -300.0
+	_battle_layer.add_child(_action_hints)
+
+	_countdown_label = Label.new()
+	_countdown_label.set_anchors_preset(Control.PRESET_CENTER)
+	_countdown_label.offset_left = -160.0
+	_countdown_label.offset_top = -160.0
+	_countdown_label.offset_right = 160.0
+	_countdown_label.offset_bottom = 160.0
+	_countdown_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_countdown_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_countdown_label.add_theme_font_size_override("font_size", 140)
+	_countdown_label.add_theme_color_override("font_color", TurnOrderArrowsLayer.ACCENT)
+	_countdown_label.add_theme_color_override("font_outline_color", Color(1, 0.99, 0.97, 0.9))
+	_countdown_label.add_theme_constant_override("outline_size", 8)
+	add_child(_countdown_label)
+
+	_build_explosion_overlay()
+
+
+func _build_explosion_overlay() -> void:
+	_explosion_panel = PanelContainer.new()
+	_explosion_panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_explosion_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.08, 0.03, 0.02, 0.55)
+	_explosion_panel.add_theme_stylebox_override("panel", style)
+	add_child(_explosion_panel)
+
+	var center := CenterContainer.new()
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_explosion_panel.add_child(center)
+
+	var col := VBoxContainer.new()
+	col.add_theme_constant_override("separation", 12)
+	center.add_child(col)
+
+	_explosion_title = Label.new()
+	_explosion_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_explosion_title.add_theme_font_size_override("font_size", 72)
+	_explosion_title.add_theme_color_override("font_color", Color(1, 0.92, 0.86, 1))
+	col.add_child(_explosion_title)
+
+	_explosion_subtitle = Label.new()
+	_explosion_subtitle.text = "Вас подорвало!"
+	_explosion_subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_explosion_subtitle.add_theme_font_size_override("font_size", 40)
+	_explosion_subtitle.add_theme_color_override("font_color", TurnOrderArrowsLayer.ACCENT.lightened(0.15))
+	col.add_child(_explosion_subtitle)
+
+
 func _hide_all() -> void:
-	if info_label:
-		info_label.visible = false
-	if player_name_label:
-		player_name_label.visible = false
-	if countdown_label:
-		countdown_label.visible = false
+	if _battle_layer:
+		_battle_layer.visible = false
+	if _countdown_label:
+		_countdown_label.visible = false
+	if _explosion_panel:
+		_explosion_panel.visible = false
 	if result_panel:
 		result_panel.visible = false
 
 
+func _sync_to_current_state() -> void:
+	if not game_manager or not game_manager.fsm:
+		_hide_all()
+		return
+	_on_game_state_changed("", game_manager.fsm.get_current_state_name())
+
+
 func _on_game_state_changed(_from_state: String, to_state: String) -> void:
+	_current_state = to_state
 	_hide_all()
 	match to_state:
+		FSMGameStates.PLAYER_CHOICE:
+			_show_player_choice()
 		FSMGameStates.READY_TO_START:
 			_show_ready_to_start()
 		FSMGameStates.COUNTDOWN:
-			if countdown_label:
-				countdown_label.visible = true
+			if _countdown_label:
+				_countdown_label.visible = true
 		FSMGameStates.PLAY:
 			_show_play()
 		FSMGameStates.EXPLOSION:
 			_show_explosion()
 		FSMGameStates.RESULT:
 			_show_result()
-		FSMGameStates.PLAYER_CHOICE:
-			if player_name_label:
-				player_name_label.visible = true
 
 
 func _on_current_player_changed(player: GamePlayer) -> void:
-	if player_name_label:
-		player_name_label.text = player.info.name
-		player_name_label.visible = true
+	if _player_strip:
+		_player_strip.set_player(player)
+	if _current_state == FSMGameStates.PLAYER_CHOICE and player.index != _last_choice_player_index:
+		_last_choice_player_index = player.index
+		_player_strip.pulse_choice_tick()
+	_sync_prev_hint()
 
 
 func _on_countdown_tick(seconds_left: int) -> void:
-	if countdown_label:
-		countdown_label.text = str(seconds_left)
-		countdown_label.visible = true
+	if _countdown_label:
+		_countdown_label.text = str(seconds_left)
+		_countdown_label.visible = true
+		var tween := create_tween()
+		tween.tween_property(_countdown_label, "scale", Vector2(1.12, 1.12), 0.08)
+		tween.tween_property(_countdown_label, "scale", Vector2.ONE, 0.12)
 
 
 func _on_card_changed(card: GameCard) -> void:
-	if info_label and game_manager:
-		var place := WordCondition.get_label(card.condition)
-		info_label.text = "[center][font_size=60](%s)[/font_size]\n[font_size=90]%s[/font_size][/center]" % [
-			place, card.word
-		]
+	if _syllable_card:
+		_syllable_card.set_card(card)
+
+
+func _on_turn_passed() -> void:
+	if _syllable_card:
+		_syllable_card.pulse_next_turn()
+
+
+func _sync_prev_hint() -> void:
+	if not _action_hints or not game_manager:
+		return
+	_action_hints.set_prev_blocked(game_manager.session.is_blocked_prev_player)
+
+
+func _show_player_choice() -> void:
+	_battle_layer.visible = true
+	_player_strip.visible = true
+	_action_hints.visible = false
+	_last_choice_player_index = -1
+	if _player_strip:
+		_player_strip.set_turn_caption("Выбираем первого...")
+	if _syllable_card:
+		_syllable_card.set_message("?", "Кто ходит первым?")
+	if game_manager:
+		_on_current_player_changed(game_manager.session.get_current_player())
 
 
 func _show_ready_to_start() -> void:
-	if info_label:
-		info_label.text = "[center]Нажми, чтобы начать следующий раунд![/center]"
-		info_label.visible = true
+	_battle_layer.visible = true
+	_player_strip.visible = true
+	_action_hints.visible = false
+	if _player_strip:
+		_player_strip.set_turn_caption("Первым ходит")
+	if _syllable_card:
+		_syllable_card.set_message("Готовы?", "Нажми «Начать раунд»")
+	if game_manager:
+		_on_current_player_changed(game_manager.session.get_current_player())
 
 
 func _show_play() -> void:
-	if info_label:
-		info_label.visible = true
-	if player_name_label:
-		player_name_label.visible = true
-	if game_manager and game_manager.session.current_card:
-		_on_card_changed(game_manager.session.current_card)
+	_battle_layer.visible = true
+	_player_strip.visible = true
+	_action_hints.visible = true
+	if _player_strip:
+		_player_strip.set_turn_caption("Сейчас ходит")
+	_sync_prev_hint()
+	if game_manager:
+		_on_current_player_changed(game_manager.session.get_current_player())
+		if game_manager.session.current_card:
+			_on_card_changed(game_manager.session.current_card)
 
 
 func _show_explosion() -> void:
-	if info_label and game_manager:
-		var player := game_manager.session.get_current_player()
-		info_label.text = "[center][font_size=75]Игрок: %s[/font_size]\n[font_size=39]Вас подорвало![/font_size][/center]" % player.info.name
-		info_label.visible = true
+	if not _explosion_panel or not game_manager:
+		return
+	var player := game_manager.session.get_current_player()
+	_explosion_title.text = player.info.name
+	_explosion_panel.visible = true
 
 
 func _show_result() -> void:
 	if not result_panel or not result_label or not game_manager:
 		return
 	result_panel.visible = true
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(1, 0.98, 0.95, 0.97)
+	result_panel.add_theme_stylebox_override("panel", style)
 	var lines: PackedStringArray = PackedStringArray()
 	var sorted := game_manager.session.get_sorted_results()
 	for i in sorted.size():
 		var player: GamePlayer = sorted[i]
 		lines.append("%d. %s — %d" % [i + 1, player.info.name, player.score])
-	result_label.text = "[center][font_size=48]Результаты[/font_size]\n[font_size=36]%s[/font_size]\n\nНажми, чтобы вернуться в меню[/center]" % "\n".join(lines)
+	result_label.text = "[center][font_size=52][color=#5C4033]Результаты[/color][/font_size]\n[font_size=38]%s[/font_size]\n\n[font_size=28][color=#8B6914]Нажми, чтобы вернуться в меню[/color][/font_size][/center]" % "\n".join(lines)

@@ -21,3 +21,15 @@ static func random() -> int:
 
 static func get_label(condition: int) -> String:
 	return LABELS.get(condition, "")
+
+
+static func get_pattern_hint(syllable: String, condition: int) -> String:
+	match condition:
+		Type.BEGIN:
+			return "[%s]___" % syllable
+		Type.END:
+			return "___[%s]" % syllable
+		Type.ANYWHERE:
+			return "_%s_" % syllable
+		_:
+			return syllable

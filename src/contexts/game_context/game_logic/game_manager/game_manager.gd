@@ -124,6 +124,8 @@ func _process_countdown(delta: float) -> void:
 	if session.state_time >= session.game_config.countdown_time:
 		session.reset_bomb()
 		session.reset_explosion()
+		if session.current_card == null:
+			session.next_card()
 		fsm.add_event(FSMGameEvents.COUNTDOWN_DONE)
 
 

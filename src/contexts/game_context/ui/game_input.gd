@@ -1,5 +1,7 @@
 extends Control
 
+const DEFAULT_GAME_CONFIG := preload("res://src/common/game_config_default.tres")
+
 @export var game_manager: GameManager
 @export var game_events: GameEvents
 @export var main_events: MainEvents
@@ -11,12 +13,15 @@ var touch_start_position: Vector2 = Vector2.ZERO
 
 
 func _ready() -> void:
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_ensure_game_config()
 	if not game_events:
 		game_events = load("res://src/common/game_events.tres") as GameEvents
 	if start_round_button:
 		start_round_button.pressed.connect(_on_start_round_pressed)
 	if game_events:
 		listener.add(game_events.ev_game_state_changed, _on_game_state_changed)
+	_sync_to_current_state()
 
 
 func _exit_tree() -> void:
@@ -33,6 +38,26 @@ func _on_game_state_changed(_from_state: String, to_state: String) -> void:
 		start_round_button.visible = to_state == FSMGameStates.READY_TO_START
 
 
+func _sync_to_current_state() -> void:
+	if not game_manager or not game_manager.fsm:
+		return
+	_on_game_state_changed("", game_manager.fsm.get_current_state_name())
+
+
+func _ensure_game_config() -> GameConfig:
+	if game_config:
+		return game_config
+	if game_manager and game_manager.session.game_config:
+		game_config = game_manager.session.game_config
+		return game_config
+	game_config = DEFAULT_GAME_CONFIG.duplicate(true)
+	return game_config
+
+
+func _drag_prev_player_threshold() -> float:
+	return _ensure_game_config().drag_prev_player_threshold
+
+
 func _input(event: InputEvent) -> void:
 	if not game_manager:
 		return
@@ -45,11 +70,12 @@ func _input(event: InputEvent) -> void:
 
 
 func _handle_play_input(event: InputEvent) -> void:
+	var drag_threshold := _drag_prev_player_threshold()
 	if event is InputEventScreenTouch:
 		var touch := event as InputEventScreenTouch
 		if touch.pressed:
 			touch_start_position = touch.position
-		elif touch.position.distance_to(touch_start_position) > game_config.drag_prev_player_threshold:
+		elif touch.position.distance_to(touch_start_position) > drag_threshold:
 			if game_manager.prev_player() and game_events:
 				game_events.ev_touch_prev_player.emit()
 		else:
@@ -62,7 +88,7 @@ func _handle_play_input(event: InputEvent) -> void:
 			return
 		if mouse.pressed:
 			touch_start_position = mouse.position
-		elif mouse.position.distance_to(touch_start_position) > game_config.drag_prev_player_threshold:
+		elif mouse.position.distance_to(touch_start_position) > drag_threshold:
 			if game_manager.prev_player() and game_events:
 				game_events.ev_touch_prev_player.emit()
 		else:
