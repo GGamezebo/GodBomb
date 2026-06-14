@@ -1,7 +1,8 @@
 class_name GameSyllableCard
-extends PanelContainer
+extends Control
 
 const ACCENT := TurnOrderArrowsLayer.ACCENT
+const DIAL_SIZE := Vector2(440, 440)
 
 var _condition_label: Label
 var _syllable_label: Label
@@ -10,38 +11,36 @@ var _pattern_label: Label
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	custom_minimum_size = Vector2(880, 340)
-	_apply_panel_style()
+	custom_minimum_size = DIAL_SIZE
+	size = DIAL_SIZE
 
-	var margin := MarginContainer.new()
-	margin.add_theme_constant_override("margin_left", 28)
-	margin.add_theme_constant_override("margin_top", 24)
-	margin.add_theme_constant_override("margin_right", 28)
-	margin.add_theme_constant_override("margin_bottom", 24)
-	add_child(margin)
+	var center := CenterContainer.new()
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(center)
 
 	var col := VBoxContainer.new()
-	col.add_theme_constant_override("separation", 16)
-	margin.add_child(col)
+	col.add_theme_constant_override("separation", 10)
+	col.alignment = BoxContainer.ALIGNMENT_CENTER
+	center.add_child(col)
 
 	_condition_label = Label.new()
 	_condition_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_condition_label.add_theme_font_size_override("font_size", 26)
-	_condition_label.add_theme_color_override("font_color", Color(0.88, 0.72, 0.52, 0.95))
+	_condition_label.add_theme_font_size_override("font_size", 24)
+	_condition_label.add_theme_color_override("font_color", Color(0.82, 0.68, 0.48, 0.95))
 	col.add_child(_condition_label)
 
 	_syllable_label = Label.new()
 	_syllable_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_syllable_label.add_theme_font_size_override("font_size", 96)
-	_syllable_label.add_theme_color_override("font_color", Color(1, 0.97, 0.92, 1))
-	_syllable_label.add_theme_color_override("font_outline_color", Color(0.06, 0.04, 0.02, 0.85))
-	_syllable_label.add_theme_constant_override("outline_size", 4)
+	_syllable_label.add_theme_font_size_override("font_size", 92)
+	_syllable_label.add_theme_color_override("font_color", Color(0.98, 0.94, 0.86, 1))
+	_syllable_label.add_theme_color_override("font_outline_color", Color(0.04, 0.03, 0.02, 0.75))
+	_syllable_label.add_theme_constant_override("outline_size", 3)
 	col.add_child(_syllable_label)
 
 	_pattern_label = Label.new()
 	_pattern_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_pattern_label.add_theme_font_size_override("font_size", 36)
-	_pattern_label.add_theme_color_override("font_color", Color(0.82, 0.68, 0.5, 0.9))
+	_pattern_label.add_theme_font_size_override("font_size", 32)
+	_pattern_label.add_theme_color_override("font_color", Color(0.72, 0.58, 0.42, 0.9))
 	col.add_child(_pattern_label)
 
 
@@ -66,15 +65,3 @@ func pulse_next_turn() -> void:
 	var tween := create_tween()
 	tween.tween_property(self, "scale", Vector2(1.04, 1.04), 0.08).set_trans(Tween.TRANS_SINE)
 	tween.tween_property(self, "scale", Vector2.ONE, 0.14).set_trans(Tween.TRANS_SINE)
-
-
-func _apply_panel_style() -> void:
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.08, 0.06, 0.05, 0.78)
-	style.border_color = ACCENT.lightened(0.05)
-	style.set_border_width_all(3)
-	style.set_corner_radius_all(28)
-	style.shadow_color = Color(0, 0, 0, 0.4)
-	style.shadow_size = 14
-	style.shadow_offset = Vector2(0, 5)
-	add_theme_stylebox_override("panel", style)

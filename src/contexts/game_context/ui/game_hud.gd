@@ -1,6 +1,10 @@
 extends Control
 
 const DESIGN_SIZE := MenuBombLayout.DESIGN_SIZE
+const PLAYER_NAME_MARKER := &"PlayerName"
+const ROUND_WORD_MARKER := &"RoundWord"
+const FALLBACK_PLAYER_NAME := Vector2(540, 698)
+const FALLBACK_ROUND_WORD := Vector2(540, 928)
 
 @export var game_manager: GameManager
 @export var game_events: GameEvents
@@ -25,6 +29,7 @@ func _ready() -> void:
 	if not game_events:
 		game_events = load("res://src/common/game_events.tres") as GameEvents
 	_build_ui()
+	_connect_layout_reposition()
 	if game_events:
 		listener.add(game_events.ev_game_state_changed, _on_game_state_changed)
 		listener.add(game_events.ev_current_player_changed, _on_current_player_changed)
@@ -52,6 +57,29 @@ func _get_design_root() -> Control:
 	return self
 
 
+func _connect_layout_reposition() -> void:
+	var layout := _find_bomb_layout()
+	if layout and not layout.layout_applied.is_connected(_reposition_battle_ui):
+		layout.layout_applied.connect(_reposition_battle_ui)
+	call_deferred("_reposition_battle_ui")
+
+
+func _reposition_battle_ui() -> void:
+	var design_root := _get_design_root()
+	if _player_strip:
+		BombMarkerLayout.place_control_at_marker(
+			_player_strip, design_root, PLAYER_NAME_MARKER, FALLBACK_PLAYER_NAME
+		)
+	if _syllable_card:
+		BombMarkerLayout.place_control_at_marker(
+			_syllable_card, design_root, ROUND_WORD_MARKER, FALLBACK_ROUND_WORD
+		)
+	if _countdown_label:
+		BombMarkerLayout.place_control_at_marker(
+			_countdown_label, design_root, ROUND_WORD_MARKER, FALLBACK_ROUND_WORD
+		)
+
+
 func _build_ui() -> void:
 	var design_root := _get_design_root()
 
@@ -71,19 +99,9 @@ func _build_ui() -> void:
 	design_root.add_child(_battle_layer)
 
 	_player_strip = GamePlayerStrip.new()
-	_player_strip.set_anchors_preset(Control.PRESET_TOP_LEFT)
-	_player_strip.offset_left = 80.0
-	_player_strip.offset_top = 520.0
-	_player_strip.offset_right = 1000.0
-	_player_strip.offset_bottom = 652.0
 	_battle_layer.add_child(_player_strip)
 
 	_syllable_card = GameSyllableCard.new()
-	_syllable_card.set_anchors_preset(Control.PRESET_TOP_LEFT)
-	_syllable_card.offset_left = 100.0
-	_syllable_card.offset_top = 720.0
-	_syllable_card.offset_right = 980.0
-	_syllable_card.offset_bottom = 1060.0
 	_battle_layer.add_child(_syllable_card)
 
 	_action_hints = GameActionHints.new()
@@ -96,16 +114,13 @@ func _build_ui() -> void:
 	_battle_layer.add_child(_action_hints)
 
 	_countdown_label = Label.new()
-	_countdown_label.set_anchors_preset(Control.PRESET_TOP_LEFT)
-	_countdown_label.offset_left = 380.0
-	_countdown_label.offset_top = 760.0
-	_countdown_label.offset_right = 700.0
-	_countdown_label.offset_bottom = 1080.0
+	_countdown_label.custom_minimum_size = Vector2(440, 440)
+	_countdown_label.size = Vector2(440, 440)
 	_countdown_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_countdown_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_countdown_label.add_theme_font_size_override("font_size", 140)
 	_countdown_label.add_theme_color_override("font_color", TurnOrderArrowsLayer.ACCENT)
-	_countdown_label.add_theme_color_override("font_outline_color", Color(0.08, 0.05, 0.03, 0.95))
+	_countdown_label.add_theme_color_override("font_outline_color", Color(0.04, 0.03, 0.02, 0.85))
 	_countdown_label.add_theme_constant_override("outline_size", 10)
 	_countdown_label.z_index = 3
 	design_root.add_child(_countdown_label)
