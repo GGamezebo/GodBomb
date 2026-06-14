@@ -169,7 +169,11 @@ func set_lobby_overlay_active(active: bool) -> void:
 	if active:
 		_hide_all()
 	elif game_manager and game_manager.fsm:
-		_on_game_state_changed("", game_manager.fsm.get_current_state_name())
+		sync_from_session()
+
+
+func sync_from_session() -> void:
+	_sync_to_current_state()
 
 
 func _hide_all() -> void:

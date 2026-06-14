@@ -18,6 +18,7 @@ const PLAYERS_ACTIVE_MODULATE := Color(1.12, 1.08, 0.94, 1.0)
 var listener: EventListener = EventListener.new()
 var _players_overlay_open: bool = false
 var _exit_dialog_open: bool = false
+var _pending_configure_data: Dictionary = {}
 
 
 func _ready() -> void:
@@ -41,6 +42,7 @@ func _ready() -> void:
 		exit_confirm_dialog.confirmed.connect(_on_exit_confirmed)
 		exit_confirm_dialog.cancelled.connect(_on_exit_cancelled)
 	call_deferred("_sync_top_bar_from_fsm")
+	call_deferred("_apply_configure")
 
 
 func _exit_tree() -> void:
@@ -50,12 +52,19 @@ func _exit_tree() -> void:
 
 
 func configure(data: Dictionary) -> void:
-	if player_lobby_overlay:
-		player_lobby_overlay.game_manager = game_manager
-		player_lobby_overlay.game_config = game_config
-		player_lobby_overlay.menu_events = menu_events
-		player_lobby_overlay._bind_menu_listeners()
-		player_lobby_overlay.configure(data)
+	_pending_configure_data = data.duplicate()
+	call_deferred("_apply_configure")
+
+
+func _apply_configure() -> void:
+	if not player_lobby_overlay:
+		return
+	player_lobby_overlay.game_manager = game_manager
+	player_lobby_overlay.game_config = game_config
+	player_lobby_overlay.menu_events = menu_events
+	player_lobby_overlay._bind_menu_listeners()
+	if not _pending_configure_data.is_empty():
+		player_lobby_overlay.configure(_pending_configure_data)
 
 
 func _sync_top_bar_from_fsm() -> void:
@@ -148,7 +157,9 @@ func _on_player_lobby_closed() -> void:
 	if players_button:
 		players_button.modulate = Color.WHITE
 	_sync_pause_state()
-	if game_hud and game_hud.has_method("set_lobby_overlay_active"):
+	if game_hud and game_hud.has_method("sync_from_session"):
+		game_hud.sync_from_session()
+	elif game_hud and game_hud.has_method("set_lobby_overlay_active"):
 		game_hud.set_lobby_overlay_active(false)
 
 

@@ -35,9 +35,17 @@ func set_paused(paused: bool) -> void:
 
 
 func resync_players_from_account(account: PDataAccount) -> void:
-	if not _session_ready:
+	if not _session_ready or not account:
 		return
 	session.resync_players_from_account(account)
+
+
+func resync_players_from_entries(entries: Array) -> void:
+	if not _session_ready:
+		return
+	var roster_account := PDataAccount.new()
+	roster_account.set_players(entries.duplicate(true))
+	session.resync_players_from_account(roster_account)
 
 
 func _collect_states() -> void:

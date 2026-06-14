@@ -5,7 +5,7 @@ signal closed
 
 const NEUTRAL_BG := Color(0.06, 0.05, 0.04, 1.0)
 const LOBBY_BLUR_SHADER := preload("res://assets/shaders/bomb_background_blur.gdshader")
-const LOBBY_BLUR_RADIUS := 14.0
+const LOBBY_BLUR_RADIUS := 5.0
 
 @export var game_manager: GameManager
 @export var game_config: GameConfig
@@ -47,11 +47,13 @@ func configure(data: Dictionary) -> void:
 	var session_account: PDataAccount = data.get("account")
 	if session_account:
 		account = session_account
+	_ensure_runtime_refs()
 	_bind_widget_account()
 	_bind_menu_listeners()
 
 
 func open() -> void:
+	_ensure_runtime_refs()
 	_bind_widget_account()
 	if background_color:
 		background_color.color = NEUTRAL_BG
@@ -69,6 +71,13 @@ func close_overlay() -> void:
 	_set_bomb_blur(false)
 	visible = false
 	closed.emit()
+
+
+func _ensure_runtime_refs() -> void:
+	if not game_manager:
+		var context := get_parent()
+		if context:
+			game_manager = context.get_node_or_null("GameManager") as GameManager
 
 
 func _connect_layout() -> void:
@@ -142,6 +151,11 @@ func _resolve_controller() -> Node:
 	return get_tree().get_first_node_in_group(PersistentDataController.PERSISTENCE_GROUP)
 
 
+func _resolve_game_manager() -> GameManager:
+	_ensure_runtime_refs()
+	return game_manager
+
+
 func _on_done_pressed() -> void:
 	var min_players := game_config.min_players if game_config else 2
 	if not player_selection_widget:
@@ -161,15 +175,15 @@ func _on_roster_changed(..._args) -> void:
 func _apply_roster_to_game() -> void:
 	if not player_selection_widget:
 		return
-	player_selection_widget.commit_roster_to_account()
+	var roster_entries: Array = player_selection_widget.export_roster_entries()
 	player_selection_widget.persist_account()
 	var canonical := _resolve_account()
-	if not canonical:
-		return
-	account = canonical
-	player_selection_widget.bind_account(canonical, pdata_controller)
-	if game_manager:
-		game_manager.resync_players_from_account(canonical)
+	if canonical:
+		account = canonical
+		player_selection_widget.bind_account(canonical, pdata_controller)
+	var manager := _resolve_game_manager()
+	if manager and not roster_entries.is_empty():
+		manager.resync_players_from_entries(roster_entries)
 
 
 func save_account() -> void:

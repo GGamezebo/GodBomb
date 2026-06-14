@@ -161,6 +161,13 @@ func commit_roster_to_account() -> void:
 		preset_storage.rebuild_locks(players)
 
 
+func export_roster_entries() -> Array:
+	commit_roster_to_account()
+	if not account:
+		return []
+	return account.get_players()
+
+
 func persist_account() -> void:
 	commit_roster_to_account()
 	_save_account()
