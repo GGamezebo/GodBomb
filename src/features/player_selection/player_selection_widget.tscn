@@ -2,14 +2,14 @@
 
 [ext_resource type="Script" uid="uid://bjj4g3ci1tbso" path="res://src/features/player_selection/player_selection_widget.gd" id="1"]
 [ext_resource type="Script" uid="uid://dj5ppmnmqwair" path="res://src/features/player_selection/player_preset_storage.gd" id="2"]
-[ext_resource type="PackedScene" path="res://src/features/player_selection/player_icon.tscn" id="3"]
+[ext_resource type="PackedScene" uid="uid://cj182qgfmj11t" path="res://src/features/player_selection/player_icon.tscn" id="3"]
 [ext_resource type="PackedScene" path="res://src/features/player_selection/edit_player_window.tscn" id="4"]
 [ext_resource type="Resource" path="res://src/common/game_config_default.tres" id="5"]
 [ext_resource type="Resource" path="res://src/contexts/main_context/account/pdata_account.tres" id="6"]
 [ext_resource type="Resource" path="res://src/common/menu_events.tres" id="7"]
-[ext_resource type="Texture2D" path="res://assets/party_kitchen/buttons/add_player.svg" id="8"]
-[ext_resource type="Texture2D" path="res://assets/party_kitchen/buttons/remove_player.svg" id="9"]
-[ext_resource type="Texture2D" path="res://assets/party_kitchen/table.svg" id="10"]
+[ext_resource type="Texture2D" uid="uid://dvlu4xtqm3p2e" path="res://assets/party_kitchen/buttons/add_player.svg" id="8"]
+[ext_resource type="Texture2D" uid="uid://barvyayav0plu" path="res://assets/party_kitchen/buttons/remove_player.svg" id="9"]
+[ext_resource type="Texture2D" uid="uid://cyemvf284wyqa" path="res://assets/party_kitchen/table.svg" id="10"]
 
 [node name="PlayerSelectionWidget" type="Control" unique_id=282943105 node_paths=PackedStringArray("preset_storage", "table_area", "icons_layer", "chairs_layer", "add_player_button", "edit_player_window")]
 layout_mode = 3
@@ -48,7 +48,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Table" type="TextureRect" parent="TableArea" unique_id=1694545373]
-z_index = 0
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -102,17 +102,11 @@ script = ExtResource("2")
 game_config = ExtResource("5")
 menu_events = ExtResource("7")
 
-[node name="ModalLayer" type="CanvasLayer" parent="."]
+[node name="ModalLayer" type="CanvasLayer" parent="." unique_id=1213723210]
 layer = 20
 
 [node name="EditPlayerWindow" parent="ModalLayer" unique_id=1947908710 instance=ExtResource("4")]
 visible = false
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 0
-preset_storage = NodePath("../../PresetStorage")
 account = ExtResource("6")
+preset_storage = NodePath("../../PresetStorage")
 game_config = ExtResource("5")
