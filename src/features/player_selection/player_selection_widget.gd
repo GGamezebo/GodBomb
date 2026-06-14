@@ -31,9 +31,6 @@ const HINT_MIN_PLAYERS := "Для игры нужно минимум 2 игро�
 const HINT_HOLD_EDIT := "Удержи 2 сек — изменить имя и цвет"
 const HOLD_EDIT_HINT_DURATION := 5.0
 const SWAP_IDLE_HINT_DURATION := 5.0
-const HINT_BANNER_PAD_BELOW_TOP_BAR := 10.0
-const HINT_BANNER_PAD_ABOVE_TABLE := 10.0
-const TOP_BAR_BOTTOM_FALLBACK := 160.0
 const BADGE_GAP_AFTER_ARROWS := 16.0
 const BADGE_MIN_FROM_SEAT := 72.0
 const DRAG_ORDER_ALPHA := 0.75
@@ -76,6 +73,41 @@ func _ready() -> void:
 	_sync_edit_window_refs()
 	reload_from_account()
 	_apply_add_button_texture()
+	_connect_bomb_layout()
+
+
+func _connect_bomb_layout() -> void:
+	var layout := _find_menu_bomb_layout()
+	if not layout:
+		return
+	if not layout.layout_applied.is_connected(_on_bomb_layout_applied):
+		layout.layout_applied.connect(_on_bomb_layout_applied)
+	_on_bomb_layout_applied()
+
+
+func _on_bomb_layout_applied() -> void:
+	_schedule_position_update()
+	_update_hint_banner_layout()
+	_apply_remove_ring_radius()
+	_layout_remove_button_ring()
+
+
+func _find_menu_bomb_layout() -> MenuBombLayout:
+	var node: Node = self
+	while node:
+		if node is MenuBombLayout:
+			return node as MenuBombLayout
+		node = node.get_parent()
+	return null
+
+
+func _get_hint_anchor_design_position() -> Vector2:
+	var layout := _find_menu_bomb_layout()
+	if layout:
+		return layout.get_hint_marker_design_position()
+	if table_area:
+		return Vector2(table_area.position.x + table_area.size.x * 0.5, table_area.position.y - 48.0)
+	return Vector2(size.x * 0.5, 160.0)
 
 
 func _apply_add_button_texture() -> void:
@@ -395,35 +427,15 @@ func _layout_table_order_badges() -> void:
 
 
 func _update_hint_banner_layout() -> void:
-	if not _table_hint_banner or not table_area:
+	if not _table_hint_banner:
 		return
-	var banner_width := maxf(TableHintBanner.MIN_WIDTH, table_area.size.x - 96.0)
+	var anchor := _get_hint_anchor_design_position()
+	var banner_width := maxf(TableHintBanner.MIN_WIDTH, minf(table_area.size.x - 96.0, 920.0) if table_area else 920.0)
 	_table_hint_banner.custom_minimum_size = Vector2(banner_width, 0)
 	_table_hint_banner.reset_size()
 	var banner_size := _table_hint_banner.get_combined_minimum_size()
 	_table_hint_banner.size = banner_size
-	_table_hint_banner.position = Vector2(
-		table_area.position.x + (table_area.size.x - banner_size.x) * 0.5,
-		_get_hint_banner_y(banner_size)
-	)
-
-
-func _get_top_bar_bottom_local_y() -> float:
-	if get_parent():
-		var top_bar := get_parent().find_child("TopBar", true, false) as Control
-		if top_bar:
-			var bottom_global: Vector2 = top_bar.global_position + Vector2(0.0, top_bar.size.y)
-			return (get_global_transform_with_canvas().affine_inverse() * bottom_global).y
-	return TOP_BAR_BOTTOM_FALLBACK
-
-
-func _get_hint_banner_y(banner_size: Vector2) -> float:
-	var gap_top := _get_top_bar_bottom_local_y() + HINT_BANNER_PAD_BELOW_TOP_BAR
-	var gap_bottom := table_area.position.y - HINT_BANNER_PAD_ABOVE_TABLE
-	var max_y := gap_bottom - banner_size.y
-	if max_y <= gap_top:
-		return gap_top
-	return gap_top + (max_y - gap_top) * 0.5
+	_table_hint_banner.position = anchor - banner_size * 0.5
 
 
 func _refresh_turn_order() -> void:

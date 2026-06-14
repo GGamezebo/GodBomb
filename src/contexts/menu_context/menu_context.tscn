@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://wcp2ufiuf4an"]
+[gd_scene load_steps=17 format=3 uid="uid://wcp2ufiuf4an"]
 
 [ext_resource type="Script" uid="uid://bbkkoj6f7bb4r" path="res://src/contexts/menu_context/menu_context.gd" id="1"]
 [ext_resource type="Resource" path="res://src/contexts/main_context/main_events.tres" id="2"]
@@ -6,8 +6,8 @@
 [ext_resource type="Resource" path="res://src/contexts/main_context/account/pdata_account.tres" id="4"]
 [ext_resource type="Resource" path="res://src/common/menu_events.tres" id="5"]
 [ext_resource type="PackedScene" uid="uid://duug5w0r0cqrv" path="res://src/features/player_selection/player_selection_widget.tscn" id="6"]
-[ext_resource type="Texture2D" uid="uid://cd8mos367bdx5" path="res://assets/party_kitchen/background_menu.svg" id="7"]
 [ext_resource type="Texture2D" uid="uid://b27y0jjb7mmmy" path="res://assets/party_kitchen/buttons/start_active.svg" id="8"]
+[ext_resource type="Texture2D" uid="uid://de4n5e1fxki8i" path="res://assets/textures/Background/Background.png" id="8_ksiyf"]
 [ext_resource type="Texture2D" uid="uid://cjgo8et40dwnd" path="res://assets/party_kitchen/buttons/start_inactive.svg" id="9"]
 [ext_resource type="PackedScene" path="res://src/features/menu/settings_window.tscn" id="10"]
 [ext_resource type="PackedScene" path="res://src/features/menu/rules_window.tscn" id="11"]
@@ -15,8 +15,9 @@
 [ext_resource type="Texture2D" uid="uid://b72rn4jb7t7eq" path="res://assets/party_kitchen/buttons/icon_music_on.svg" id="13"]
 [ext_resource type="Texture2D" uid="uid://cbb8gsai6lwuy" path="res://assets/party_kitchen/buttons/icon_music_off.svg" id="14"]
 [ext_resource type="Texture2D" uid="uid://ci0nbi42m75wm" path="res://assets/party_kitchen/buttons/icon_rules.svg" id="15"]
+[ext_resource type="Script" path="res://src/features/menu/menu_bomb_layout.gd" id="16"]
 
-[node name="MenuContext" type="Control" unique_id=1137190925 node_paths=PackedStringArray("start_button", "player_selection_widget", "settings_button", "music_button", "rules_button", "settings_window", "rules_window")]
+[node name="MenuContext" type="Control" node_paths=PackedStringArray("start_button", "player_selection_widget", "settings_button", "music_button", "rules_button", "settings_window", "rules_window")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -28,86 +29,103 @@ main_events = ExtResource("2")
 game_config = ExtResource("3")
 account = ExtResource("4")
 menu_events = ExtResource("5")
-start_button = NodePath("StartButton")
-player_selection_widget = NodePath("PlayerSelectionWidget")
-settings_button = NodePath("TopBarLayer/TopBar/SettingsButton")
-music_button = NodePath("TopBarLayer/TopBar/MusicButton")
-rules_button = NodePath("TopBarLayer/TopBar/RulesButton")
+start_button = NodePath("BackgroundBomb/ScaledContent/StartButton")
+player_selection_widget = NodePath("BackgroundBomb/ScaledContent/PlayerSelectionWidget")
+settings_button = NodePath("BackgroundBomb/ScaledContent/TopBar/SettingsButton")
+music_button = NodePath("BackgroundBomb/ScaledContent/TopBar/MusicButton")
+rules_button = NodePath("BackgroundBomb/ScaledContent/TopBar/RulesButton")
 settings_window = NodePath("ModalLayer/SettingsWindow")
 rules_window = NodePath("ModalLayer/RulesWindow")
 music_on_texture = ExtResource("13")
 music_off_texture = ExtResource("14")
 
-[node name="Background" type="TextureRect" parent="." unique_id=893368180]
+[node name="Background" type="TextureRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("7")
+mouse_filter = 2
+
+[node name="BackgroundBomb" type="TextureRect" parent="." node_paths=PackedStringArray("scaled_content")]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("8_ksiyf")
 expand_mode = 1
 stretch_mode = 6
+script = ExtResource("16")
+scaled_content = NodePath("ScaledContent")
+hint_marker = NodePath("ScaledContent/Marker2D")
 
-[node name="PlayerSelectionWidget" parent="." unique_id=972041160 instance=ExtResource("6")]
-layout_mode = 1
-start_button = NodePath("../StartButton")
+[node name="ScaledContent" type="Control" parent="BackgroundBomb"]
+layout_mode = 0
+offset_right = 1080.0
+offset_bottom = 1920.0
+mouse_filter = 2
 
-[node name="TopBarLayer" type="CanvasLayer" parent="." unique_id=399366936]
-layer = 15
+[node name="Marker2D" type="Marker2D" parent="BackgroundBomb/ScaledContent"]
+position = Vector2(528, 483)
 
-[node name="TopBar" type="HBoxContainer" parent="TopBarLayer" unique_id=2002716399]
-anchors_preset = 10
-anchor_right = 1.0
-offset_left = 40.0
-offset_top = 40.0
-offset_right = -40.0
-offset_bottom = 160.0
-grow_horizontal = 2
+[node name="TopBar" type="HBoxContainer" parent="BackgroundBomb/ScaledContent"]
+layout_mode = 0
+offset_left = 26.0
+offset_top = 268.0
+offset_right = 1026.0
+offset_bottom = 388.0
 theme_override_constants/separation = 20
 alignment = 1
 
-[node name="SettingsButton" type="TextureButton" parent="TopBarLayer/TopBar" unique_id=665305160]
+[node name="SettingsButton" type="TextureButton" parent="BackgroundBomb/ScaledContent/TopBar"]
 custom_minimum_size = Vector2(112, 112)
 layout_mode = 2
 texture_normal = ExtResource("12")
 ignore_texture_size = true
 stretch_mode = 5
 
-[node name="MusicButton" type="TextureButton" parent="TopBarLayer/TopBar" unique_id=2045987059]
+[node name="MusicButton" type="TextureButton" parent="BackgroundBomb/ScaledContent/TopBar"]
 custom_minimum_size = Vector2(112, 112)
 layout_mode = 2
 texture_normal = ExtResource("13")
 ignore_texture_size = true
 stretch_mode = 5
 
-[node name="RulesButton" type="TextureButton" parent="TopBarLayer/TopBar" unique_id=51105700]
+[node name="RulesButton" type="TextureButton" parent="BackgroundBomb/ScaledContent/TopBar"]
 custom_minimum_size = Vector2(112, 112)
 layout_mode = 2
 texture_normal = ExtResource("15")
 ignore_texture_size = true
 stretch_mode = 5
 
-[node name="StartButton" type="TextureButton" parent="." unique_id=157967625]
+[node name="PlayerSelectionWidget" parent="BackgroundBomb/ScaledContent" instance=ExtResource("6")]
 layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
+anchors_preset = 15
+anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -220.0
-offset_top = -200.0
-offset_right = 220.0
-offset_bottom = -80.0
 grow_horizontal = 2
-grow_vertical = 0
+grow_vertical = 2
+mouse_filter = 2
+start_button = NodePath("../StartButton")
+
+[node name="StartButton" type="TextureButton" parent="BackgroundBomb/ScaledContent"]
+z_index = 4
+layout_mode = 0
+offset_left = 325.0
+offset_top = 1388.0
+offset_right = 765.0
+offset_bottom = 1508.0
 disabled = true
 texture_normal = ExtResource("8")
 texture_disabled = ExtResource("9")
 ignore_texture_size = true
 stretch_mode = 5
 
-[node name="StartLabel" type="Label" parent="StartButton" unique_id=1309503180]
+[node name="StartLabel" type="Label" parent="BackgroundBomb/ScaledContent/StartButton"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -120,9 +138,12 @@ text = "СТАРТ"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="ModalLayer" type="CanvasLayer" parent="." unique_id=1308098573]
+[node name="ModalLayer" type="CanvasLayer" parent="."]
 layer = 30
+visible = false
 
-[node name="SettingsWindow" parent="ModalLayer" unique_id=1666640120 instance=ExtResource("10")]
+[node name="SettingsWindow" parent="ModalLayer" instance=ExtResource("10")]
+visible = false
 
-[node name="RulesWindow" parent="ModalLayer" unique_id=2008206316 instance=ExtResource("11")]
+[node name="RulesWindow" parent="ModalLayer" instance=ExtResource("11")]
+visible = false
