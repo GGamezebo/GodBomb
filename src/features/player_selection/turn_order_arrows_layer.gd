@@ -14,6 +14,10 @@ var _pulse_boost: float = 1.0
 var _dimmed: bool = false
 
 
+static func min_clearance_radius(center_button_radius: float) -> float:
+	return center_button_radius + RING_MARGIN + STROKE + 3.0
+
+
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)

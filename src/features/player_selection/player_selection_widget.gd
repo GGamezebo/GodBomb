@@ -31,6 +31,8 @@ const SWAP_IDLE_HINT_DURATION := 5.0
 const HINT_BANNER_PAD_BELOW_TOP_BAR := 10.0
 const HINT_BANNER_PAD_ABOVE_TABLE := 10.0
 const TOP_BAR_BOTTOM_FALLBACK := 160.0
+const BADGE_GAP_AFTER_ARROWS := 16.0
+const BADGE_MIN_FROM_SEAT := 72.0
 
 var _player_icons: Array[PlayerIcon] = []
 var _chairs: Array[TextureRect] = []
@@ -43,6 +45,8 @@ var _add_pulse_tween: Tween
 var _start_bomb_preview: TextureRect
 var _is_start_preview_playing: bool = false
 var _turn_order_arrows: TurnOrderArrowsLayer
+var _order_badges_layer: Control
+var _order_badges: Array[SeatOrderBadge] = []
 var _table_hint_banner: TableHintBanner
 var _swap_drag_hint_active: bool = false
 var _remove_hint_active: bool = false
@@ -53,6 +57,7 @@ var listener: EventListener = EventListener.new()
 
 func _ready() -> void:
 	_setup_turn_order_arrows()
+	_setup_order_badges()
 	_setup_start_bomb_preview()
 	_setup_swap_hints()
 	if add_player_button:
@@ -111,6 +116,17 @@ func _setup_turn_order_arrows() -> void:
 	table_area.add_child(_turn_order_arrows)
 
 
+func _setup_order_badges() -> void:
+	if not table_area:
+		return
+	_order_badges_layer = Control.new()
+	_order_badges_layer.name = "OrderBadgesLayer"
+	_order_badges_layer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_order_badges_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_order_badges_layer.z_index = 2
+	table_area.add_child(_order_badges_layer)
+
+
 func _setup_swap_hints() -> void:
 	_table_hint_banner = TableHintBanner.new()
 	_table_hint_banner.z_index = 12
@@ -147,9 +163,12 @@ func _clear_icons() -> void:
 		icon.queue_free()
 	for chair in _chairs:
 		chair.queue_free()
+	for badge in _order_badges:
+		badge.queue_free()
 	_player_icons.clear()
 	_chairs.clear()
 	_chair_rings.clear()
+	_order_badges.clear()
 
 
 func _create_player_icon(info: PlayerInfo) -> PlayerIcon:
@@ -223,19 +242,58 @@ func _update_positions() -> void:
 		_player_icons[i].set_order_index(i, player_count)
 		_player_icons[i].reset_home_position(seat_global, true)
 
-	call_deferred("_layout_all_order_badges")
+	call_deferred("_layout_table_order_badges")
 
 	_update_hint_banner_layout()
 	_refresh_turn_order()
 	_refresh_table_hint()
 
 
-func _layout_all_order_badges() -> void:
-	if not table_area:
+func _center_button_radius() -> float:
+	var button_radius := 72.0
+	if add_player_button:
+		button_radius = maxf(add_player_button.size.x, add_player_button.size.y) * 0.5
+	return button_radius
+
+
+func _seat_badge_local_for_index(index: int, player_count: int) -> Vector2:
+	var center := table_area.size * 0.5
+	var seat_local := _seat_local_for_index(index, player_count)
+	var outward := (seat_local - center).normalized()
+	var seat_dist := center.distance_to(seat_local)
+	var min_radius := TurnOrderArrowsLayer.min_clearance_radius(_center_button_radius()) + BADGE_GAP_AFTER_ARROWS
+	var max_radius := seat_dist - BADGE_MIN_FROM_SEAT
+	var badge_radius := min_radius + 10.0
+	if max_radius > min_radius:
+		badge_radius = clampf(badge_radius, min_radius, max_radius)
+	else:
+		badge_radius = (min_radius + max_radius) * 0.5
+	return center + outward * badge_radius
+
+
+func _sync_order_badges(player_count: int) -> void:
+	while _order_badges.size() < player_count:
+		var badge := SeatOrderBadge.new()
+		_order_badges_layer.add_child(badge)
+		_order_badges.append(badge)
+	while _order_badges.size() > player_count:
+		var badge: SeatOrderBadge = _order_badges.pop_back()
+		badge.queue_free()
+
+
+func _layout_table_order_badges() -> void:
+	if not table_area or not _order_badges_layer:
 		return
+	var player_count := _player_icons.size()
+	_sync_order_badges(player_count)
 	var table_center_global := table_area.global_position + table_area.size * 0.5
+	for i in player_count:
+		var badge := _order_badges[i]
+		var badge_local := _seat_badge_local_for_index(i, player_count)
+		badge.set_number(i + 1)
+		badge.position = badge_local - badge.size * 0.5
 	for icon in _player_icons:
-		icon.layout_order_badge(table_center_global)
+		icon.layout_name_plate(table_center_global)
 
 
 func _update_hint_banner_layout() -> void:
@@ -276,9 +334,7 @@ func _refresh_turn_order() -> void:
 	var min_players := game_config.min_players if game_config else 2
 	var count := _player_icons.size()
 	var can_start := count >= min_players
-	var button_radius := 72.0
-	if add_player_button:
-		button_radius = maxf(add_player_button.size.x, add_player_button.size.y) * 0.5
+	var button_radius := _center_button_radius()
 	_turn_order_arrows.update_state(table_area.size, can_start, count >= 2, button_radius)
 
 
@@ -694,7 +750,7 @@ func _play_swap_whoosh(icon_a: PlayerIcon, icon_b: PlayerIcon, index_a: int, ind
 		var seat_global := table_area.global_position + _seat_local_for_index(i, player_count)
 		_player_icons[i].reset_home_position(seat_global, true)
 
-	call_deferred("_layout_all_order_badges")
+	call_deferred("_layout_table_order_badges")
 
 
 func play_start_preview(on_complete: Callable) -> void:
