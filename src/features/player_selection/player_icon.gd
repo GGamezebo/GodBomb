@@ -2,9 +2,16 @@ class_name PlayerIcon
 extends Control
 
 const SLIME_PATH := "res://assets/party_kitchen/slimes/%d.svg"
-const ICON_SIZE := Vector2(110, 180)
+const ICON_SIZE := Vector2(110, 200)
 const SLIME_SIZE := Vector2(104, 104)
 const SLIME_POSITION := Vector2(3, 32)
+const NAME_GAP := 6.0
+const NAME_PLATE_PAD_X := 14.0
+const NAME_FONT_MAX := 30
+const NAME_FONT_MIN := 10
+const NAME_PLATE_MIN_WIDTH := 72.0
+const NAME_PLATE_MAX_WIDTH := 240.0
+const NAME_NEIGHBOR_MARGIN := 0.86
 
 signal drag_started
 signal drag_ended
@@ -45,6 +52,7 @@ var _hold_progress_ring: HoldProgressRing
 var _hold_idle_hint: HoldEditIdleHint
 var _last_drag_global: Vector2 = Vector2.ZERO
 var _release_slime_center: Vector2 = Vector2.ZERO
+var _table_center_global: Vector2 = Vector2.ZERO
 
 
 func _ready() -> void:
@@ -121,7 +129,7 @@ func set_player_data(info: PlayerInfo, index: int, player_count: int = -1) -> vo
 		name_label.text = info.name
 	if slime_rect:
 		slime_rect.texture = load(SLIME_PATH % info.preset_id)
-	layout_name_plate()
+	layout_name_plate(_table_center_global)
 
 
 func get_player_info() -> PlayerInfo:
@@ -134,22 +142,33 @@ func set_order_index(index: int, player_count: int = -1) -> void:
 		_display_player_count = player_count
 
 
-func layout_name_plate(_table_center_global: Vector2 = Vector2.ZERO) -> void:
+func layout_name_plate(table_center_global: Vector2 = Vector2.ZERO) -> void:
 	if not slime_rect or not name_label:
 		return
 	var name_plate := name_label.get_parent() as Control
 	if not name_plate:
 		return
 
-	const NAME_GAP := 6.0
-	const PLATE_WIDTH := 100.0
+	if table_center_global != Vector2.ZERO:
+		_table_center_global = table_center_global
+
+	name_label.clip_text = false
+	name_label.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING
+	name_label.autowrap_mode = TextServer.AUTOWRAP_OFF
+
+	var max_plate_width := _compute_max_plate_width()
+	var font_size := _fit_name_font_size(max_plate_width)
+	name_label.add_theme_font_size_override("font_size", font_size)
+
+	var text_width := _measure_name_width(font_size)
+	var plate_width := clampf(text_width + NAME_PLATE_PAD_X * 2.0, NAME_PLATE_MIN_WIDTH, max_plate_width)
 
 	name_plate.z_index = 2
-	name_plate.custom_minimum_size = Vector2(PLATE_WIDTH, 0)
+	name_plate.custom_minimum_size = Vector2(plate_width, 0)
 	name_plate.reset_size()
 	var plate_size := name_plate.get_combined_minimum_size()
 	if plate_size.y <= 0.0:
-		plate_size.y = 34.0
+		plate_size.y = float(font_size) + 12.0
 	name_plate.size = plate_size
 
 	var seat_anchor := _compute_seat_offset()
@@ -158,6 +177,46 @@ func layout_name_plate(_table_center_global: Vector2 = Vector2.ZERO) -> void:
 		seat_anchor.x - plate_size.x * 0.5,
 		slime_bottom + NAME_GAP
 	)
+
+
+func _compute_max_plate_width() -> float:
+	var player_count := maxi(_display_player_count, 1)
+	if player_count <= 1:
+		return NAME_PLATE_MAX_WIDTH
+
+	var seat_dist := 144.0
+	if _table_center_global != Vector2.ZERO and home_position != Vector2.ZERO:
+		seat_dist = home_position.distance_to(_table_center_global)
+	elif slime_rect:
+		seat_dist = maxf(seat_dist, _compute_seat_offset().distance_to(size * 0.5) + 40.0)
+
+	var angle_step := TAU / float(player_count)
+	var name_radius := seat_dist + slime_rect.size.y * 0.5 + NAME_GAP + float(NAME_FONT_MAX) * 0.55
+	var chord := 2.0 * name_radius * sin(angle_step * 0.5)
+	return clampf(chord * NAME_NEIGHBOR_MARGIN, NAME_PLATE_MIN_WIDTH, NAME_PLATE_MAX_WIDTH)
+
+
+func _fit_name_font_size(max_plate_width: float) -> int:
+	var available_text_width := maxf(max_plate_width - NAME_PLATE_PAD_X * 2.0, 24.0)
+	for size in range(NAME_FONT_MAX, NAME_FONT_MIN - 1, -1):
+		if _measure_name_width(size) <= available_text_width:
+			return size
+	return NAME_FONT_MIN
+
+
+func _measure_name_width(font_size: int) -> float:
+	if not name_label:
+		return 0.0
+	var text := name_label.text if not name_label.text.is_empty() else "Игрок"
+	var font := name_label.get_theme_font("font")
+	if font == null:
+		return float(text.length()) * float(font_size) * 0.55
+	return font.get_string_size(
+		text,
+		HORIZONTAL_ALIGNMENT_LEFT,
+		-1,
+		font_size
+	).x
 
 
 func refresh_seat_offset() -> void:
@@ -173,7 +232,7 @@ func apply_fixed_layout() -> void:
 		slime_rect.position = SLIME_POSITION
 		slime_rect.size = SLIME_SIZE
 	_cache_seat_offset()
-	layout_name_plate()
+	layout_name_plate(_table_center_global)
 	_layout_hold_overlays()
 
 

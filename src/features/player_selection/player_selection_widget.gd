@@ -322,7 +322,7 @@ func _clear_icons() -> void:
 func _create_player_icon(info: PlayerInfo) -> PlayerIcon:
 	var icon: PlayerIcon = player_icon_scene.instantiate()
 	icon.lobby_phase_offset = randf() * TAU
-	icon.set_player_data(info, _player_icons.size())
+	icon.set_player_data(info, _player_icons.size(), _player_icons.size() + 1)
 	icon.drag_started.connect(_on_icon_drag_started.bind(icon))
 	icon.drag_ended.connect(_on_icon_drag_ended.bind(icon))
 	icon.hold_edit_requested.connect(_on_icon_hold_edit)
