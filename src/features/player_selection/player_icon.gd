@@ -2,6 +2,9 @@ class_name PlayerIcon
 extends Control
 
 const SLIME_PATH := "res://assets/party_kitchen/slimes/%d.svg"
+const ICON_SIZE := Vector2(110, 180)
+const SLIME_SIZE := Vector2(104, 104)
+const SLIME_POSITION := Vector2(3, 32)
 
 signal drag_started
 signal drag_ended
@@ -53,12 +56,9 @@ func _ready() -> void:
 
 
 func _setup_slime_pivot() -> void:
-	if not slime_rect:
-		return
-	slime_rect.pivot_offset = slime_rect.size * 0.5
-	_cache_seat_offset()
-	layout_name_plate()
-	_layout_hold_overlays()
+	apply_fixed_layout()
+	if slime_rect:
+		slime_rect.pivot_offset = slime_rect.size * 0.5
 
 
 func _setup_edit_hint() -> void:
@@ -156,6 +156,19 @@ func layout_name_plate(_table_center_global: Vector2 = Vector2.ZERO) -> void:
 
 func refresh_seat_offset() -> void:
 	_cache_seat_offset()
+
+
+func apply_fixed_layout() -> void:
+	custom_minimum_size = ICON_SIZE
+	size = ICON_SIZE
+	if slime_rect:
+		slime_rect.layout_mode = 0
+		slime_rect.set_anchors_preset(Control.PRESET_TOP_LEFT)
+		slime_rect.position = SLIME_POSITION
+		slime_rect.size = SLIME_SIZE
+	_cache_seat_offset()
+	layout_name_plate()
+	_layout_hold_overlays()
 
 
 func _cache_seat_offset() -> void:
@@ -497,3 +510,8 @@ func _reset_slime_visuals() -> void:
 	slime_rect.rotation = 0.0
 	slime_rect.modulate = Color.WHITE
 	_reset_hold_feedback()
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_RESIZED:
+		apply_fixed_layout()

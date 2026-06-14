@@ -325,6 +325,9 @@ func _apply_chair_transform(chair: TextureRect, seat_local: Vector2) -> void:
 func _update_positions() -> void:
 	if not table_area:
 		return
+	const TABLE_SIZE := Vector2(640, 640)
+	table_area.custom_minimum_size = TABLE_SIZE
+	table_area.size = TABLE_SIZE
 	if _player_icons.is_empty():
 		_sync_order_badges(0)
 		_update_hint_banner_layout()
@@ -342,6 +345,7 @@ func _update_positions() -> void:
 		var seat_global := table_area.global_position + seat_local
 		_apply_chair_transform(_chairs[i], seat_local)
 		_player_icons[i].set_order_index(i, player_count)
+		_player_icons[i].apply_fixed_layout()
 		_player_icons[i].reset_home_position(seat_global, true)
 
 	call_deferred("_layout_table_order_badges")
