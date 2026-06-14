@@ -7,6 +7,7 @@ var fsm: FSM
 var session: GameSession = GameSession.new()
 var states: Array[StateBase] = []
 var _session_ready: bool = false
+var _paused: bool = false
 
 
 func _ready() -> void:
@@ -27,6 +28,16 @@ func setup_session(game_config: GameConfig, account: PDataAccount) -> void:
 	if fsm == null:
 		_start_fsm()
 	set_process(true)
+
+
+func set_paused(paused: bool) -> void:
+	_paused = paused
+
+
+func resync_players_from_account(account: PDataAccount) -> void:
+	if not _session_ready:
+		return
+	session.resync_players_from_account(account)
 
 
 func _collect_states() -> void:
@@ -83,7 +94,7 @@ func _start_fsm() -> void:
 
 
 func _process(delta: float) -> void:
-	if not _session_ready or fsm == null:
+	if not _session_ready or fsm == null or _paused:
 		return
 
 	var state_name := fsm.get_current_state_name()

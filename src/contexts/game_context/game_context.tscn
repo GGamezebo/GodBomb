@@ -26,8 +26,14 @@
 [ext_resource type="Script" uid="uid://dkplswcbvqptx" path="res://src/features/background/game_bomb_background.gd" id="27"]
 [ext_resource type="Texture2D" uid="uid://b27y0jjb7mmmy" path="res://assets/party_kitchen/buttons/start_active.svg" id="28"]
 [ext_resource type="Script" path="res://src/features/bomb/bomb_lamps.gd" id="29"]
+[ext_resource type="Resource" path="res://src/common/menu_events.tres" id="31"]
+[ext_resource type="Texture2D" path="res://assets/party_kitchen/buttons/icon_exit_menu.svg" id="32"]
+[ext_resource type="Texture2D" path="res://assets/party_kitchen/buttons/icon_players.svg" id="33"]
+[ext_resource type="Script" path="res://src/contexts/game_context/ui/game_battle_chrome.gd" id="34"]
+[ext_resource type="PackedScene" path="res://src/features/menu/exit_confirm_dialog.tscn" id="35"]
+[ext_resource type="PackedScene" path="res://src/contexts/game_context/ui/battle_player_lobby_overlay.tscn" id="36"]
 
-[node name="GameContext" type="Control" unique_id=1610270397 node_paths=PackedStringArray("game_manager")]
+[node name="GameContext" type="Control" unique_id=1610270397 node_paths=PackedStringArray("game_manager", "battle_chrome")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -40,6 +46,7 @@ account = ExtResource("13")
 main_events = ExtResource("14")
 game_events = ExtResource("15")
 game_manager = NodePath("GameManager")
+battle_chrome = NodePath("UI/BackgroundBomb/ScaledContent/GameBattleChrome")
 
 [node name="GameManager" type="Node" parent="." unique_id=2103439218]
 script = ExtResource("2")
@@ -132,6 +139,48 @@ mouse_filter = 2
 script = ExtResource("29")
 game_events = ExtResource("15")
 
+[node name="GameBattleChrome" type="Control" parent="UI/BackgroundBomb/ScaledContent" node_paths=PackedStringArray("game_manager", "game_hud", "top_bar", "exit_button", "players_button", "player_lobby_overlay", "exit_confirm_dialog")]
+layout_mode = 0
+offset_right = 1080.0
+offset_bottom = 1920.0
+mouse_filter = 2
+script = ExtResource("34")
+main_events = ExtResource("14")
+menu_events = ExtResource("31")
+game_events = ExtResource("15")
+game_config = ExtResource("12")
+game_manager = NodePath("../../../GameManager")
+game_hud = NodePath("../../HUD")
+top_bar = NodePath("TopBar")
+exit_button = NodePath("TopBar/ExitButton")
+players_button = NodePath("TopBar/PlayersButton")
+player_lobby_overlay = NodePath("../../../../BattlePlayerLobbyOverlay")
+exit_confirm_dialog = NodePath("../../../../ModalLayer/ExitConfirmDialog")
+
+[node name="TopBar" type="HBoxContainer" parent="UI/BackgroundBomb/ScaledContent/GameBattleChrome"]
+z_index = 8
+layout_mode = 0
+offset_left = 26.0
+offset_top = 268.0
+offset_right = 1026.0
+offset_bottom = 388.0
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="ExitButton" type="TextureButton" parent="UI/BackgroundBomb/ScaledContent/GameBattleChrome/TopBar"]
+custom_minimum_size = Vector2(112, 112)
+layout_mode = 2
+texture_normal = ExtResource("32")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="PlayersButton" type="TextureButton" parent="UI/BackgroundBomb/ScaledContent/GameBattleChrome/TopBar"]
+custom_minimum_size = Vector2(112, 112)
+layout_mode = 2
+texture_normal = ExtResource("33")
+ignore_texture_size = true
+stretch_mode = 5
+
 [node name="ExplosionEffect" type="Node2D" parent="UI/BackgroundBomb/ScaledContent" unique_id=1230183710 node_paths=PackedStringArray("particles")]
 z_index = 6
 position = Vector2(540, 1050)
@@ -217,3 +266,13 @@ mouse_filter = 2
 script = ExtResource("10")
 game_manager = NodePath("../../GameManager")
 start_round_button = NodePath("../BackgroundBomb/ScaledContent/StartRoundButton")
+
+[node name="BattlePlayerLobbyOverlay" parent="." instance=ExtResource("36")]
+visible = false
+
+[node name="ModalLayer" type="CanvasLayer" parent="."]
+layer = 30
+visible = false
+
+[node name="ExitConfirmDialog" parent="ModalLayer" instance=ExtResource("35")]
+visible = false

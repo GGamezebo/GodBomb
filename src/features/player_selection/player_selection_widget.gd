@@ -54,6 +54,7 @@ var _remove_hint_active: bool = false
 var _swap_idle_intro_played: bool = false
 var _swap_idle_hint_showing: bool = false
 var _hold_edit_hint_showing: bool = false
+var _battle_mode: bool = false
 var listener: EventListener = EventListener.new()
 
 
@@ -73,8 +74,18 @@ func _ready() -> void:
 	_connect_bomb_layout()
 
 
+func set_battle_mode(enabled: bool) -> void:
+	_battle_mode = enabled
+	min_players_for_remove = 2 if enabled else 0
+	if enabled and _is_remove_mode:
+		_set_remove_mode(false)
+	_update_add_button()
+	_update_start_button()
+	_refresh_table_hint()
+
+
 func _connect_bomb_layout() -> void:
-	var layout := _find_menu_bomb_layout()
+	var layout := _find_layout_host()
 	if not layout:
 		return
 	if not layout.layout_applied.is_connected(_on_bomb_layout_applied):
@@ -89,17 +100,17 @@ func _on_bomb_layout_applied() -> void:
 	_layout_remove_button_ring()
 
 
-func _find_menu_bomb_layout() -> MenuBombLayout:
+func _find_layout_host() -> Node:
 	var node: Node = self
 	while node:
-		if node is MenuBombLayout:
-			return node as MenuBombLayout
+		if node.has_signal("layout_applied") and node.has_method("get_hint_marker_design_position"):
+			return node
 		node = node.get_parent()
 	return null
 
 
 func _get_hint_anchor_design_position() -> Vector2:
-	var layout := _find_menu_bomb_layout()
+	var layout := _find_layout_host()
 	if layout:
 		return layout.get_hint_marker_design_position()
 	if table_area:
@@ -121,6 +132,37 @@ func _sync_edit_window_refs() -> void:
 		return
 	edit_player_window.account = account
 	edit_player_window.preset_storage = preset_storage
+
+
+func bind_account(p_account: PDataAccount, p_controller: Node = null) -> void:
+	if p_account:
+		account = p_account
+	if p_controller:
+		pdata_controller = p_controller
+	_sync_edit_window_refs()
+
+
+func get_roster_size() -> int:
+	return _player_icons.size()
+
+
+func commit_roster_to_account() -> void:
+	if not account:
+		return
+	var players: Array = []
+	for icon in _player_icons:
+		var info := icon.get_player_info()
+		if info == null:
+			continue
+		players.append(account.dict_from_player_info(info))
+	account.set_players(players)
+	if preset_storage:
+		preset_storage.rebuild_locks(players)
+
+
+func persist_account() -> void:
+	commit_roster_to_account()
+	_save_account()
 
 
 func _exit_tree() -> void:
@@ -442,6 +484,8 @@ func _min_players_required() -> int:
 
 
 func _needs_min_players_hint() -> bool:
+	if _battle_mode:
+		return false
 	return _player_icons.size() < _min_players_required() and _dragging_icon == null
 
 
@@ -557,6 +601,25 @@ func _update_add_button() -> void:
 
 
 func _update_start_button() -> void:
+	if _battle_mode:
+		_refresh_turn_order()
+		if start_button:
+			var count := _player_icons.size()
+			start_button.visible = true
+			start_button.disabled = count < _min_players_required()
+			_kill_start_pulse_tween()
+			start_button.scale = Vector2.ONE
+			start_button.modulate = Color.WHITE if not start_button.disabled else Color(0.88, 0.88, 0.88, 1)
+			var label := start_button.get_node_or_null("StartLabel") as Label
+			if not label:
+				label = start_button.get_node_or_null("DoneLabel") as Label
+			if label:
+				label.text = "ГОТОВО"
+				label.add_theme_color_override(
+					"font_color",
+					Color(1, 1, 1, 1) if not start_button.disabled else Color(0.94, 0.92, 0.9, 1)
+				)
+		return
 	if not start_button:
 		return
 	var min_players := game_config.min_players if game_config else 2
@@ -593,6 +656,8 @@ func _update_add_button_animation(need_more_players: bool) -> void:
 	add_player_button.modulate = Color.WHITE
 	add_player_button.pivot_offset = add_player_button.size * 0.5
 	add_player_button.scale = Vector2.ONE
+	if _battle_mode:
+		return
 	if need_more_players and not _is_remove_mode:
 		_add_pulse_tween = create_tween().set_loops()
 		_add_pulse_tween.tween_property(add_player_button, "scale", Vector2(1.12, 1.12), 0.55).set_trans(Tween.TRANS_SINE)
@@ -618,9 +683,11 @@ func _set_remove_mode(enabled: bool) -> void:
 		if add_player_button:
 			add_player_button.scale = Vector2.ONE
 			add_player_button.modulate = Color.WHITE
-		menu_events.ev_player_move_begin.emit()
+		if menu_events:
+			menu_events.ev_player_move_begin.emit()
 	else:
-		menu_events.ev_player_move_end.emit()
+		if menu_events:
+			menu_events.ev_player_move_end.emit()
 	_update_add_button()
 
 
@@ -942,7 +1009,15 @@ func _rect_overlaps(icon: PlayerIcon, button: Control) -> bool:
 
 
 func _save_account() -> void:
+	if not account:
+		return
 	var controller := _resolve_pdata_controller()
+	if controller and "account" in controller:
+		var persistent: PDataAccount = controller.account
+		if persistent and persistent != account:
+			ResourceUtils.update_resource(persistent, account)
+			account = persistent
+			_sync_edit_window_refs()
 	if controller and controller.has_method("save_account"):
 		controller.save_account()
 

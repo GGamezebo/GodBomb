@@ -39,6 +39,66 @@ func setup(p_config: GameConfig, p_events: GameEvents, account: PDataAccount) ->
 	_emit_current_player()
 
 
+func resync_players_from_account(account: PDataAccount) -> void:
+	if players.is_empty():
+		setup(game_config, game_events, account)
+		return
+
+	var score_by_key: Dictionary = {}
+	for player in players:
+		score_by_key[_player_key(player.info)] = player.score
+
+	var current_key := _player_key(get_current_player().info) if not players.is_empty() else ""
+	var previous_index := current_player_index
+	var old_players: Array[GamePlayer] = []
+	old_players.assign(players)
+
+	players.clear()
+	var account_players: Array = account.get_players()
+	for i in account_players.size():
+		var info := account.player_info_from_dict(account_players[i])
+		var player := GamePlayer.new(info, i)
+		player.score = int(score_by_key.get(_player_key(info), 0))
+		players.append(player)
+
+	if players.is_empty():
+		current_player_index = 0
+		return
+
+	var next_index := 0
+	var found_current := false
+	for i in players.size():
+		if _player_key(players[i].info) == current_key:
+			next_index = i
+			found_current = true
+			break
+	if not found_current:
+		next_index = _next_clockwise_player_index(previous_index, old_players, account)
+
+	current_player_index = next_index
+	max_rand_player_choices = 40 + randi() % maxi(players.size(), 1)
+	_emit_current_player()
+
+
+func _next_clockwise_player_index(from_index: int, old_players: Array[GamePlayer], account: PDataAccount) -> int:
+	var account_players: Array = account.get_players()
+	var old_count := old_players.size()
+	if old_count == 0 or account_players.is_empty():
+		return 0
+	for step in range(1, old_count + 1):
+		var old_idx := (from_index + step) % old_count
+		var key := _player_key(old_players[old_idx].info)
+		for i in account_players.size():
+			var info := account.player_info_from_dict(account_players[i])
+			if _player_key(info) == key:
+				return i
+	return 0
+
+
+func _player_key(info: PlayerInfo) -> String:
+	return "%d|%s" % [info.preset_id, info.name]
+
+
 func _build_card_deck(game_time_minutes: int) -> void:
 	var card_strings: Array[String] = []
 	for syllable in game_config.cards:

@@ -20,6 +20,7 @@ enum DragState {
 @export var name_label: Label
 
 var _display_player_count: int = 0
+var _player_info: PlayerInfo
 @export var hold_time: float = 2.0
 @export var move_lerp_speed: float = 12.0
 @export var swap_activation_distance: float = 24.0
@@ -112,6 +113,7 @@ func get_drag_state() -> DragState:
 
 
 func set_player_data(info: PlayerInfo, index: int, player_count: int = -1) -> void:
+	_player_info = info
 	player_index = index
 	if player_count > 0:
 		_display_player_count = player_count
@@ -120,6 +122,10 @@ func set_player_data(info: PlayerInfo, index: int, player_count: int = -1) -> vo
 	if slime_rect:
 		slime_rect.texture = load(SLIME_PATH % info.preset_id)
 	layout_name_plate()
+
+
+func get_player_info() -> PlayerInfo:
+	return _player_info
 
 
 func set_order_index(index: int, player_count: int = -1) -> void:

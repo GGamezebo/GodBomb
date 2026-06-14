@@ -165,6 +165,13 @@ func _build_explosion_overlay(design_root: Control) -> void:
 	col.add_child(_explosion_subtitle)
 
 
+func set_lobby_overlay_active(active: bool) -> void:
+	if active:
+		_hide_all()
+	elif game_manager and game_manager.fsm:
+		_on_game_state_changed("", game_manager.fsm.get_current_state_name())
+
+
 func _hide_all() -> void:
 	if _battle_layer:
 		_battle_layer.visible = false

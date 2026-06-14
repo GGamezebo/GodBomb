@@ -1,0 +1,84 @@
+[gd_scene load_steps=6 format=3 uid="uid://battle_player_lobby_overlay"]
+
+[ext_resource type="Script" path="res://src/contexts/game_context/ui/battle_player_lobby_overlay.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://de4n5e1fxki8i" path="res://assets/textures/Background/Background.png" id="2"]
+[ext_resource type="Script" uid="uid://bombs212nuf58" path="res://src/features/menu/menu_bomb_layout.gd" id="3"]
+[ext_resource type="PackedScene" uid="uid://duug5w0r0cqrv" path="res://src/features/player_selection/player_selection_widget.tscn" id="4"]
+[ext_resource type="Texture2D" uid="uid://b27y0jjb7mmmy" path="res://assets/party_kitchen/buttons/start_active.svg" id="5"]
+
+[node name="BattlePlayerLobbyOverlay" type="CanvasLayer" node_paths=PackedStringArray("background_color", "player_selection_widget", "done_button")]
+layer = 12
+script = ExtResource("1")
+background_color = NodePath("Root/BackgroundColor")
+player_selection_widget = NodePath("Root/BackgroundBomb/ScaledContent/PlayerSelectionWidget")
+done_button = NodePath("Root/BackgroundBomb/ScaledContent/DoneButton")
+
+[node name="Root" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="BackgroundColor" type="ColorRect" parent="Root"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.06, 0.05, 0.04, 1)
+
+[node name="BackgroundBomb" type="TextureRect" parent="Root" node_paths=PackedStringArray("scaled_content")]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2")
+expand_mode = 1
+stretch_mode = 6
+script = ExtResource("3")
+scaled_content = NodePath("ScaledContent")
+hint_marker = NodePath("ScaledContent/Marker2D")
+
+[node name="ScaledContent" type="Control" parent="Root/BackgroundBomb"]
+anchors_preset = 0
+offset_right = 1080.0
+offset_bottom = 1920.0
+mouse_filter = 2
+
+[node name="Marker2D" type="Marker2D" parent="Root/BackgroundBomb/ScaledContent"]
+position = Vector2(528, 483)
+
+[node name="PlayerSelectionWidget" parent="Root/BackgroundBomb/ScaledContent" instance=ExtResource("4")]
+layout_mode = 1
+
+[node name="DoneButton" type="TextureButton" parent="Root/BackgroundBomb/ScaledContent"]
+z_index = 4
+layout_mode = 0
+offset_left = 325.0
+offset_top = 1388.0
+offset_right = 765.0
+offset_bottom = 1508.0
+texture_normal = ExtResource("5")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="DoneLabel" type="Label" parent="Root/BackgroundBomb/ScaledContent/DoneButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 42
+text = "ГОТОВО"
+horizontal_alignment = 1
+vertical_alignment = 1
