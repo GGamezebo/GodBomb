@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1920" width="1080" height="1920">
+  <defs>
+    <linearGradient id="wall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFF4E8"/>
+      <stop offset="55%" stop-color="#FFE8D6"/>
+      <stop offset="100%" stop-color="#FFDCC4"/>
+    </linearGradient>
+    <pattern id="tiles" width="120" height="120" patternUnits="userSpaceOnUse">
+      <rect width="120" height="120" fill="#FFE8D6"/>
+      <rect x="4" y="4" width="112" height="112" rx="8" fill="#FFF7EF" opacity="0.65"/>
+    </pattern>
+  </defs>
+  <rect width="1080" height="1920" fill="url(#wall)"/>
+  <rect width="1080" height="960" fill="url(#tiles)" opacity="0.35"/>
+  <ellipse cx="540" cy="980" rx="520" ry="420" fill="#000000" opacity="0.06"/>
+  <text x="540" y="120" text-anchor="middle" font-family="Arial, sans-serif" font-size="72" font-weight="700" fill="#5C4033">БОМБА</text>
+  <text x="540" y="175" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" fill="#8B6914" opacity="0.85">Party Kitchen</text>
+</svg>

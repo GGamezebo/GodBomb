@@ -6,9 +6,9 @@
 [ext_resource type="Resource" path="res://src/contexts/main_context/account/pdata_account.tres" id="4"]
 [ext_resource type="Resource" path="res://src/common/menu_events.tres" id="5"]
 [ext_resource type="PackedScene" path="res://src/features/player_selection/player_selection_widget.tscn" id="6"]
-[ext_resource type="Texture2D" uid="uid://bw7hyi4pisso0" path="res://assets/sprites/Background_Menu.png" id="7"]
-[ext_resource type="Texture2D" uid="uid://c3plm560pa6y8" path="res://assets/sprites/StartGame_active.png" id="8"]
-[ext_resource type="Texture2D" uid="uid://snokg6c3tme2" path="res://assets/sprites/StartGame_inactive.png" id="9"]
+[ext_resource type="Texture2D" path="res://assets/party_kitchen/background_menu.svg" id="7"]
+[ext_resource type="Texture2D" path="res://assets/party_kitchen/buttons/start_active.svg" id="8"]
+[ext_resource type="Texture2D" path="res://assets/party_kitchen/buttons/start_inactive.svg" id="9"]
 
 [node name="MenuContext" type="Control" unique_id=1137190925 node_paths=PackedStringArray("start_button", "player_selection_widget", "game_time_slider", "game_time_label")]
 layout_mode = 3

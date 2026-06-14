@@ -79,7 +79,7 @@ func _create_player_icon(info: PlayerInfo) -> PlayerIcon:
 	_player_icons.append(icon)
 
 	var chair := TextureRect.new()
-	chair.texture = load("res://assets/sprites/Chair.png")
+	chair.texture = load("res://assets/party_kitchen/chair.svg")
 	chair.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	chair.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	chair.custom_minimum_size = chair_size
@@ -166,6 +166,8 @@ func _set_remove_mode(enabled: bool) -> void:
 func _on_add_player_button_pressed() -> void:
 	if _is_remove_mode:
 		return
+	if preset_storage and account:
+		preset_storage.rebuild_locks(account.get_players())
 	if edit_player_window:
 		edit_player_window.open_add_window()
 

@@ -1,6 +1,8 @@
 class_name PlayerIcon
 extends Control
 
+const SLIME_PATH := "res://assets/party_kitchen/slimes/%d.svg"
+
 signal drag_started
 signal drag_ended
 signal hold_edit_requested(index: int)
@@ -42,7 +44,7 @@ func set_player_data(info: PlayerInfo, index: int) -> void:
 	if name_label:
 		name_label.text = info.name
 	if slime_rect:
-		slime_rect.texture = load("res://assets/slimes/%d.png" % info.preset_id)
+		slime_rect.texture = load(SLIME_PATH % info.preset_id)
 
 
 func refresh_seat_offset() -> void:

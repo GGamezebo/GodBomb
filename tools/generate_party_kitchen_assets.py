@@ -1,0 +1,194 @@
+#!/usr/bin/env python3
+"""Generate Party Kitchen SVG assets (stdlib only, no Pillow)."""
+
+from __future__ import annotations
+
+import os
+
+ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "assets", "party_kitchen"))
+
+
+SLIME_PALETTE = [
+    ("#D71E22", "#9A1518"),
+    ("#132ED1", "#0E2299"),
+    ("#117F2D", "#0C5A20"),
+    ("#ED54BA", "#B53D8E"),
+    ("#EF7D0D", "#B35E0A"),
+    ("#F5F557", "#C4C445"),
+    ("#3F474E", "#2A2F33"),
+    ("#D6E0F0", "#A8B4C8"),
+    ("#6B2FBC", "#4F2290"),
+    ("#71491E", "#523610"),
+    ("#38FEDC", "#2ABFB0"),
+    ("#50EF39", "#3DB82C"),
+]
+
+
+def write(path: str, content: str) -> None:
+    full = os.path.join(ROOT, path)
+    os.makedirs(os.path.dirname(full), exist_ok=True)
+    with open(full, "w", encoding="utf-8") as f:
+        f.write(content)
+    print("wrote", path)
+
+
+def slime_svg(main: str, dark: str) -> str:
+    outline = "#2A2118" if main.upper() not in ("#3F474E", "#132ED1", "#6B2FBC") else "#111111"
+    eye_fill = "#FFFFFF"
+    pupil = "#1A1410"
+    if main.upper() in ("#D6E0F0", "#F5F557", "#38FEDC", "#50EF39"):
+        pupil = "#1A1410"
+    return f"""<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <ellipse cx="64" cy="118" rx="38" ry="8" fill="#000000" opacity="0.18"/>
+  <path d="M24 78 C24 48 40 28 64 28 C88 28 104 48 104 78 C104 98 88 112 64 112 C40 112 24 98 24 78 Z"
+        fill="{dark}" stroke="{outline}" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M30 74 C30 50 44 34 64 34 C84 34 98 50 98 74 C98 92 84 104 64 104 C44 104 30 92 30 74 Z"
+        fill="{main}"/>
+  <ellipse cx="48" cy="62" rx="16" ry="18" fill="{eye_fill}" stroke="{outline}" stroke-width="2"/>
+  <ellipse cx="80" cy="62" rx="16" ry="18" fill="{eye_fill}" stroke="{outline}" stroke-width="2"/>
+  <circle cx="52" cy="64" r="6" fill="{pupil}"/>
+  <circle cx="84" cy="64" r="6" fill="{pupil}"/>
+  <circle cx="50" cy="60" r="3" fill="#FFFFFF" opacity="0.85"/>
+  <circle cx="82" cy="60" r="3" fill="#FFFFFF" opacity="0.85"/>
+  <path d="M54 86 Q64 92 74 86" fill="none" stroke="{outline}" stroke-width="2.5" stroke-linecap="round" opacity="0.55"/>
+  <ellipse cx="44" cy="48" rx="10" ry="6" fill="#FFFFFF" opacity="0.22"/>
+</svg>
+"""
+
+
+def color_swatch_svg(main: str, dark: str, locked: bool = False) -> str:
+    lock = ""
+    if locked:
+        lock = """
+  <line x1="16" y1="16" x2="56" y2="56" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round"/>
+  <line x1="56" y1="16" x2="16" y2="56" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round"/>
+  <rect x="0" y="0" width="72" height="72" rx="36" fill="#000000" opacity="0.45"/>
+"""
+    return f"""<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" width="72" height="72">
+  <circle cx="36" cy="36" r="32" fill="{dark}" stroke="#2A2118" stroke-width="3"/>
+  <circle cx="36" cy="36" r="26" fill="{main}"/>
+{lock}
+</svg>
+"""
+
+
+def background_svg() -> str:
+    return """<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1920" width="1080" height="1920">
+  <defs>
+    <linearGradient id="wall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFF4E8"/>
+      <stop offset="55%" stop-color="#FFE8D6"/>
+      <stop offset="100%" stop-color="#FFDCC4"/>
+    </linearGradient>
+    <pattern id="tiles" width="120" height="120" patternUnits="userSpaceOnUse">
+      <rect width="120" height="120" fill="#FFE8D6"/>
+      <rect x="4" y="4" width="112" height="112" rx="8" fill="#FFF7EF" opacity="0.65"/>
+    </pattern>
+  </defs>
+  <rect width="1080" height="1920" fill="url(#wall)"/>
+  <rect width="1080" height="960" fill="url(#tiles)" opacity="0.35"/>
+  <ellipse cx="540" cy="980" rx="520" ry="420" fill="#000000" opacity="0.06"/>
+  <text x="540" y="120" text-anchor="middle" font-family="Arial, sans-serif" font-size="72" font-weight="700" fill="#5C4033">БОМБА</text>
+  <text x="540" y="175" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" fill="#8B6914" opacity="0.85">Party Kitchen</text>
+</svg>
+"""
+
+
+def table_svg() -> str:
+    return """<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640">
+  <defs>
+    <radialGradient id="wood" cx="45%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#E8B87A"/>
+      <stop offset="100%" stop-color="#B87941"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="320" cy="340" rx="290" ry="270" fill="#000000" opacity="0.15"/>
+  <ellipse cx="320" cy="320" rx="290" ry="270" fill="url(#wood)" stroke="#8B5A2B" stroke-width="8"/>
+  <ellipse cx="320" cy="300" rx="220" ry="200" fill="#C98952" opacity="0.35"/>
+  <ellipse cx="250" cy="260" rx="80" ry="40" fill="#FFFFFF" opacity="0.12"/>
+  <circle cx="320" cy="320" r="52" fill="#A66B38" opacity="0.25"/>
+  <circle cx="320" cy="320" r="36" fill="#8B5A2B" opacity="0.2"/>
+</svg>
+"""
+
+
+def chair_svg() -> str:
+    return """<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <ellipse cx="50" cy="88" rx="34" ry="8" fill="#000000" opacity="0.12"/>
+  <rect x="22" y="58" width="56" height="14" rx="6" fill="#8B5A2B"/>
+  <rect x="26" y="18" width="48" height="44" rx="14" fill="#D4956A" stroke="#8B5A2B" stroke-width="3"/>
+  <rect x="30" y="24" width="40" height="32" rx="10" fill="#E8B87A"/>
+  <rect x="24" y="66" width="8" height="22" rx="3" fill="#6B4423"/>
+  <rect x="68" y="66" width="8" height="22" rx="3" fill="#6B4423"/>
+</svg>
+"""
+
+
+def plate_button_svg(symbol: str, accent: str, bg: str) -> str:
+    return f"""<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 144 144" width="144" height="144">
+  <ellipse cx="72" cy="78" rx="58" ry="14" fill="#000000" opacity="0.12"/>
+  <circle cx="72" cy="68" r="56" fill="#FFFDF8" stroke="#E8D5C4" stroke-width="4"/>
+  <circle cx="72" cy="68" r="44" fill="{bg}" opacity="0.15"/>
+  <text x="72" y="82" text-anchor="middle" font-family="Arial, sans-serif" font-size="56" font-weight="700" fill="{accent}">{symbol}</text>
+</svg>
+"""
+
+
+def start_button_svg(active: bool) -> str:
+    if active:
+        fill, stroke, text_c = "#FF6B4A", "#C44E32", "#FFFFFF"
+        label = "СТАРТ"
+    else:
+        fill, stroke, text_c = "#B8B0A8", "#8A827A", "#F0EBE6"
+        label = "СТАРТ"
+    return f"""<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 120" width="440" height="120">
+  <rect x="8" y="14" width="424" height="92" rx="46" fill="#000000" opacity="0.12"/>
+  <rect x="0" y="6" width="424" height="92" rx="46" fill="{fill}" stroke="{stroke}" stroke-width="5"/>
+  <text x="212" y="64" text-anchor="middle" font-family="Arial, sans-serif" font-size="42" font-weight="700" fill="{text_c}">{label}</text>
+</svg>
+"""
+
+
+def panel_svg() -> str:
+    return """<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 840" width="720" height="840">
+  <defs>
+    <linearGradient id="panel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFF9F2"/>
+      <stop offset="100%" stop-color="#FFEEDD"/>
+    </linearGradient>
+  </defs>
+  <rect x="8" y="12" width="704" height="820" rx="36" fill="#000000" opacity="0.12"/>
+  <rect x="0" y="0" width="704" height="820" rx="36" fill="url(#panel)" stroke="#E8C9A8" stroke-width="6"/>
+  <rect x="24" y="24" width="656" height="772" rx="28" fill="#FFFFFF" opacity="0.35"/>
+</svg>
+"""
+
+
+def main() -> None:
+    write("background_menu.svg", background_svg())
+    write("table.svg", table_svg())
+    write("chair.svg", chair_svg())
+    write("edit_panel.svg", panel_svg())
+    write("buttons/start_active.svg", start_button_svg(True))
+    write("buttons/start_inactive.svg", start_button_svg(False))
+    write("buttons/add_player.svg", plate_button_svg("+", "#2EAE55", "#2EAE55"))
+    write("buttons/remove_player.svg", plate_button_svg("−", "#D64545", "#D64545"))
+
+    for i, (main, dark) in enumerate(SLIME_PALETTE):
+        write(f"slimes/{i}.svg", slime_svg(main, dark))
+        write(f"color_swatches/{i}.svg", color_swatch_svg(main, dark, False))
+        write(f"color_swatches/{i}_locked.svg", color_swatch_svg(main, dark, True))
+
+    print("Done:", ROOT)
+
+
+if __name__ == "__main__":
+    main()

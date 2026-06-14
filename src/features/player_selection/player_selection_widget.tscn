@@ -7,9 +7,9 @@
 [ext_resource type="Resource" path="res://src/common/game_config_default.tres" id="5"]
 [ext_resource type="Resource" path="res://src/contexts/main_context/account/pdata_account.tres" id="6"]
 [ext_resource type="Resource" path="res://src/common/menu_events.tres" id="7"]
-[ext_resource type="Texture2D" uid="uid://ddv23yhjs6cba" path="res://assets/sprites/AddPlayer.png" id="8"]
-[ext_resource type="Texture2D" uid="uid://caca5t1ugblkb" path="res://assets/sprites/RemovePlayer.png" id="9"]
-[ext_resource type="Texture2D" uid="uid://bdbql2pbvktyp" path="res://assets/sprites/EditPlayerModelWindow/Table.png" id="10"]
+[ext_resource type="Texture2D" path="res://assets/party_kitchen/buttons/add_player.svg" id="8"]
+[ext_resource type="Texture2D" path="res://assets/party_kitchen/buttons/remove_player.svg" id="9"]
+[ext_resource type="Texture2D" path="res://assets/party_kitchen/table.svg" id="10"]
 
 [node name="PlayerSelectionWidget" type="Control" unique_id=282943105 node_paths=PackedStringArray("preset_storage", "table_area", "icons_layer", "chairs_layer", "add_player_button", "edit_player_window")]
 layout_mode = 3

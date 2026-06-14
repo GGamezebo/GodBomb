@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640">
+  <defs>
+    <radialGradient id="wood" cx="45%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#E8B87A"/>
+      <stop offset="100%" stop-color="#B87941"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="320" cy="340" rx="290" ry="270" fill="#000000" opacity="0.15"/>
+  <ellipse cx="320" cy="320" rx="290" ry="270" fill="url(#wood)" stroke="#8B5A2B" stroke-width="8"/>
+  <ellipse cx="320" cy="300" rx="220" ry="200" fill="#C98952" opacity="0.35"/>
+  <ellipse cx="250" cy="260" rx="80" ry="40" fill="#FFFFFF" opacity="0.12"/>
+  <circle cx="320" cy="320" r="52" fill="#A66B38" opacity="0.25"/>
+  <circle cx="320" cy="320" r="36" fill="#8B5A2B" opacity="0.2"/>
+</svg>

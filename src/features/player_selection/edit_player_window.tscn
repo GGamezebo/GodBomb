@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://edit_player_window_godbomb"]
 
 [ext_resource type="Script" path="res://src/features/player_selection/edit_player_window.gd" id="1"]
-[ext_resource type="Texture2D" path="res://assets/sprites/EditPlayerModelWindow/PlayerBackground.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/party_kitchen/edit_panel.svg" id="2"]
 
 [node name="EditPlayerWindow" type="Control" node_paths=PackedStringArray("name_edit", "slime_preview", "ok_button", "apply_button", "cancel_button", "colors_grid")]
 layout_mode = 3
@@ -61,7 +61,15 @@ theme_override_constants/separation = 16
 [node name="Title" type="Label" parent="Panel/Margin/VBox"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 36
+theme_override_colors/font_color = Color(0.36, 0.25, 0.15, 1)
 text = "Игрок"
+horizontal_alignment = 1
+
+[node name="ColorHint" type="Label" parent="Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(0.45, 0.35, 0.28, 1)
+text = "Выберите цвет — занятые недоступны"
 horizontal_alignment = 1
 
 [node name="PreviewRow" type="HBoxContainer" parent="Panel/Margin/VBox"]
