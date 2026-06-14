@@ -9,6 +9,7 @@ const SWATCH_SIZE := 72
 
 @export var account: PDataAccount
 @export var name_edit: LineEdit
+@export var name_history_grid: GridContainer
 @export var slime_preview: TextureRect
 @export var ok_button: Button
 @export var apply_button: Button
@@ -75,6 +76,7 @@ func _show_window(player_name: String) -> void:
 	_refresh_all_swatches()
 	_sort_color_grid()
 	_update_occupied_summary()
+	_refresh_name_history()
 	_on_name_changed(player_name)
 
 
@@ -95,6 +97,47 @@ func _input(event: InputEvent) -> void:
 
 func _on_name_submitted(_text: String) -> void:
 	_try_confirm()
+
+
+func _refresh_name_history() -> void:
+	if not name_history_grid:
+		return
+	for child in name_history_grid.get_children():
+		child.queue_free()
+	if not account:
+		return
+
+	var chip_style := StyleBoxFlat.new()
+	chip_style.bg_color = Color(1, 0.97, 0.92, 1)
+	chip_style.border_color = Color(0.78, 0.62, 0.46, 1)
+	chip_style.set_border_width_all(2)
+	chip_style.set_corner_radius_all(14)
+	chip_style.content_margin_left = 10
+	chip_style.content_margin_right = 10
+	chip_style.content_margin_top = 4
+	chip_style.content_margin_bottom = 4
+
+	for player_name in account.get_recent_names():
+		var btn := Button.new()
+		btn.text = player_name
+		btn.focus_mode = Control.FOCUS_NONE
+		btn.add_theme_font_size_override("font_size", 18)
+		btn.add_theme_color_override("font_color", Color(0.32, 0.22, 0.16, 1))
+		var btn_style := chip_style.duplicate()
+		btn.add_theme_stylebox_override("normal", btn_style)
+		btn.add_theme_stylebox_override("hover", btn_style.duplicate())
+		btn.add_theme_stylebox_override("pressed", btn_style.duplicate())
+		btn.pressed.connect(_on_history_name_pressed.bind(player_name))
+		name_history_grid.add_child(btn)
+
+
+func _on_history_name_pressed(player_name: String) -> void:
+	if not name_edit:
+		return
+	name_edit.text = player_name
+	name_edit.caret_column = player_name.length()
+	name_edit.grab_focus()
+	_on_name_changed(player_name)
 
 
 func _build_color_buttons() -> void:

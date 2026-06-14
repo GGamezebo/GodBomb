@@ -297,6 +297,7 @@ func _remove_player(icon: PlayerIcon) -> void:
 	var info := account.player_info_from_dict(players[index])
 	players.remove_at(index)
 	account.set_players(players)
+	account.remember_removed_player(info.name)
 
 	icon.queue_free()
 	_chairs[index].queue_free()

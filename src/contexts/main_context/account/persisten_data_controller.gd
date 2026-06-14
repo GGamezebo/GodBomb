@@ -34,9 +34,13 @@ func _load_account() -> void:
 		var saved_res: PDataAccount = ResourceLoader.load(PDataAccount.SAVE_PATH)
 		if saved_res:
 			ResourceUtils.update_resource(account, saved_res)
+			if account:
+				account.ensure_recent_names_initialized()
 			return
 
 	if account_default:
 		ResourceUtils.update_resource(account, account_default)
 
+	if account:
+		account.ensure_recent_names_initialized()
 	save_account()

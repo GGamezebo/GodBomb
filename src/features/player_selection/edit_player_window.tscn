@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://src/features/player_selection/edit_player_window.gd" id="1"]
 [ext_resource type="Texture2D" path="res://assets/party_kitchen/edit_panel.svg" id="2"]
 
-[node name="EditPlayerWindow" type="Control" node_paths=PackedStringArray("name_edit", "slime_preview", "ok_button", "apply_button", "cancel_button", "colors_grid", "occupied_label")]
+[node name="EditPlayerWindow" type="Control" node_paths=PackedStringArray("name_edit", "name_history_grid", "slime_preview", "ok_button", "apply_button", "cancel_button", "colors_grid", "occupied_label")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -13,6 +13,7 @@ grow_vertical = 2
 mouse_filter = 0
 script = ExtResource("1")
 name_edit = NodePath("Panel/Margin/VBox/NameEdit")
+name_history_grid = NodePath("Panel/Margin/VBox/NameHistoryGrid")
 slime_preview = NodePath("Panel/Margin/VBox/PreviewRow/SlimePreview")
 ok_button = NodePath("Panel/Margin/VBox/Buttons/OkButton")
 apply_button = NodePath("Panel/Margin/VBox/Buttons/ApplyButton")
@@ -38,9 +39,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -360.0
-offset_top = -420.0
+offset_top = -480.0
 offset_right = 360.0
-offset_bottom = 420.0
+offset_bottom = 480.0
 
 [node name="Background" type="TextureRect" parent="Panel"]
 layout_mode = 2
@@ -95,6 +96,19 @@ stretch_mode = 5
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
 placeholder_text = "Имя игрока"
+
+[node name="NameHistoryHint" type="Label" parent="Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.45, 0.35, 0.28, 1)
+text = "Недавние имена — нажми, чтобы подставить"
+horizontal_alignment = 1
+
+[node name="NameHistoryGrid" type="GridContainer" parent="Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+columns = 3
 
 [node name="ColorsGrid" type="GridContainer" parent="Panel/Margin/VBox"]
 layout_mode = 2
