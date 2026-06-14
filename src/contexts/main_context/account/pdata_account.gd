@@ -5,6 +5,7 @@ const SAVE_PATH := "user://account.tres"
 const CURRENT_VERSION := 1
 const RECENT_NAMES_MAX := 12
 const SWAP_HINT_GAMES_MAX := 5
+const HOLD_EDIT_HINT_MAX_VIEWS := 2
 const DEFAULT_MUSIC_VOLUME := 0.6
 const DEFAULT_SFX_VOLUME := 1.0
 
@@ -96,6 +97,36 @@ func mark_swap_hint_seen() -> void:
 	pass
 
 
+func _get_hints_seen() -> Dictionary:
+	if not data.has("hints_seen") or not data["hints_seen"] is Dictionary:
+		data["hints_seen"] = {}
+	return data["hints_seen"]
+
+
+func get_hold_edit_hint_views() -> int:
+	return maxi(0, int(_get_hints_seen().get("hold_edit", 0)))
+
+
+func increment_hold_edit_hint_views() -> void:
+	var hints := _get_hints_seen()
+	hints["hold_edit"] = get_hold_edit_hint_views() + 1
+	data["hints_seen"] = hints
+	emit_changed()
+
+
+func has_edited_player() -> bool:
+	return bool(data.get("has_edited_player", false))
+
+
+func mark_has_edited_player() -> void:
+	data["has_edited_player"] = true
+	emit_changed()
+
+
+func should_show_hold_edit_hint() -> bool:
+	return not has_edited_player() and get_hold_edit_hint_views() < HOLD_EDIT_HINT_MAX_VIEWS
+
+
 func get_music_enabled() -> bool:
 	return bool(data.get("music_enabled", true))
 
@@ -126,6 +157,8 @@ func set_sfx_volume(linear: float) -> void:
 func reset_progress() -> void:
 	data["games_played"] = 0
 	data["recent_player_names"] = DEFAULT_FUNNY_NAMES.duplicate()
+	data.erase("has_edited_player")
+	data["hints_seen"] = {}
 	emit_changed()
 
 

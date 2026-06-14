@@ -28,6 +28,8 @@ const HINT_SWAP_IDLE := "Перетащи на другое место — по�
 const HINT_SWAP_DRAG := "Отпусти — поменяетесь местами"
 const HINT_REMOVE := "Отпусти — игрок будет удалён"
 const HINT_MIN_PLAYERS := "Для игры нужно минимум 2 игрока"
+const HINT_HOLD_EDIT := "Удержи 2 сек — изменить имя и цвет"
+const HOLD_EDIT_HINT_DURATION := 5.0
 const SWAP_IDLE_HINT_DURATION := 5.0
 const HINT_BANNER_PAD_BELOW_TOP_BAR := 10.0
 const HINT_BANNER_PAD_ABOVE_TABLE := 10.0
@@ -56,6 +58,7 @@ var _swap_drag_hint_active: bool = false
 var _remove_hint_active: bool = false
 var _swap_idle_intro_played: bool = false
 var _swap_idle_hint_showing: bool = false
+var _hold_edit_hint_showing: bool = false
 var listener: EventListener = EventListener.new()
 
 
@@ -216,10 +219,12 @@ func reload_from_account() -> void:
 	_clear_icons()
 	_swap_idle_intro_played = false
 	_swap_idle_hint_showing = false
+	_hold_edit_hint_showing = false
 	_remove_hint_active = false
 	_swap_drag_hint_active = false
 	_load_from_account()
 	call_deferred("_play_swap_hint_intro_if_needed")
+	call_deferred("_play_hold_edit_hint_if_needed")
 
 
 func _load_from_account() -> void:
@@ -305,7 +310,14 @@ func _apply_chair_transform(chair: TextureRect, seat_local: Vector2) -> void:
 
 
 func _update_positions() -> void:
-	if _player_icons.is_empty() or not table_area:
+	if not table_area:
+		return
+	if _player_icons.is_empty():
+		_sync_order_badges(0)
+		_update_hint_banner_layout()
+		_refresh_turn_order()
+		_refresh_table_hint()
+		_sync_hold_idle_hints()
 		return
 	if _chairs.size() != _player_icons.size():
 		return
@@ -324,6 +336,7 @@ func _update_positions() -> void:
 	_update_hint_banner_layout()
 	_refresh_turn_order()
 	_refresh_table_hint()
+	_sync_hold_idle_hints()
 
 
 func _center_button_radius() -> float:
@@ -446,6 +459,8 @@ func _refresh_table_hint() -> void:
 		return
 	if _swap_idle_hint_showing:
 		return
+	if _hold_edit_hint_showing:
+		return
 	if _needs_min_players_hint():
 		_update_hint_banner_layout()
 		_table_hint_banner.show_message(HINT_MIN_PLAYERS, true, false)
@@ -477,6 +492,52 @@ func _dismiss_swap_idle_hint(animate: bool = true) -> void:
 	_swap_idle_hint_showing = false
 	if _table_hint_banner:
 		_table_hint_banner.hide_message(animate)
+
+
+func _play_hold_edit_hint_if_needed() -> void:
+	if not account or not account.should_show_hold_edit_hint() or _player_icons.is_empty():
+		_sync_hold_idle_hints()
+		return
+	account.increment_hold_edit_hint_views()
+	_save_account()
+	if not _swap_idle_hint_showing:
+		_hold_edit_hint_showing = true
+		_update_hint_banner_layout()
+		_table_hint_banner.show_message(HINT_HOLD_EDIT, true, false)
+		get_tree().create_timer(HOLD_EDIT_HINT_DURATION).timeout.connect(_on_hold_edit_hint_timeout, CONNECT_ONE_SHOT)
+	_sync_hold_idle_hints()
+
+
+func _on_hold_edit_hint_timeout() -> void:
+	if _dragging_icon or _remove_hint_active or _swap_drag_hint_active:
+		return
+	_dismiss_hold_edit_hint()
+
+
+func _dismiss_hold_edit_hint(animate: bool = true) -> void:
+	if not _hold_edit_hint_showing:
+		_sync_hold_idle_hints()
+		return
+	_hold_edit_hint_showing = false
+	if _table_hint_banner:
+		_table_hint_banner.hide_message(animate)
+	_sync_hold_idle_hints()
+
+
+func _sync_hold_idle_hints() -> void:
+	var show_corner := account != null and account.should_show_hold_edit_hint() and _dragging_icon == null
+	for i in _player_icons.size():
+		_player_icons[i].set_idle_hold_hint_visible(show_corner and i == 0)
+
+
+func _mark_hold_edit_learned() -> void:
+	if not account or account.has_edited_player():
+		return
+	account.mark_has_edited_player()
+	_save_account()
+	_dismiss_hold_edit_hint(false)
+	for icon in _player_icons:
+		icon.set_idle_hold_hint_visible(false)
 
 
 func _update_add_button() -> void:
@@ -577,6 +638,9 @@ func _on_add_player_button_pressed() -> void:
 
 func _on_icon_drag_started(icon: PlayerIcon) -> void:
 	_dragging_icon = icon
+	_dismiss_hold_edit_hint()
+	for player_icon in _player_icons:
+		player_icon.set_idle_hold_hint_visible(false)
 	_set_remove_mode(true)
 	_dismiss_swap_idle_hint()
 	_refresh_table_hint()
@@ -737,6 +801,7 @@ func _on_icon_drag_ended(icon: PlayerIcon) -> void:
 
 
 func _on_icon_hold_edit(index: int) -> void:
+	_mark_hold_edit_learned()
 	_set_remove_mode(false)
 	for icon in _player_icons:
 		icon.set_drag_state(PlayerIcon.DragState.RETURNING)
@@ -767,6 +832,7 @@ func _on_player_added_from_window(player_name: String, preset_id: int) -> void:
 
 
 func _on_player_applied_from_window(index: int, player_name: String, preset_id: int) -> void:
+	_mark_hold_edit_learned()
 	var players := account.get_players()
 	if index < 0 or index >= players.size():
 		return

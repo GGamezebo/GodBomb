@@ -37,6 +37,8 @@ var _seat_offset_cached: bool = false
 var _base_slime_scale: Vector2 = Vector2.ONE
 var _motion_tween: Tween
 var _edit_hint: Label
+var _hold_progress_ring: HoldProgressRing
+var _hold_idle_hint: HoldEditIdleHint
 var _last_drag_global: Vector2 = Vector2.ZERO
 var _release_slime_center: Vector2 = Vector2.ZERO
 
@@ -46,6 +48,7 @@ func _ready() -> void:
 		_base_slime_scale = slime_rect.scale
 		call_deferred("_setup_slime_pivot")
 	_setup_edit_hint()
+	_setup_hold_overlays()
 	call_deferred("_cache_seat_offset")
 
 
@@ -55,6 +58,7 @@ func _setup_slime_pivot() -> void:
 	slime_rect.pivot_offset = slime_rect.size * 0.5
 	_cache_seat_offset()
 	layout_name_plate()
+	_layout_hold_overlays()
 
 
 func _setup_edit_hint() -> void:
@@ -69,6 +73,38 @@ func _setup_edit_hint() -> void:
 	_edit_hint.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
 	_edit_hint.offset_top = -8.0
 	add_child(_edit_hint)
+
+
+func _setup_hold_overlays() -> void:
+	_hold_progress_ring = HoldProgressRing.new()
+	_hold_progress_ring.z_index = 4
+	_hold_progress_ring.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_hold_progress_ring)
+
+	_hold_idle_hint = HoldEditIdleHint.new()
+	_hold_idle_hint.z_index = 5
+	_hold_idle_hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_hold_idle_hint)
+
+
+func set_idle_hold_hint_visible(show_hint: bool) -> void:
+	if _hold_idle_hint:
+		_hold_idle_hint.set_hint_visible(show_hint)
+
+
+func _layout_hold_overlays() -> void:
+	if not slime_rect:
+		return
+	var seat_anchor := _compute_seat_offset()
+	if _hold_progress_ring:
+		var ring_size := Vector2(122, 122)
+		_hold_progress_ring.position = seat_anchor - ring_size * 0.5
+		_hold_progress_ring.size = ring_size
+	if _hold_idle_hint:
+		_hold_idle_hint.position = slime_rect.position + Vector2(
+			slime_rect.size.x - _hold_idle_hint.size.x - 4.0,
+			6.0
+		)
 
 
 func get_drag_state() -> DragState:
@@ -282,9 +318,16 @@ func _process(delta: float) -> void:
 		_hold_timer += delta
 		if _hold_timer >= hold_time:
 			_holding = false
+			var was_dragging := _dragging
 			_dragging = false
+			_reset_hold_feedback()
 			hold_edit_requested.emit(player_index)
 			set_drag_state(DragState.RETURNING)
+			if was_dragging:
+				z_index = 0
+				_apply_drag_lift(false)
+				drag_ended.emit()
+			return
 
 	_update_hold_visuals()
 	_update_drag_stretch()
@@ -299,20 +342,57 @@ func _process(delta: float) -> void:
 				_reset_slime_visuals()
 
 
+func _is_hold_active_at_home() -> bool:
+	return (
+		_holding
+		and _dragging
+		and global_position.distance_to(_position_for_seat(home_position)) <= 8.0
+	)
+
+
+func _get_hold_progress() -> float:
+	if not _is_hold_active_at_home():
+		return 0.0
+	return clampf(_hold_timer / hold_time, 0.0, 1.0)
+
+
+func _reset_hold_feedback() -> void:
+	_hold_timer = 0.0
+	_hold_vibrated = false
+	if _hold_progress_ring:
+		_hold_progress_ring.progress = 0.0
+		_hold_progress_ring.visible_ring = false
+	if _edit_hint:
+		_edit_hint.visible = false
+	if slime_rect:
+		slime_rect.modulate = Color.WHITE
+
+
 func _update_hold_visuals() -> void:
-	if not _edit_hint:
-		return
-	if not _holding or not _dragging:
-		_edit_hint.visible = false
-		return
-	if global_position.distance_to(_position_for_seat(home_position)) > 8.0:
-		_edit_hint.visible = false
+	if not _is_hold_active_at_home():
+		if _hold_progress_ring and _hold_progress_ring.visible_ring:
+			_reset_hold_feedback()
 		return
 
-	var progress := clampf(_hold_timer / hold_time, 0.0, 1.0)
-	_edit_hint.visible = progress > 0.15
-	_edit_hint.modulate.a = progress
-	_edit_hint.scale = Vector2.ONE * (0.85 + progress * 0.35)
+	var progress := _get_hold_progress()
+	if _hold_progress_ring:
+		_hold_progress_ring.visible_ring = true
+		_hold_progress_ring.progress = progress
+
+	if _edit_hint:
+		_edit_hint.visible = progress > 0.35
+		_edit_hint.modulate.a = clampf((progress - 0.35) / 0.65, 0.0, 1.0)
+		_edit_hint.scale = Vector2.ONE * (0.85 + progress * 0.35)
+
+	if slime_rect:
+		if progress >= 0.75:
+			var glow := clampf((progress - 0.75) / 0.25, 0.0, 1.0)
+			slime_rect.modulate = Color(1.0, 1.0, 1.0, 1.0).lerp(
+				Color(1.14, 1.08, 0.82, 1.0),
+				glow
+			)
+		else:
+			slime_rect.modulate = Color.WHITE
 
 	if progress >= 0.75 and not _hold_vibrated:
 		_hold_vibrated = true
@@ -321,6 +401,9 @@ func _update_hold_visuals() -> void:
 
 func _update_drag_stretch() -> void:
 	if not _dragging or not slime_rect:
+		return
+	if _is_hold_active_at_home():
+		slime_rect.scale = _base_slime_scale * 1.08
 		return
 	var velocity := global_position - _last_drag_global
 	_last_drag_global = global_position
@@ -363,8 +446,7 @@ func _end_drag() -> void:
 	_holding = false
 	z_index = 0
 	_apply_drag_lift(false)
-	if _edit_hint:
-		_edit_hint.visible = false
+	_reset_hold_feedback()
 	drag_ended.emit()
 
 
@@ -384,9 +466,9 @@ func _apply_drag_motion(global_point: Vector2) -> void:
 
 func _check_hold_cancel() -> void:
 	if global_position.distance_to(_position_for_seat(home_position)) > 8.0:
-		_holding = false
-		if _edit_hint:
-			_edit_hint.visible = false
+		if _holding:
+			_holding = false
+			_reset_hold_feedback()
 
 
 func _apply_arc_position(t: float, start_pos: Vector2, control_point: Vector2, end_pos: Vector2) -> void:
@@ -413,3 +495,5 @@ func _reset_slime_visuals() -> void:
 		return
 	slime_rect.scale = _base_slime_scale
 	slime_rect.rotation = 0.0
+	slime_rect.modulate = Color.WHITE
+	_reset_hold_feedback()
