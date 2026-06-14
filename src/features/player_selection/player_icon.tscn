@@ -45,9 +45,9 @@ stretch_mode = 5
 [node name="NamePlate" type="PanelContainer" parent="."]
 layout_mode = 0
 offset_left = 5.0
-offset_top = 138.0
+offset_top = 52.0
 offset_right = 105.0
-offset_bottom = 174.0
+offset_bottom = 86.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_name")
 
 [node name="PlayerName" type="Label" parent="NamePlate" unique_id=1061097853]

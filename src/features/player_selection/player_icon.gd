@@ -54,6 +54,7 @@ func _setup_slime_pivot() -> void:
 		return
 	slime_rect.pivot_offset = slime_rect.size * 0.5
 	_cache_seat_offset()
+	layout_name_plate()
 
 
 func _setup_edit_hint() -> void:
@@ -82,6 +83,7 @@ func set_player_data(info: PlayerInfo, index: int, player_count: int = -1) -> vo
 		name_label.text = info.name
 	if slime_rect:
 		slime_rect.texture = load(SLIME_PATH % info.preset_id)
+	layout_name_plate()
 
 
 func set_order_index(index: int, player_count: int = -1) -> void:
@@ -90,23 +92,30 @@ func set_order_index(index: int, player_count: int = -1) -> void:
 		_display_player_count = player_count
 
 
-func layout_name_plate(table_center_global: Vector2) -> void:
-	const NAME_OUTWARD := 56.0
-	const NAME_PLATE_SIZE := Vector2(100, 34)
+func layout_name_plate(_table_center_global: Vector2 = Vector2.ZERO) -> void:
+	if not slime_rect or not name_label:
+		return
+	var name_plate := name_label.get_parent() as Control
+	if not name_plate:
+		return
+
+	const NAME_GAP := 6.0
+	const PLATE_WIDTH := 100.0
+
+	name_plate.z_index = 2
+	name_plate.custom_minimum_size = Vector2(PLATE_WIDTH, 0)
+	name_plate.reset_size()
+	var plate_size := name_plate.get_combined_minimum_size()
+	if plate_size.y <= 0.0:
+		plate_size.y = 34.0
+	name_plate.size = plate_size
 
 	var seat_anchor := _compute_seat_offset()
-	var seat_global := global_position + seat_anchor
-	var to_center := table_center_global - seat_global
-	if to_center.length_squared() < 1.0:
-		to_center = Vector2.DOWN * 100.0
-	var inward := to_center.normalized()
-
-	var name_plate := name_label.get_parent() as Control if name_label else null
-	if name_plate:
-		name_plate.z_index = 2
-		var outward := -inward
-		var name_center := seat_anchor + outward * NAME_OUTWARD
-		name_plate.position = name_center - NAME_PLATE_SIZE * 0.5
+	var slime_bottom := slime_rect.position.y + slime_rect.size.y
+	name_plate.position = Vector2(
+		seat_anchor.x - plate_size.x * 0.5,
+		slime_bottom + NAME_GAP
+	)
 
 
 func refresh_seat_offset() -> void:
