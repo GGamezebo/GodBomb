@@ -129,29 +129,31 @@ def chair_svg() -> str:
 """
 
 
-def plate_button_svg(symbol: str, accent: str, bg: str) -> str:
+def plate_button_svg(kind: str, accent: str, bg: str) -> str:
+    if kind == "plus":
+        symbol = f"""  <line x1="72" y1="48" x2="72" y2="88" stroke="{accent}" stroke-width="10" stroke-linecap="round"/>
+  <line x1="52" y1="68" x2="92" y2="68" stroke="{accent}" stroke-width="10" stroke-linecap="round"/>"""
+    else:
+        symbol = f"""  <line x1="52" y1="68" x2="92" y2="68" stroke="{accent}" stroke-width="10" stroke-linecap="round"/>"""
     return f"""<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 144 144" width="144" height="144">
   <ellipse cx="72" cy="78" rx="58" ry="14" fill="#000000" opacity="0.12"/>
   <circle cx="72" cy="68" r="56" fill="#FFFDF8" stroke="#E8D5C4" stroke-width="4"/>
   <circle cx="72" cy="68" r="44" fill="{bg}" opacity="0.15"/>
-  <text x="72" y="82" text-anchor="middle" font-family="Arial, sans-serif" font-size="56" font-weight="700" fill="{accent}">{symbol}</text>
+{symbol}
 </svg>
 """
 
 
 def start_button_svg(active: bool) -> str:
     if active:
-        fill, stroke, text_c = "#FF6B4A", "#C44E32", "#FFFFFF"
-        label = "СТАРТ"
+        fill, stroke = "#FF6B4A", "#C44E32"
     else:
-        fill, stroke, text_c = "#B8B0A8", "#8A827A", "#F0EBE6"
-        label = "СТАРТ"
+        fill, stroke = "#B8B0A8", "#8A827A"
     return f"""<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 120" width="440" height="120">
   <rect x="8" y="14" width="424" height="92" rx="46" fill="#000000" opacity="0.12"/>
   <rect x="0" y="6" width="424" height="92" rx="46" fill="{fill}" stroke="{stroke}" stroke-width="5"/>
-  <text x="212" y="64" text-anchor="middle" font-family="Arial, sans-serif" font-size="42" font-weight="700" fill="{text_c}">{label}</text>
 </svg>
 """
 
@@ -179,8 +181,8 @@ def main() -> None:
     write("edit_panel.svg", panel_svg())
     write("buttons/start_active.svg", start_button_svg(True))
     write("buttons/start_inactive.svg", start_button_svg(False))
-    write("buttons/add_player.svg", plate_button_svg("+", "#2EAE55", "#2EAE55"))
-    write("buttons/remove_player.svg", plate_button_svg("−", "#D64545", "#D64545"))
+    write("buttons/add_player.svg", plate_button_svg("plus", "#2EAE55", "#2EAE55"))
+    write("buttons/remove_player.svg", plate_button_svg("minus", "#D64545", "#D64545"))
 
     for i, (main, dark) in enumerate(SLIME_PALETTE):
         write(f"slimes/{i}.svg", slime_svg(main, dark))

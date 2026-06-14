@@ -52,6 +52,16 @@ func _ready() -> void:
 		edit_player_window.player_applied.connect(_on_player_applied_from_window)
 	_sync_edit_window_refs()
 	reload_from_account()
+	_apply_add_button_texture()
+
+
+func _apply_add_button_texture() -> void:
+	if not add_player_button:
+		return
+	if _is_remove_mode and remove_player_texture:
+		add_player_button.texture_normal = remove_player_texture
+	elif add_player_texture:
+		add_player_button.texture_normal = add_player_texture
 
 
 func _sync_edit_window_refs() -> void:
@@ -294,12 +304,15 @@ func _update_add_button() -> void:
 		return
 	var count := account.get_players().size() if account else 0
 	var min_players := game_config.min_players if game_config else 2
+	var at_max := count >= game_config.max_players
+	add_player_button.visible = _is_remove_mode or not at_max
 	if _is_remove_mode:
 		add_player_button.disabled = count <= min_players_for_remove
 		_kill_add_pulse_tween()
 	else:
 		add_player_button.disabled = count >= game_config.max_players
 		_update_add_button_animation(count < min_players)
+	_apply_add_button_texture()
 
 
 func _update_start_button() -> void:
@@ -316,14 +329,19 @@ func _update_start_button_animation(can_start: bool) -> void:
 		return
 	_kill_start_pulse_tween()
 	start_button.scale = Vector2.ONE
+	var label := start_button.get_node_or_null("StartLabel") as Label
 	if can_start:
 		start_button.modulate = Color(1.05, 1.02, 0.95, 1)
+		if label:
+			label.add_theme_color_override("font_color", Color(1, 1, 1, 1))
 		start_button.pivot_offset = start_button.size * 0.5
 		_start_pulse_tween = create_tween().set_loops()
 		_start_pulse_tween.tween_property(start_button, "scale", Vector2(1.05, 1.05), 0.5).set_trans(Tween.TRANS_SINE)
 		_start_pulse_tween.tween_property(start_button, "scale", Vector2.ONE, 0.5).set_trans(Tween.TRANS_SINE)
 	else:
 		start_button.modulate = Color(0.88, 0.88, 0.88, 1)
+		if label:
+			label.add_theme_color_override("font_color", Color(0.94, 0.92, 0.9, 1))
 
 
 func _update_add_button_animation(need_more_players: bool) -> void:
@@ -354,8 +372,6 @@ func _kill_add_pulse_tween() -> void:
 
 func _set_remove_mode(enabled: bool) -> void:
 	_is_remove_mode = enabled
-	if add_player_button:
-		add_player_button.texture_normal = remove_player_texture if enabled else add_player_texture
 	if enabled:
 		_kill_add_pulse_tween()
 		menu_events.ev_player_move_begin.emit()

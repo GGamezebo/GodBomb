@@ -3,5 +3,6 @@
   <ellipse cx="72" cy="78" rx="58" ry="14" fill="#000000" opacity="0.12"/>
   <circle cx="72" cy="68" r="56" fill="#FFFDF8" stroke="#E8D5C4" stroke-width="4"/>
   <circle cx="72" cy="68" r="44" fill="#2EAE55" opacity="0.15"/>
-  <text x="72" y="82" text-anchor="middle" font-family="Arial, sans-serif" font-size="56" font-weight="700" fill="#2EAE55">+</text>
+  <line x1="72" y1="48" x2="72" y2="88" stroke="#2EAE55" stroke-width="10" stroke-linecap="round"/>
+  <line x1="52" y1="68" x2="92" y2="68" stroke="#2EAE55" stroke-width="10" stroke-linecap="round"/>
 </svg>
