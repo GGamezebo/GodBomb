@@ -10,12 +10,22 @@ extends IContext
 @export var game_time_slider: HSlider
 @export var game_time_label: Label
 
+var listener: EventListener = EventListener.new()
+
 
 func _ready() -> void:
 	if start_button:
 		start_button.pressed.connect(_on_start_pressed)
 	if game_time_slider:
 		game_time_slider.value_changed.connect(_on_game_time_changed)
+	if menu_events:
+		listener.add(menu_events.ev_player_added, _on_player_list_changed)
+		listener.add(menu_events.ev_player_removed, _on_player_list_changed)
+		listener.add(menu_events.ev_player_swapped, _on_player_list_changed)
+
+
+func _exit_tree() -> void:
+	listener.deinit()
 
 
 func initialize(data: Dictionary) -> void:
@@ -29,11 +39,18 @@ func initialize(data: Dictionary) -> void:
 
 	if player_selection_widget:
 		player_selection_widget.account = account
+		player_selection_widget.game_config = game_config
+		player_selection_widget.start_button = start_button
 		if passed_controller:
 			player_selection_widget.pdata_controller = passed_controller
 		player_selection_widget.reload_from_account()
 
 	_load_game_time_from_account()
+	_update_start_button()
+
+
+func _on_player_list_changed(..._args) -> void:
+	_update_start_button()
 
 
 func deinit() -> void:
@@ -66,6 +83,14 @@ func _on_game_time_changed(value: float) -> void:
 func _update_game_time_label(minutes: int) -> void:
 	if game_time_label:
 		game_time_label.text = "Длительность: %d мин" % minutes
+
+
+func _update_start_button() -> void:
+	if not start_button:
+		return
+	var min_players := game_config.min_players if game_config else 2
+	var count := account.get_players().size() if account else 0
+	start_button.disabled = count < min_players
 
 
 func _on_start_pressed() -> void:

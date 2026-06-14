@@ -145,8 +145,11 @@ func _update_add_button() -> void:
 
 
 func _update_start_button() -> void:
-	if start_button and game_config and account:
-		start_button.disabled = account.get_players().size() < game_config.min_players
+	if not start_button:
+		return
+	var min_players := game_config.min_players if game_config else 2
+	var count := _player_icons.size()
+	start_button.disabled = count < min_players
 
 
 func _set_remove_mode(enabled: bool) -> void:
@@ -173,7 +176,30 @@ func _on_icon_drag_started(icon: PlayerIcon) -> void:
 	for other in _player_icons:
 		if other != icon:
 			other.swap_target = null
-			other.set_drag_state(PlayerIcon.DragState.NONE)
+			if other.get_drag_state() != PlayerIcon.DragState.NONE:
+				other.set_drag_state(PlayerIcon.DragState.RETURNING)
+
+
+func _process(_delta: float) -> void:
+	if _dragging_icon:
+		_update_swap_preview(_dragging_icon)
+
+
+func _update_swap_preview(dragging: PlayerIcon) -> void:
+	var overlap_target: PlayerIcon = null
+	for other in _player_icons:
+		if other != dragging and dragging.overlaps_icon(other):
+			overlap_target = other
+			break
+
+	for other in _player_icons:
+		if other == dragging:
+			continue
+		if other == overlap_target:
+			other.swap_target = dragging
+			other.set_drag_state(PlayerIcon.DragState.SWAPPING)
+		elif other.swap_target == dragging:
+			other.cancel_swap_preview()
 
 
 func _on_icon_drag_ended(icon: PlayerIcon) -> void:
@@ -186,10 +212,17 @@ func _on_icon_drag_ended(icon: PlayerIcon) -> void:
 
 	for other in _player_icons:
 		if other != icon and icon.overlaps_icon(other):
+			for reset_icon in _player_icons:
+				if reset_icon != icon:
+					reset_icon.stop_motion()
 			_swap_players(icon, other)
-			icon.set_drag_state(PlayerIcon.DragState.NONE)
+			icon.stop_motion()
 			_dragging_icon = null
 			return
+
+	for other in _player_icons:
+		if other.swap_target == icon:
+			other.cancel_swap_preview()
 
 	icon.set_drag_state(PlayerIcon.DragState.RETURNING)
 	_dragging_icon = null
@@ -286,6 +319,7 @@ func _swap_players(icon_a: PlayerIcon, icon_b: PlayerIcon) -> void:
 	menu_events.ev_player_swapped.emit(index_a, index_b)
 	_save_account()
 	_schedule_position_update()
+	_update_start_button()
 
 
 func _rect_overlaps(icon: PlayerIcon, button: Control) -> bool:

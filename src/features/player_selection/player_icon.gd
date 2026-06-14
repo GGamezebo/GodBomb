@@ -14,6 +14,7 @@ enum DragState {
 @export var slime_rect: TextureRect
 @export var name_label: Label
 @export var hold_time: float = 2.0
+@export var move_lerp_speed: float = 12.0
 
 var home_position: Vector2 = Vector2.ZERO
 var player_index: int = -1
@@ -24,12 +25,15 @@ var _drag_offset: Vector2 = Vector2.ZERO
 var _hold_timer: float = 0.0
 var _holding: bool = false
 var _drag_state: DragState = DragState.NONE
-var _move_tween: Tween
 var _seat_offset: Vector2 = Vector2.ZERO
 
 
 func _ready() -> void:
 	call_deferred("refresh_seat_offset")
+
+
+func get_drag_state() -> DragState:
+	return _drag_state
 
 
 func set_player_data(info: PlayerInfo, index: int) -> void:
@@ -64,12 +68,9 @@ func _apply_home_position() -> void:
 func reset_home_position(seat_center: Vector2, force: bool = false) -> void:
 	home_position = seat_center
 	if force:
-		if _move_tween:
-			_move_tween.kill()
-			_move_tween = null
+		stop_motion()
 		_dragging = false
 		_holding = false
-		_drag_state = DragState.NONE
 		z_index = 0
 	if force or (not _dragging and _drag_state == DragState.NONE):
 		call_deferred("_apply_home_position")
@@ -88,9 +89,22 @@ func get_home_rect() -> Rect2:
 
 
 func set_drag_state(state: DragState) -> void:
+	if _drag_state == state:
+		return
 	_drag_state = state
-	if state == DragState.RETURNING or state == DragState.SWAPPING:
-		_animate_to_target()
+	if state == DragState.NONE:
+		swap_target = null
+
+
+func cancel_swap_preview() -> void:
+	if _drag_state == DragState.SWAPPING:
+		swap_target = null
+		set_drag_state(DragState.RETURNING)
+
+
+func stop_motion() -> void:
+	_drag_state = DragState.NONE
+	swap_target = null
 
 
 func _gui_input(event: InputEvent) -> void:
@@ -127,6 +141,26 @@ func _process(delta: float) -> void:
 			hold_edit_requested.emit(player_index)
 			set_drag_state(DragState.RETURNING)
 
+	match _drag_state:
+		DragState.SWAPPING:
+			_lerp_towards(_swap_preview_target(), delta)
+		DragState.RETURNING:
+			var target := _position_for_seat(home_position)
+			if _lerp_towards(target, delta):
+				stop_motion()
+
+
+func _swap_preview_target() -> Vector2:
+	if swap_target:
+		return _position_for_seat(swap_target.home_position)
+	return _position_for_seat(home_position)
+
+
+func _lerp_towards(target: Vector2, delta: float) -> bool:
+	var t := clampf(delta * move_lerp_speed, 0.0, 1.0)
+	global_position = global_position.lerp(target, t)
+	return global_position.distance_to(target) <= 1.0
+
 
 func _begin_drag(global_point: Vector2) -> void:
 	_dragging = true
@@ -149,19 +183,3 @@ func _end_drag() -> void:
 func _check_hold_cancel() -> void:
 	if global_position.distance_to(_position_for_seat(home_position)) > 8.0:
 		_holding = false
-
-
-func _animate_to_target() -> void:
-	if _move_tween:
-		_move_tween.kill()
-	_move_tween = create_tween()
-	var target := _position_for_seat(home_position)
-	if _drag_state == DragState.SWAPPING and swap_target:
-		target = _position_for_seat(swap_target.home_position)
-	_move_tween.tween_property(self, "global_position", target, 0.2).set_trans(Tween.TRANS_QUAD)
-	_move_tween.finished.connect(func() -> void:
-		if _drag_state == DragState.SWAPPING:
-			global_position = _position_for_seat(home_position)
-		_drag_state = DragState.NONE
-		swap_target = null
-	)
