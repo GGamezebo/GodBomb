@@ -15,6 +15,9 @@ enum DragState {
 
 @export var slime_rect: TextureRect
 @export var name_label: Label
+@export var order_badge: Label
+
+var _display_player_count: int = 0
 @export var hold_time: float = 2.0
 @export var move_lerp_speed: float = 12.0
 @export var swap_activation_distance: float = 24.0
@@ -72,12 +75,93 @@ func get_drag_state() -> DragState:
 	return _drag_state
 
 
-func set_player_data(info: PlayerInfo, index: int) -> void:
+func set_player_data(info: PlayerInfo, index: int, player_count: int = -1) -> void:
 	player_index = index
+	if player_count > 0:
+		_display_player_count = player_count
 	if name_label:
 		name_label.text = info.name
 	if slime_rect:
 		slime_rect.texture = load(SLIME_PATH % info.preset_id)
+	_update_order_badge()
+
+
+func set_order_index(index: int, player_count: int = -1) -> void:
+	player_index = index
+	if player_count > 0:
+		_display_player_count = player_count
+	_update_order_badge()
+
+
+func layout_order_badge(table_center_global: Vector2) -> void:
+	var plate := order_badge.get_parent() as Control
+	if not plate:
+		return
+
+	const BADGE_SIZE := Vector2(40, 40)
+	const BADGE_GAP := 4.0
+	const NAME_OUTWARD := 56.0
+	const NAME_PLATE_SIZE := Vector2(100, 34)
+
+	plate.custom_minimum_size = BADGE_SIZE
+	plate.size = BADGE_SIZE
+	plate.z_index = 3
+
+	var seat_anchor := _compute_seat_offset()
+	var seat_global := global_position + seat_anchor
+	var to_center := table_center_global - seat_global
+	if to_center.length_squared() < 1.0:
+		to_center = Vector2.DOWN * 100.0
+	var inward := to_center.normalized()
+
+	var slime_half := 50.0
+	if slime_rect:
+		slime_half = maxf(slime_rect.size.x, slime_rect.size.y) * 0.46
+	var badge_half := BADGE_SIZE.y * 0.5
+	var min_inward := slime_half + badge_half + BADGE_GAP
+	var max_inward := to_center.length() * 0.38
+	var badge_inward := clampf(min_inward + 10.0, min_inward, max_inward)
+
+	var badge_center := seat_anchor + inward * badge_inward
+	plate.position = badge_center - BADGE_SIZE * 0.5
+	plate.pivot_offset = BADGE_SIZE * 0.5
+
+	var name_plate := name_label.get_parent() as Control if name_label else null
+	if name_plate:
+		name_plate.z_index = 2
+		var outward := -inward
+		var name_center := seat_anchor + outward * NAME_OUTWARD
+		name_plate.position = name_center - NAME_PLATE_SIZE * 0.5
+
+
+func _update_order_badge() -> void:
+	if not order_badge:
+		return
+	var display_index := clampi(player_index, 0, 19)
+	if display_index >= 0 and display_index < 20:
+		order_badge.text = char(0x2460 + display_index)
+	else:
+		order_badge.text = str(player_index + 1)
+	order_badge.visible = player_index >= 0
+
+
+func play_order_flash(flash_duration: float = 0.14) -> void:
+	if not order_badge:
+		return
+	var plate := order_badge.get_parent() as Control
+	var targets: Array[CanvasItem] = [order_badge]
+	if plate:
+		targets.append(plate)
+	for target in targets:
+		target.scale = Vector2.ONE
+		target.modulate = Color.WHITE
+	var tween := create_tween()
+	for target in targets:
+		tween.parallel().tween_property(target, "scale", Vector2(1.28, 1.28), flash_duration * 0.45).set_trans(Tween.TRANS_BACK)
+		tween.parallel().tween_property(target, "modulate", Color(0.72, 0.7, 0.68, 1), flash_duration * 0.45)
+	for target in targets:
+		tween.parallel().tween_property(target, "scale", Vector2.ONE, flash_duration * 0.55).set_trans(Tween.TRANS_SINE)
+		tween.parallel().tween_property(target, "modulate", Color.WHITE, flash_duration * 0.55)
 
 
 func refresh_seat_offset() -> void:
