@@ -25,6 +25,7 @@
 [ext_resource type="Texture2D" uid="uid://de4n5e1fxki8i" path="res://assets/textures/Background/Background.png" id="26"]
 [ext_resource type="Script" uid="uid://dkplswcbvqptx" path="res://src/features/background/game_bomb_background.gd" id="27"]
 [ext_resource type="Texture2D" uid="uid://b27y0jjb7mmmy" path="res://assets/party_kitchen/buttons/start_active.svg" id="28"]
+[ext_resource type="Script" path="res://src/features/bomb/bomb_lamps.gd" id="29"]
 
 [node name="GameContext" type="Control" unique_id=1610270397 node_paths=PackedStringArray("game_manager")]
 layout_mode = 3
@@ -122,6 +123,14 @@ position = Vector2(528, 483)
 
 [node name="RoundWord" type="Marker2D" parent="UI/BackgroundBomb/ScaledContent"]
 position = Vector2(540, 928)
+
+[node name="BombLamps" type="Control" parent="UI/BackgroundBomb/ScaledContent"]
+layout_mode = 0
+offset_right = 1080.0
+offset_bottom = 1920.0
+mouse_filter = 2
+script = ExtResource("29")
+game_events = ExtResource("15")
 
 [node name="ExplosionEffect" type="Node2D" parent="UI/BackgroundBomb/ScaledContent" unique_id=1230183710 node_paths=PackedStringArray("particles")]
 z_index = 6

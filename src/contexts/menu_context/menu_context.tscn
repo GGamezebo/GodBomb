@@ -16,6 +16,7 @@
 [ext_resource type="Texture2D" uid="uid://cbb8gsai6lwuy" path="res://assets/party_kitchen/buttons/icon_music_off.svg" id="14"]
 [ext_resource type="Texture2D" uid="uid://ci0nbi42m75wm" path="res://assets/party_kitchen/buttons/icon_rules.svg" id="15"]
 [ext_resource type="Script" uid="uid://bombs212nuf58" path="res://src/features/menu/menu_bomb_layout.gd" id="16"]
+[ext_resource type="Script" path="res://src/features/bomb/bomb_lamps.gd" id="17"]
 
 [node name="MenuContext" type="Control" unique_id=1379479129 node_paths=PackedStringArray("start_button", "player_selection_widget", "settings_button", "music_button", "rules_button", "settings_window", "rules_window")]
 layout_mode = 3
@@ -71,6 +72,13 @@ mouse_filter = 2
 
 [node name="Marker2D" type="Marker2D" parent="BackgroundBomb/ScaledContent" unique_id=1831889289]
 position = Vector2(528, 483)
+
+[node name="BombLamps" type="Control" parent="BackgroundBomb/ScaledContent"]
+layout_mode = 0
+offset_right = 1080.0
+offset_bottom = 1920.0
+mouse_filter = 2
+script = ExtResource("17")
 
 [node name="TopBar" type="HBoxContainer" parent="BackgroundBomb/ScaledContent" unique_id=2074903033]
 layout_mode = 0
