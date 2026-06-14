@@ -12,7 +12,6 @@ const FALLBACK_ROUND_WORD := Vector2(540, 928)
 @export var result_label: RichTextLabel
 
 var listener: EventListener = EventListener.new()
-var _vignette: GameBattleVignette
 var _player_strip: GamePlayerStrip
 var _syllable_card: GameSyllableCard
 var _action_hints: GameActionHints
@@ -43,10 +42,10 @@ func _exit_tree() -> void:
 	listener.deinit()
 
 
-func _find_bomb_layout() -> MenuBombLayout:
+func _find_bomb_layout() -> GameBombBackground:
 	var ui := get_parent()
 	if ui:
-		return ui.get_node_or_null("BackgroundBomb") as MenuBombLayout
+		return ui.get_node_or_null("BackgroundBomb") as GameBombBackground
 	return null
 
 
@@ -92,13 +91,6 @@ func _reposition_battle_ui() -> void:
 
 func _build_ui() -> void:
 	var design_root := _get_design_root()
-
-	_vignette = GameBattleVignette.new()
-	_vignette.game_events = game_events
-	_vignette.set_anchors_preset(Control.PRESET_TOP_LEFT)
-	_vignette.size = DESIGN_SIZE
-	_vignette.z_index = 1
-	design_root.add_child(_vignette)
 
 	_battle_layer = Control.new()
 	_battle_layer.name = "BattleLayer"
