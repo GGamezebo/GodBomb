@@ -137,6 +137,7 @@ func _apply_state(state: String) -> void:
 	match state:
 		FSMGameStates.READY_TO_START, FSMGameStates.PLAYER_CHOICE, FSMGameStates.COUNTDOWN, FSMGameStates.PLAY:
 			_alert_active = false
+			_set_bomb_visible(true)
 			_set_bomb_modulate(Color.WHITE)
 			if state == FSMGameStates.PLAY:
 				_play_comes_flash()
@@ -147,8 +148,17 @@ func _apply_state(state: String) -> void:
 			_play_explosion()
 		FSMGameStates.RESULT:
 			_alert_active = false
+			_set_bomb_visible(true)
 			_set_bomb_modulate(Color.WHITE)
 			_clear_player_tint()
+
+
+func _set_bomb_visible(visible: bool) -> void:
+	if not bomb_art:
+		return
+	bomb_art.visible = visible
+	if visible:
+		bomb_art.modulate = Color.WHITE
 
 
 func _set_bomb_modulate(color: Color) -> void:
@@ -176,17 +186,21 @@ func _play_comes_flash() -> void:
 
 func _play_explosion() -> void:
 	_kill_tween()
-	if bomb_art:
+	if bomb_art and bomb_art.visible:
 		bomb_art.modulate = Color(1.45, 0.42, 0.12, 1.0)
-	_tween = create_tween()
+		var fade := create_tween()
+		fade.tween_property(bomb_art, "modulate:a", 0.0, 0.14).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_IN)
+		fade.tween_callback(func() -> void:
+			if bomb_art:
+				bomb_art.visible = false
+		)
 	if scaled_content:
+		_tween = create_tween()
 		var base := _content_base_pos
 		for i in 6:
 			var offset := Vector2(randf_range(-10, 10), randf_range(-10, 10))
 			_tween.tween_property(scaled_content, "position", base + offset, 0.04)
 		_tween.tween_property(scaled_content, "position", base, 0.06)
-	if bomb_art:
-		_tween.parallel().tween_property(bomb_art, "modulate", Color.WHITE, 0.28)
 
 
 func _kill_tween() -> void:
