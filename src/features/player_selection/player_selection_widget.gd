@@ -17,7 +17,7 @@ extends Control
 
 @export var add_player_texture: Texture2D
 @export var remove_player_texture: Texture2D
-@export var min_players_for_remove: int = 1
+@export var min_players_for_remove: int = 0
 @export var table_radius_coeff: float = 0.45
 @export var chair_size: Vector2 = Vector2(100, 100)
 @export var chair_facing_offset: float = -PI * 0.5
@@ -27,6 +27,7 @@ const SWAP_HINT_MIN_PLAYERS := 3
 const HINT_SWAP_IDLE := "Перетащи на другое место — поменяетесь"
 const HINT_SWAP_DRAG := "Отпусти — поменяетесь местами"
 const HINT_REMOVE := "Отпусти — игрок будет удалён"
+const HINT_MIN_PLAYERS := "Для игры нужно минимум 2 игрока"
 const SWAP_IDLE_HINT_DURATION := 5.0
 const HINT_BANNER_PAD_BELOW_TOP_BAR := 10.0
 const HINT_BANNER_PAD_ABOVE_TABLE := 10.0
@@ -426,6 +427,14 @@ func _should_show_swap_hints() -> bool:
 	return account != null and account.should_show_swap_hints()
 
 
+func _min_players_required() -> int:
+	return game_config.min_players if game_config else 2
+
+
+func _needs_min_players_hint() -> bool:
+	return _player_icons.size() < _min_players_required() and _dragging_icon == null
+
+
 func _refresh_table_hint() -> void:
 	if not _table_hint_banner:
 		return
@@ -436,6 +445,10 @@ func _refresh_table_hint() -> void:
 		_table_hint_banner.show_message(HINT_SWAP_DRAG, false, true)
 		return
 	if _swap_idle_hint_showing:
+		return
+	if _needs_min_players_hint():
+		_update_hint_banner_layout()
+		_table_hint_banner.show_message(HINT_MIN_PLAYERS, true, false)
 		return
 	_table_hint_banner.hide_message()
 
@@ -469,17 +482,20 @@ func _dismiss_swap_idle_hint(animate: bool = true) -> void:
 func _update_add_button() -> void:
 	if not add_player_button or not game_config:
 		return
-	var count := account.get_players().size() if account else 0
-	var min_players := game_config.min_players if game_config else 2
+	var count := _player_icons.size()
 	var at_max := count >= game_config.max_players
 	add_player_button.visible = _is_remove_mode or not at_max
 	if _is_remove_mode:
 		add_player_button.disabled = count <= min_players_for_remove
 		_kill_add_pulse_tween()
+		if add_player_button:
+			add_player_button.scale = Vector2.ONE
+			add_player_button.modulate = Color.WHITE
 	else:
 		add_player_button.disabled = count >= game_config.max_players
-		_update_add_button_animation(count < min_players)
+		_update_add_button_animation(_player_icons.size() < _min_players_required())
 	_apply_add_button_texture()
+	_refresh_table_hint()
 
 
 func _update_start_button() -> void:
@@ -516,14 +532,13 @@ func _update_add_button_animation(need_more_players: bool) -> void:
 	if not add_player_button:
 		return
 	_kill_add_pulse_tween()
+	add_player_button.modulate = Color.WHITE
+	add_player_button.pivot_offset = add_player_button.size * 0.5
 	add_player_button.scale = Vector2.ONE
 	if need_more_players and not _is_remove_mode:
-		add_player_button.modulate = Color(1.05, 1.05, 1.05, 1)
 		_add_pulse_tween = create_tween().set_loops()
-		_add_pulse_tween.tween_property(add_player_button, "modulate", Color(1.15, 1.1, 0.92, 1), 0.55).set_trans(Tween.TRANS_SINE)
-		_add_pulse_tween.tween_property(add_player_button, "modulate", Color(1.05, 1.05, 1.05, 1), 0.55).set_trans(Tween.TRANS_SINE)
-	else:
-		add_player_button.modulate = Color.WHITE
+		_add_pulse_tween.tween_property(add_player_button, "scale", Vector2(1.12, 1.12), 0.55).set_trans(Tween.TRANS_SINE)
+		_add_pulse_tween.tween_property(add_player_button, "scale", Vector2.ONE, 0.55).set_trans(Tween.TRANS_SINE)
 
 
 func _kill_start_pulse_tween() -> void:
@@ -542,6 +557,9 @@ func _set_remove_mode(enabled: bool) -> void:
 	_is_remove_mode = enabled
 	if enabled:
 		_kill_add_pulse_tween()
+		if add_player_button:
+			add_player_button.scale = Vector2.ONE
+			add_player_button.modulate = Color.WHITE
 		menu_events.ev_player_move_begin.emit()
 	else:
 		menu_events.ev_player_move_end.emit()
