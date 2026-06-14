@@ -7,12 +7,14 @@ signal player_applied(index: int, player_name: String, preset_id: int)
 const SLIME_PATH := "res://assets/party_kitchen/slimes/%d.svg"
 const SWATCH_SIZE := 72
 
+@export var account: PDataAccount
 @export var name_edit: LineEdit
 @export var slime_preview: TextureRect
 @export var ok_button: Button
 @export var apply_button: Button
 @export var cancel_button: Button
 @export var colors_grid: GridContainer
+@export var occupied_label: Label
 @export var preset_storage: PlayerPresetStorage
 @export var game_config: GameConfig
 
@@ -21,6 +23,7 @@ var _editable_preset_id: int = -1
 var _selected_preset_id: int = 0
 var _color_buttons: Array[Button] = []
 var _lock_labels: Array[Label] = []
+var _holder_labels: Array[Label] = []
 
 
 func _ready() -> void:
@@ -70,6 +73,8 @@ func _show_window(player_name: String) -> void:
 		name_edit.text = player_name
 		name_edit.grab_focus()
 	_refresh_all_swatches()
+	_sort_color_grid()
+	_update_occupied_summary()
 	_on_name_changed(player_name)
 
 
@@ -99,13 +104,19 @@ func _build_color_buttons() -> void:
 		child.queue_free()
 	_color_buttons.clear()
 	_lock_labels.clear()
+	_holder_labels.clear()
 
 	for i in game_config.max_players:
+		var cell := VBoxContainer.new()
+		cell.custom_minimum_size = Vector2(SWATCH_SIZE, SWATCH_SIZE + 22)
+		cell.add_theme_constant_override("separation", 2)
+		colors_grid.add_child(cell)
+
 		var btn := Button.new()
 		btn.custom_minimum_size = Vector2(SWATCH_SIZE, SWATCH_SIZE)
 		btn.focus_mode = Control.FOCUS_NONE
 		btn.pressed.connect(_on_color_pressed.bind(i))
-		colors_grid.add_child(btn)
+		cell.add_child(btn)
 		_color_buttons.append(btn)
 
 		var lock := Label.new()
@@ -120,11 +131,32 @@ func _build_color_buttons() -> void:
 		btn.add_child(lock)
 		_lock_labels.append(lock)
 
+		var holder := Label.new()
+		holder.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		holder.custom_minimum_size = Vector2(SWATCH_SIZE, 18)
+		holder.add_theme_font_size_override("font_size", 12)
+		holder.add_theme_color_override("font_color", Color(0.52, 0.36, 0.28, 1))
+		holder.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		cell.add_child(holder)
+		_holder_labels.append(holder)
+
 	_refresh_all_swatches()
 
 
+func _get_preset_holder(preset_id: int) -> String:
+	if not account:
+		return ""
+	for i in account.get_players().size():
+		if _player_index >= 0 and i == _player_index:
+			continue
+		var entry: Dictionary = account.get_players()[i]
+		if int(entry.get("preset_id", 0)) == preset_id:
+			return str(entry.get("name", ""))
+	return ""
+
+
 func _is_preset_held(preset_id: int) -> bool:
-	return preset_storage != null and preset_storage.is_held(preset_id) and preset_id != _editable_preset_id
+	return not _get_preset_holder(preset_id).is_empty()
 
 
 func _make_swatch_style(preset_id: int, selected: bool, held: bool) -> StyleBoxFlat:
@@ -152,8 +184,9 @@ func _apply_swatch(preset_id: int) -> void:
 	if preset_id < 0 or preset_id >= _color_buttons.size():
 		return
 	var btn := _color_buttons[preset_id]
-	var held := _is_preset_held(preset_id)
-	var selected := preset_id == _selected_preset_id
+	var holder_name := _get_preset_holder(preset_id)
+	var held := not holder_name.is_empty()
+	var selected := preset_id == _selected_preset_id and not held
 	var style := _make_swatch_style(preset_id, selected, held)
 	btn.add_theme_stylebox_override("normal", style)
 	btn.add_theme_stylebox_override("hover", style.duplicate())
@@ -161,13 +194,51 @@ func _apply_swatch(preset_id: int) -> void:
 	btn.add_theme_stylebox_override("disabled", style.duplicate())
 	btn.disabled = held
 	btn.button_pressed = selected
-	btn.tooltip_text = SlimeColors.get_color_name(preset_id)
+	if held:
+		btn.tooltip_text = "%s — занят: %s" % [SlimeColors.get_color_name(preset_id), holder_name]
+	else:
+		btn.tooltip_text = SlimeColors.get_color_name(preset_id)
 	if preset_id < _lock_labels.size():
 		_lock_labels[preset_id].visible = held
+	if preset_id < _holder_labels.size():
+		_holder_labels[preset_id].text = holder_name if held else ""
 
 
-func _update_color_availability() -> void:
-	_refresh_all_swatches()
+func _sort_color_grid() -> void:
+	if not colors_grid:
+		return
+	var free_ids: Array[int] = []
+	var held_ids: Array[int] = []
+	for preset_id in _color_buttons.size():
+		if _is_preset_held(preset_id):
+			held_ids.append(preset_id)
+		else:
+			free_ids.append(preset_id)
+
+	var ordered := free_ids + held_ids
+	var cells: Array[Node] = []
+	for preset_id in ordered:
+		cells.append(_color_buttons[preset_id].get_parent())
+
+	for cell in cells:
+		colors_grid.remove_child(cell)
+	for cell in cells:
+		colors_grid.add_child(cell)
+
+
+func _update_occupied_summary() -> void:
+	if not occupied_label:
+		return
+	var parts: PackedStringArray = PackedStringArray()
+	for i in _color_buttons.size():
+		var holder_name := _get_preset_holder(i)
+		if holder_name.is_empty():
+			continue
+		parts.append("%s (%s)" % [holder_name, SlimeColors.get_color_name(i)])
+	if parts.is_empty():
+		occupied_label.text = "Все цвета свободны"
+	else:
+		occupied_label.text = "Занято: " + ", ".join(parts)
 
 
 func _select_first_available_preset() -> void:
@@ -178,6 +249,8 @@ func _select_first_available_preset() -> void:
 
 
 func _select_preset(preset_id: int) -> void:
+	if _is_preset_held(preset_id):
+		return
 	_selected_preset_id = preset_id
 	_refresh_all_swatches()
 	if slime_preview:
@@ -192,13 +265,16 @@ func _on_color_pressed(preset_id: int) -> void:
 
 func _on_name_changed(text: String) -> void:
 	var is_empty := text.strip_edges().is_empty()
+	var color_taken := _is_preset_held(_selected_preset_id)
 	if ok_button:
-		ok_button.disabled = is_empty
+		ok_button.disabled = is_empty or color_taken
 	if apply_button:
-		apply_button.disabled = is_empty
+		apply_button.disabled = is_empty or color_taken
 
 
 func _try_confirm() -> bool:
+	if _is_preset_held(_selected_preset_id):
+		return false
 	if ok_button and ok_button.visible and not ok_button.disabled:
 		_on_ok_pressed()
 		return true
@@ -216,7 +292,7 @@ func _close_window() -> void:
 
 func _on_ok_pressed() -> void:
 	var player_name := name_edit.text.strip_edges() if name_edit else ""
-	if player_name.is_empty():
+	if player_name.is_empty() or _is_preset_held(_selected_preset_id):
 		return
 	_close_window()
 	player_added.emit(player_name, _selected_preset_id)
@@ -224,7 +300,7 @@ func _on_ok_pressed() -> void:
 
 func _on_apply_pressed() -> void:
 	var player_name := name_edit.text.strip_edges() if name_edit else ""
-	if player_name.is_empty() or _player_index < 0:
+	if player_name.is_empty() or _player_index < 0 or _is_preset_held(_selected_preset_id):
 		return
 	_close_window()
 	player_applied.emit(_player_index, player_name, _selected_preset_id)

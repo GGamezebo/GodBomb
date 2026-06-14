@@ -113,4 +113,5 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 0
 preset_storage = NodePath("../../PresetStorage")
+account = ExtResource("6")
 game_config = ExtResource("5")

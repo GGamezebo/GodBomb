@@ -35,7 +35,15 @@ func _ready() -> void:
 	if edit_player_window:
 		edit_player_window.player_added.connect(_on_player_added_from_window)
 		edit_player_window.player_applied.connect(_on_player_applied_from_window)
+	_sync_edit_window_refs()
 	_load_from_account()
+
+
+func _sync_edit_window_refs() -> void:
+	if not edit_player_window:
+		return
+	edit_player_window.account = account
+	edit_player_window.preset_storage = preset_storage
 
 
 func _exit_tree() -> void:
@@ -43,6 +51,7 @@ func _exit_tree() -> void:
 
 
 func reload_from_account() -> void:
+	_sync_edit_window_refs()
 	_clear_icons()
 	_load_from_account()
 

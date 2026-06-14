@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://src/features/player_selection/edit_player_window.gd" id="1"]
 [ext_resource type="Texture2D" path="res://assets/party_kitchen/edit_panel.svg" id="2"]
 
-[node name="EditPlayerWindow" type="Control" node_paths=PackedStringArray("name_edit", "slime_preview", "ok_button", "apply_button", "cancel_button", "colors_grid")]
+[node name="EditPlayerWindow" type="Control" node_paths=PackedStringArray("name_edit", "slime_preview", "ok_button", "apply_button", "cancel_button", "colors_grid", "occupied_label")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -18,6 +18,7 @@ ok_button = NodePath("Panel/Margin/VBox/Buttons/OkButton")
 apply_button = NodePath("Panel/Margin/VBox/Buttons/ApplyButton")
 cancel_button = NodePath("Panel/Margin/VBox/Buttons/CancelButton")
 colors_grid = NodePath("Panel/Margin/VBox/ColorsGrid")
+occupied_label = NodePath("Panel/Margin/VBox/OccupiedLabel")
 
 [node name="Dimmer" type="ColorRect" parent="."]
 layout_mode = 1
@@ -69,8 +70,16 @@ horizontal_alignment = 1
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 theme_override_colors/font_color = Color(0.45, 0.35, 0.28, 1)
-text = "Выберите цвет — занятые недоступны"
+text = "Выберите свободный цвет"
 horizontal_alignment = 1
+
+[node name="OccupiedLabel" type="Label" parent="Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.55, 0.38, 0.28, 1)
+text = "Все цвета свободны"
+horizontal_alignment = 1
+autowrap_mode = 3
 
 [node name="PreviewRow" type="HBoxContainer" parent="Panel/Margin/VBox"]
 layout_mode = 2
