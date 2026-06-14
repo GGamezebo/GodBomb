@@ -1,7 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://rules_window_godbomb"]
+[gd_scene load_steps=2 format=3 uid="uid://rules_window_godbomb"]
 
 [ext_resource type="Script" path="res://src/features/menu/rules_window.gd" id="1"]
-[ext_resource type="Texture2D" path="res://assets/party_kitchen/edit_panel.svg" id="2"]
 
 [node name="RulesWindow" type="Control" node_paths=PackedStringArray("rules_text", "close_button")]
 layout_mode = 3
@@ -22,7 +21,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 0
-color = Color(0, 0, 0, 0.65)
+color = Color(0.04, 0.03, 0.025, 0.82)
 
 [node name="Panel" type="PanelContainer" parent="."]
 layout_mode = 1
@@ -35,12 +34,6 @@ offset_left = -360.0
 offset_top = -460.0
 offset_right = 360.0
 offset_bottom = 460.0
-
-[node name="Background" type="TextureRect" parent="Panel"]
-layout_mode = 2
-texture = ExtResource("2")
-expand_mode = 1
-stretch_mode = 6
 
 [node name="Margin" type="MarginContainer" parent="Panel"]
 layout_mode = 2
@@ -55,8 +48,7 @@ theme_override_constants/separation = 16
 
 [node name="Title" type="Label" parent="Panel/Margin/VBox"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 36
-theme_override_colors/font_color = Color(0.36, 0.25, 0.15, 1)
+theme_type_variation = &"Title"
 text = "Правила"
 horizontal_alignment = 1
 
@@ -69,12 +61,10 @@ size_flags_vertical = 3
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-theme_override_colors/default_color = Color(0.36, 0.25, 0.15, 1)
 bbcode_enabled = true
 fit_content = true
 scroll_active = false
 
 [node name="CloseButton" type="Button" parent="Panel/Margin/VBox"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 24
 text = "Закрыть"

@@ -1,7 +1,6 @@
-[gd_scene load_steps=4 format=3 uid="uid://edit_player_window_godbomb"]
+[gd_scene load_steps=2 format=3 uid="uid://edit_player_window_godbomb"]
 
 [ext_resource type="Script" path="res://src/features/player_selection/edit_player_window.gd" id="1"]
-[ext_resource type="Texture2D" path="res://assets/party_kitchen/edit_panel.svg" id="2"]
 
 [node name="EditPlayerWindow" type="Control" node_paths=PackedStringArray("name_edit", "name_history_grid", "slime_preview", "ok_button", "apply_button", "cancel_button", "colors_grid", "occupied_label")]
 layout_mode = 3
@@ -29,7 +28,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 0
-color = Color(0, 0, 0, 0.65)
+color = Color(0.04, 0.03, 0.025, 0.82)
 
 [node name="Panel" type="PanelContainer" parent="."]
 layout_mode = 1
@@ -42,12 +41,6 @@ offset_left = -360.0
 offset_top = -480.0
 offset_right = 360.0
 offset_bottom = 480.0
-
-[node name="Background" type="TextureRect" parent="Panel"]
-layout_mode = 2
-texture = ExtResource("2")
-expand_mode = 1
-stretch_mode = 6
 
 [node name="Margin" type="MarginContainer" parent="Panel"]
 layout_mode = 2
@@ -62,22 +55,18 @@ theme_override_constants/separation = 16
 
 [node name="Title" type="Label" parent="Panel/Margin/VBox"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 36
-theme_override_colors/font_color = Color(0.36, 0.25, 0.15, 1)
+theme_type_variation = &"Title"
 text = "Игрок"
 horizontal_alignment = 1
 
 [node name="ColorHint" type="Label" parent="Panel/Margin/VBox"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
-theme_override_colors/font_color = Color(0.45, 0.35, 0.28, 1)
 text = "Выберите свободный цвет"
 horizontal_alignment = 1
 
 [node name="OccupiedLabel" type="Label" parent="Panel/Margin/VBox"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
-theme_override_colors/font_color = Color(0.55, 0.38, 0.28, 1)
+theme_type_variation = &"Muted"
 text = "Все цвета свободны"
 horizontal_alignment = 1
 autowrap_mode = 3
@@ -94,14 +83,12 @@ stretch_mode = 5
 
 [node name="NameEdit" type="LineEdit" parent="Panel/Margin/VBox"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
 placeholder_text = "Имя игрока (до 16 символов)"
 max_length = 16
 
 [node name="NameHistoryHint" type="Label" parent="Panel/Margin/VBox"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
-theme_override_colors/font_color = Color(0.45, 0.35, 0.28, 1)
+theme_type_variation = &"Muted"
 text = "Недавние имена — нажми, чтобы подставить"
 horizontal_alignment = 1
 
@@ -124,15 +111,12 @@ theme_override_constants/separation = 16
 
 [node name="OkButton" type="Button" parent="Panel/Margin/VBox/Buttons"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 24
 text = "OK"
 
 [node name="ApplyButton" type="Button" parent="Panel/Margin/VBox/Buttons"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 24
 text = "Применить"
 
 [node name="CancelButton" type="Button" parent="Panel/Margin/VBox/Buttons"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 24
 text = "Отмена"

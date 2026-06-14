@@ -1,7 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://exit_confirm_dialog_godbomb"]
+[gd_scene load_steps=2 format=3 uid="uid://exit_confirm_dialog_godbomb"]
 
 [ext_resource type="Script" path="res://src/features/menu/exit_confirm_dialog.gd" id="1"]
-[ext_resource type="Texture2D" path="res://assets/party_kitchen/edit_panel.svg" id="2"]
 
 [node name="ExitConfirmDialog" type="Control" node_paths=PackedStringArray("message_label", "cancel_button", "confirm_button")]
 layout_mode = 3
@@ -23,7 +22,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 0
-color = Color(0, 0, 0, 0.65)
+color = Color(0.04, 0.03, 0.025, 0.82)
 
 [node name="Panel" type="PanelContainer" parent="."]
 layout_mode = 1
@@ -36,12 +35,6 @@ offset_left = -320.0
 offset_top = -180.0
 offset_right = 320.0
 offset_bottom = 180.0
-
-[node name="Background" type="TextureRect" parent="Panel"]
-layout_mode = 2
-texture = ExtResource("2")
-expand_mode = 1
-stretch_mode = 6
 
 [node name="Margin" type="MarginContainer" parent="Panel"]
 layout_mode = 2
@@ -57,8 +50,7 @@ alignment = 1
 
 [node name="Message" type="Label" parent="Panel/Margin/VBox"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 30
-theme_override_colors/font_color = Color(0.36, 0.25, 0.15, 1)
+theme_type_variation = &"Title"
 text = "Вы действительно хотите закончить игру?"
 horizontal_alignment = 1
 autowrap_mode = 2
@@ -72,12 +64,10 @@ alignment = 1
 custom_minimum_size = Vector2(180, 56)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 24
 text = "Отмена"
 
 [node name="ConfirmButton" type="Button" parent="Panel/Margin/VBox/Buttons"]
 custom_minimum_size = Vector2(180, 56)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 24
 text = "Да"

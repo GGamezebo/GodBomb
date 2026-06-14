@@ -109,8 +109,8 @@ func _refresh_name_history() -> void:
 		return
 
 	var chip_style := StyleBoxFlat.new()
-	chip_style.bg_color = Color(1, 0.97, 0.92, 1)
-	chip_style.border_color = Color(0.78, 0.62, 0.46, 1)
+	chip_style.bg_color = Color(0.16, 0.13, 0.11, 1)
+	chip_style.border_color = Color(0.42, 0.34, 0.27, 1)
 	chip_style.set_border_width_all(2)
 	chip_style.set_corner_radius_all(14)
 	chip_style.content_margin_left = 10
@@ -122,8 +122,8 @@ func _refresh_name_history() -> void:
 		var btn := Button.new()
 		btn.text = player_name
 		btn.focus_mode = Control.FOCUS_NONE
-		btn.add_theme_font_size_override("font_size", 18)
-		btn.add_theme_color_override("font_color", Color(0.32, 0.22, 0.16, 1))
+		btn.add_theme_font_size_override("font_size", 24)
+		btn.add_theme_color_override("font_color", Color(0.96, 0.91, 0.84, 1))
 		var btn_style := chip_style.duplicate()
 		btn.add_theme_stylebox_override("normal", btn_style)
 		btn.add_theme_stylebox_override("hover", btn_style.duplicate())
@@ -179,8 +179,8 @@ func _build_color_buttons() -> void:
 		var holder := Label.new()
 		holder.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		holder.custom_minimum_size = Vector2(SWATCH_SIZE, 18)
-		holder.add_theme_font_size_override("font_size", 12)
-		holder.add_theme_color_override("font_color", Color(0.52, 0.36, 0.28, 1))
+		holder.add_theme_font_size_override("font_size", 22)
+		holder.add_theme_color_override("font_color", Color(0.78, 0.71, 0.62, 1))
 		holder.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 		cell.add_child(holder)
 		_holder_labels.append(holder)
