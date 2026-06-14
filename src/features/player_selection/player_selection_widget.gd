@@ -51,7 +51,7 @@ func _ready() -> void:
 		edit_player_window.player_added.connect(_on_player_added_from_window)
 		edit_player_window.player_applied.connect(_on_player_applied_from_window)
 	_sync_edit_window_refs()
-	_load_from_account()
+	reload_from_account()
 
 
 func _sync_edit_window_refs() -> void:

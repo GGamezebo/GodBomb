@@ -86,6 +86,14 @@ func should_show_swap_hints() -> bool:
 	return get_games_played() < SWAP_HINT_GAMES_MAX
 
 
+func has_seen_swap_hint() -> bool:
+	return not should_show_swap_hints()
+
+
+func mark_swap_hint_seen() -> void:
+	pass
+
+
 func player_info_from_dict(entry: Dictionary) -> PlayerInfo:
 	return PlayerInfo.new(
 		PlayerInfo.sanitize_name(str(entry.get("name", ""))),
