@@ -972,6 +972,7 @@ func _remove_player(icon: PlayerIcon) -> void:
 	if preset_storage:
 		preset_storage.rebuild_locks(players)
 	menu_events.ev_player_removed.emit(info, index)
+	Haptics.vibrate_lobby_action(account)
 	_save_account()
 	_update_add_button()
 	_update_start_button()
@@ -995,6 +996,7 @@ func _swap_players(icon_a: PlayerIcon, icon_b: PlayerIcon) -> void:
 	if preset_storage:
 		preset_storage.rebuild_locks(players)
 	menu_events.ev_player_swapped.emit(index_a, index_b)
+	Haptics.vibrate_lobby_action(account)
 	_save_account()
 	for i in _player_icons.size():
 		_player_icons[i].set_order_index(i, _player_icons.size())

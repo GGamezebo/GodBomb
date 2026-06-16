@@ -41,7 +41,7 @@ var _dragging: bool = false
 var _drag_offset: Vector2 = Vector2.ZERO
 var _hold_timer: float = 0.0
 var _holding: bool = false
-var _hold_vibrated: bool = false
+var _hold_haptic_timer: float = 0.0
 var _drag_state: DragState = DragState.NONE
 var _seat_offset: Vector2 = Vector2.ZERO
 var _seat_offset_cached: bool = false
@@ -461,7 +461,7 @@ func _process(delta: float) -> void:
 				_apply_drag_lift(false)
 				drag_ended.emit()
 			return
-		_update_hold_visuals()
+		_update_hold_visuals(delta)
 		_update_drag_stretch()
 		return
 
@@ -495,7 +495,7 @@ func _get_hold_progress() -> float:
 
 func _reset_hold_feedback() -> void:
 	_hold_timer = 0.0
-	_hold_vibrated = false
+	_hold_haptic_timer = 0.0
 	if _hold_progress_ring:
 		_hold_progress_ring.progress = 0.0
 		_hold_progress_ring.visible_ring = false
@@ -505,7 +505,7 @@ func _reset_hold_feedback() -> void:
 		slime_rect.modulate = Color.WHITE
 
 
-func _update_hold_visuals() -> void:
+func _update_hold_visuals(delta: float = 0.0) -> void:
 	if not _is_hold_active_at_home():
 		if _hold_progress_ring and _hold_progress_ring.visible_ring:
 			_reset_hold_feedback()
@@ -531,9 +531,17 @@ func _update_hold_visuals() -> void:
 		else:
 			slime_rect.modulate = Color.WHITE
 
-	if progress >= 0.75 and not _hold_vibrated:
-		_hold_vibrated = true
-		Haptics.vibrate(18)
+	_update_hold_haptics(progress, delta)
+
+
+func _update_hold_haptics(progress: float, delta: float) -> void:
+	if progress <= 0.05:
+		return
+	_hold_haptic_timer -= delta
+	if _hold_haptic_timer > 0.0:
+		return
+	Haptics.vibrate_hold_progress(progress)
+	_hold_haptic_timer = lerpf(0.28, 0.11, progress)
 
 
 func _update_drag_stretch() -> void:
@@ -569,7 +577,7 @@ func _begin_drag_at_parent_local(parent_local: Vector2) -> void:
 	_dragging = true
 	_holding = true
 	_hold_timer = 0.0
-	_hold_vibrated = false
+	_hold_haptic_timer = 0.0
 	_drag_offset = parent_local - position
 	_last_drag_local = position
 	z_index = 10
