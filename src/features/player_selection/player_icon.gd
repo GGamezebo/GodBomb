@@ -50,9 +50,10 @@ var _motion_tween: Tween
 var _edit_hint: Label
 var _hold_progress_ring: HoldProgressRing
 var _hold_idle_hint: HoldEditIdleHint
-var _last_drag_global: Vector2 = Vector2.ZERO
+var _last_drag_local: Vector2 = Vector2.ZERO
 var _release_slime_center: Vector2 = Vector2.ZERO
 var _table_center_global: Vector2 = Vector2.ZERO
+var _active_touch_index: int = -1
 
 
 func _ready() -> void:
@@ -286,6 +287,7 @@ func reset_home_position(seat_center: Vector2, force: bool = false) -> void:
 
 
 func animate_arc_to(seat_center: Vector2, duration: float = 0.38) -> Tween:
+	var start_pos := get_global_transform_with_canvas() * Vector2.ZERO
 	home_position = seat_center
 	_kill_motion_tween()
 	stop_motion()
@@ -293,7 +295,6 @@ func animate_arc_to(seat_center: Vector2, duration: float = 0.38) -> Tween:
 	_holding = false
 	z_index = 5
 
-	var start_pos := global_position
 	var end_pos := _global_position_for_seat(seat_center)
 	var arc_lift := start_pos.distance_to(end_pos) * 0.22 + 48.0
 	var control_point := (start_pos + end_pos) * 0.5 + Vector2(0, -arc_lift)
@@ -329,12 +330,15 @@ func update_lobby_visuals(delta: float, look_target_global: Vector2, can_start: 
 
 
 func get_world_rect() -> Rect2:
-	return Rect2(global_position, size)
+	var xf := get_global_transform_with_canvas()
+	var origin := xf * Vector2.ZERO
+	var far_corner := xf * size
+	return Rect2(origin, far_corner - origin)
 
 
 func get_slime_center_global() -> Vector2:
 	if _dragging or _drag_state != DragState.NONE:
-		return global_position + _compute_seat_offset()
+		return get_global_transform_with_canvas() * _compute_seat_offset()
 	return get_home_global()
 
 
@@ -386,30 +390,69 @@ func _gui_input(event: InputEvent) -> void:
 		if mouse.button_index != MOUSE_BUTTON_LEFT:
 			return
 		if mouse.pressed:
-			_begin_drag(mouse.global_position)
+			accept_event()
+			_begin_drag_at_parent_local(_parent_local_from_event(mouse))
 		else:
+			accept_event()
 			_end_drag()
 	elif event is InputEventScreenTouch:
 		var touch := event as InputEventScreenTouch
 		if touch.pressed:
-			_begin_drag(touch.position)
-		else:
+			accept_event()
+			_active_touch_index = touch.index
+			_begin_drag_at_parent_local(_parent_local_from_event(touch))
+		elif _active_touch_index < 0 or touch.index == _active_touch_index:
+			accept_event()
 			_end_drag()
-	elif event is InputEventMouseMotion and _dragging:
-		var motion := event as InputEventMouseMotion
-		_apply_drag_motion(motion.global_position)
-	elif event is InputEventScreenDrag and _dragging:
+
+
+func _input(event: InputEvent) -> void:
+	if not _dragging:
+		return
+	if event is InputEventScreenDrag:
 		var drag := event as InputEventScreenDrag
-		_apply_drag_motion(drag.position)
+		if _active_touch_index >= 0 and drag.index != _active_touch_index:
+			return
+		_apply_drag_motion(_parent_local_from_canvas(drag.position))
+		get_viewport().set_input_as_handled()
+	elif event is InputEventMouseMotion:
+		_apply_drag_motion(_parent_local_from_event(event as InputEventMouseMotion))
+		get_viewport().set_input_as_handled()
+	elif event is InputEventMouseButton and not event.pressed:
+		if (event as InputEventMouseButton).button_index == MOUSE_BUTTON_LEFT:
+			_end_drag()
+			get_viewport().set_input_as_handled()
+	elif event is InputEventScreenTouch and not event.pressed:
+		var touch := event as InputEventScreenTouch
+		if _active_touch_index < 0 or touch.index == _active_touch_index:
+			_end_drag()
+			get_viewport().set_input_as_handled()
+
+
+func _parent_local_from_event(event: InputEvent) -> Vector2:
+	var canvas_point: Vector2
+	if event is InputEventMouse:
+		canvas_point = (event as InputEventMouse).global_position
+	else:
+		canvas_point = get_global_transform_with_canvas() * event.position
+	return _parent_local_from_canvas(canvas_point)
+
+
+func _parent_local_from_canvas(canvas_point: Vector2) -> Vector2:
+	var parent := get_parent() as CanvasItem
+	if parent:
+		return parent.get_global_transform_with_canvas().affine_inverse() * canvas_point
+	return canvas_point
 
 
 func _process(delta: float) -> void:
-	if _holding:
+	if _holding and _dragging:
 		_hold_timer += delta
 		if _hold_timer >= hold_time:
 			_holding = false
 			var was_dragging := _dragging
 			_dragging = false
+			_active_touch_index = -1
 			_reset_hold_feedback()
 			hold_edit_requested.emit(player_index)
 			set_drag_state(DragState.RETURNING)
@@ -418,9 +461,13 @@ func _process(delta: float) -> void:
 				_apply_drag_lift(false)
 				drag_ended.emit()
 			return
+		_update_hold_visuals()
+		_update_drag_stretch()
+		return
 
-	_update_hold_visuals()
-	_update_drag_stretch()
+	if _dragging:
+		_update_drag_stretch()
+		return
 
 	match _drag_state:
 		DragState.SWAPPING:
@@ -495,8 +542,8 @@ func _update_drag_stretch() -> void:
 	if _is_hold_active_at_home():
 		slime_rect.scale = _base_slime_scale * 1.08
 		return
-	var velocity := global_position - _last_drag_global
-	_last_drag_global = global_position
+	var velocity := position - _last_drag_local
+	_last_drag_local = position
 	if velocity.length_squared() < 0.5:
 		return
 	var stretch_x := 1.0 + clampf(abs(velocity.x) * 0.004, 0.0, 0.12)
@@ -516,34 +563,30 @@ func _lerp_towards(target: Vector2, delta: float) -> bool:
 	return position.distance_to(target) <= 1.0
 
 
-func _begin_drag(global_point: Vector2) -> void:
+func _begin_drag_at_parent_local(parent_local: Vector2) -> void:
+	stop_motion()
+	_kill_motion_tween()
 	_dragging = true
 	_holding = true
 	_hold_timer = 0.0
 	_hold_vibrated = false
-	_drag_offset = global_point - global_position
-	_last_drag_global = global_position
+	_drag_offset = parent_local - position
+	_last_drag_local = position
 	z_index = 10
 	_apply_drag_lift(true)
 	drag_started.emit()
 
 
-func _sync_local_from_global() -> void:
-	var parent := get_parent() as CanvasItem
-	if parent:
-		position = parent.get_global_transform_with_canvas().affine_inverse() * global_position
-
-
 func _end_drag() -> void:
 	if not _dragging:
 		return
-	_release_slime_center = global_position + _compute_seat_offset()
+	_release_slime_center = get_slime_center_global()
 	_dragging = false
 	_holding = false
+	_active_touch_index = -1
 	z_index = 0
 	_apply_drag_lift(false)
 	_reset_hold_feedback()
-	_sync_local_from_global()
 	drag_ended.emit()
 
 
@@ -556,8 +599,8 @@ func _apply_drag_lift(active: bool) -> void:
 		slime_rect.scale = _base_slime_scale
 
 
-func _apply_drag_motion(global_point: Vector2) -> void:
-	global_position = global_point - _drag_offset
+func _apply_drag_motion(parent_local: Vector2) -> void:
+	position = parent_local - _drag_offset
 	_check_hold_cancel()
 
 
@@ -570,7 +613,12 @@ func _check_hold_cancel() -> void:
 
 func _apply_arc_position(t: float, start_pos: Vector2, control_point: Vector2, end_pos: Vector2) -> void:
 	var inv := 1.0 - t
-	global_position = inv * inv * start_pos + 2.0 * inv * t * control_point + t * t * end_pos
+	var global_pos := inv * inv * start_pos + 2.0 * inv * t * control_point + t * t * end_pos
+	var parent := get_parent() as CanvasItem
+	if parent:
+		position = parent.get_global_transform_with_canvas().affine_inverse() * global_pos
+	else:
+		position = global_pos
 	if slime_rect:
 		slime_rect.rotation = lerp(slime_rect.rotation, 0.0, t)
 
