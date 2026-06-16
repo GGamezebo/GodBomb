@@ -22,6 +22,7 @@ extends Control
 @export var chair_size: Vector2 = Vector2(100, 100)
 @export var chair_facing_offset: float = -PI * 0.5
 
+const TABLE_SIZE := Vector2(640, 640)
 const SWAP_HINT_MIN_PLAYERS := 3
 const HINT_SWAP_IDLE := "Перетащи на другое место — поменяетесь"
 const HINT_SWAP_DRAG := "Отпусти — поменяетесь местами"
@@ -375,12 +376,18 @@ func _apply_chair_transform(chair: TextureRect, seat_local: Vector2) -> void:
 	chair.position = seat_local - chair_size * 0.5
 
 
+func _layout_table_area() -> void:
+	if not table_area:
+		return
+	table_area.custom_minimum_size = TABLE_SIZE
+	table_area.size = TABLE_SIZE
+	table_area.position = (size - TABLE_SIZE) * 0.5
+
+
 func _update_positions() -> void:
 	if not table_area:
 		return
-	const TABLE_SIZE := Vector2(640, 640)
-	table_area.custom_minimum_size = TABLE_SIZE
-	table_area.size = TABLE_SIZE
+	_layout_table_area()
 	if _player_icons.is_empty():
 		_sync_order_badges(0)
 		_update_hint_banner_layout()
@@ -395,11 +402,10 @@ func _update_positions() -> void:
 
 	for i in player_count:
 		var seat_local := _seat_local_for_index(i, player_count)
-		var seat_global := table_area.global_position + seat_local
 		_apply_chair_transform(_chairs[i], seat_local)
 		_player_icons[i].set_order_index(i, player_count)
 		_player_icons[i].apply_fixed_layout()
-		_player_icons[i].reset_home_position(seat_global, true)
+		_player_icons[i].reset_home_position(seat_local, true)
 
 	call_deferred("_layout_table_order_badges")
 
@@ -766,7 +772,7 @@ func _update_lobby_animations(delta: float) -> void:
 		var look_target := table_center
 		if can_start and _player_icons.size() > 1:
 			var next_index := (i + 1) % _player_icons.size()
-			look_target = _player_icons[next_index].home_position
+			look_target = _player_icons[next_index].get_home_global()
 		icon.update_lobby_visuals(delta, look_target, can_start)
 
 
@@ -1006,16 +1012,15 @@ func _play_swap_whoosh(icon_a: PlayerIcon, icon_b: PlayerIcon, index_a: int, ind
 		var seat_local := _seat_local_for_index(i, player_count)
 		_apply_chair_transform(_chairs[i], seat_local)
 
-	var seat_a := table_area.global_position + _seat_local_for_index(index_b, player_count)
-	var seat_b := table_area.global_position + _seat_local_for_index(index_a, player_count)
+	var seat_a := _seat_local_for_index(index_b, player_count)
+	var seat_b := _seat_local_for_index(index_a, player_count)
 	icon_a.animate_arc_to(seat_a)
 	icon_b.animate_arc_to(seat_b)
 
 	for i in player_count:
 		if _player_icons[i] == icon_a or _player_icons[i] == icon_b:
 			continue
-		var seat_global := table_area.global_position + _seat_local_for_index(i, player_count)
-		_player_icons[i].reset_home_position(seat_global, true)
+		_player_icons[i].reset_home_position(_seat_local_for_index(i, player_count), true)
 
 	call_deferred("_layout_table_order_badges")
 

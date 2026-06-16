@@ -186,7 +186,7 @@ func _compute_max_plate_width() -> float:
 
 	var seat_dist := 144.0
 	if _table_center_global != Vector2.ZERO and home_position != Vector2.ZERO:
-		seat_dist = home_position.distance_to(_table_center_global)
+		seat_dist = get_home_global().distance_to(_table_center_global)
 	elif slime_rect:
 		seat_dist = maxf(seat_dist, _compute_seat_offset().distance_to(size * 0.5) + 40.0)
 
@@ -250,6 +250,15 @@ func _compute_seat_offset() -> Vector2:
 	return _seat_offset
 
 
+func get_home_global() -> Vector2:
+	if home_position == Vector2.ZERO:
+		return global_position + _compute_seat_offset()
+	var parent := get_parent() as CanvasItem
+	if parent:
+		return parent.get_global_transform_with_canvas() * home_position
+	return home_position
+
+
 func _position_for_seat(seat_center: Vector2) -> Vector2:
 	return seat_center - _seat_offset
 
@@ -257,7 +266,7 @@ func _position_for_seat(seat_center: Vector2) -> Vector2:
 func _apply_home_position() -> void:
 	if not is_inside_tree():
 		return
-	global_position = _position_for_seat(home_position)
+	position = _position_for_seat(home_position)
 
 
 func reset_home_position(seat_center: Vector2, force: bool = false) -> void:
@@ -270,7 +279,10 @@ func reset_home_position(seat_center: Vector2, force: bool = false) -> void:
 		z_index = 0
 		_reset_slime_visuals()
 	if force or (not _dragging and _drag_state == DragState.NONE):
-		call_deferred("_apply_home_position")
+		if force:
+			_apply_home_position()
+		else:
+			call_deferred("_apply_home_position")
 
 
 func animate_arc_to(seat_center: Vector2, duration: float = 0.38) -> Tween:
@@ -282,7 +294,7 @@ func animate_arc_to(seat_center: Vector2, duration: float = 0.38) -> Tween:
 	z_index = 5
 
 	var start_pos := global_position
-	var end_pos := _position_for_seat(seat_center)
+	var end_pos := _global_position_for_seat(seat_center)
 	var arc_lift := start_pos.distance_to(end_pos) * 0.22 + 48.0
 	var control_point := (start_pos + end_pos) * 0.5 + Vector2(0, -arc_lift)
 
@@ -303,7 +315,7 @@ func update_lobby_visuals(delta: float, look_target_global: Vector2, can_start: 
 	if not slime_rect:
 		return
 
-	var to_target := look_target_global - home_position
+	var to_target := look_target_global - get_home_global()
 	if to_target.length_squared() > 64.0:
 		var look_angle := clampf(to_target.angle() + PI * 0.5, -0.35, 0.35)
 		slime_rect.rotation = lerp(slime_rect.rotation, look_angle, clampf(delta * 4.0, 0.0, 1.0))
@@ -323,15 +335,15 @@ func get_world_rect() -> Rect2:
 func get_slime_center_global() -> Vector2:
 	if _dragging or _drag_state != DragState.NONE:
 		return global_position + _compute_seat_offset()
-	return home_position
+	return get_home_global()
 
 
 func has_moved_for_swap() -> bool:
-	return get_slime_center_global().distance_to(home_position) >= swap_activation_distance
+	return get_slime_center_global().distance_to(get_home_global()) >= swap_activation_distance
 
 
 func has_moved_for_swap_at(center: Vector2) -> bool:
-	return center.distance_to(home_position) >= swap_activation_distance
+	return center.distance_to(get_home_global()) >= swap_activation_distance
 
 
 func is_slime_over_seat(other: PlayerIcon, seat_size: Vector2) -> bool:
@@ -341,7 +353,7 @@ func is_slime_over_seat(other: PlayerIcon, seat_size: Vector2) -> bool:
 func is_slime_over_seat_at(other: PlayerIcon, seat_size: Vector2, center: Vector2) -> bool:
 	if other == self:
 		return false
-	var seat_rect := Rect2(other.home_position - seat_size * 0.5, seat_size)
+	var seat_rect := Rect2(other.get_home_global() - seat_size * 0.5, seat_size)
 	return seat_rect.has_point(center)
 
 
@@ -424,7 +436,7 @@ func _is_hold_active_at_home() -> bool:
 	return (
 		_holding
 		and _dragging
-		and global_position.distance_to(_position_for_seat(home_position)) <= 8.0
+		and get_slime_center_global().distance_to(get_home_global()) <= 8.0
 	)
 
 
@@ -500,8 +512,8 @@ func _swap_preview_target() -> Vector2:
 
 func _lerp_towards(target: Vector2, delta: float) -> bool:
 	var t := clampf(delta * move_lerp_speed, 0.0, 1.0)
-	global_position = global_position.lerp(target, t)
-	return global_position.distance_to(target) <= 1.0
+	position = position.lerp(target, t)
+	return position.distance_to(target) <= 1.0
 
 
 func _begin_drag(global_point: Vector2) -> void:
@@ -516,6 +528,12 @@ func _begin_drag(global_point: Vector2) -> void:
 	drag_started.emit()
 
 
+func _sync_local_from_global() -> void:
+	var parent := get_parent() as CanvasItem
+	if parent:
+		position = parent.get_global_transform_with_canvas().affine_inverse() * global_position
+
+
 func _end_drag() -> void:
 	if not _dragging:
 		return
@@ -525,6 +543,7 @@ func _end_drag() -> void:
 	z_index = 0
 	_apply_drag_lift(false)
 	_reset_hold_feedback()
+	_sync_local_from_global()
 	drag_ended.emit()
 
 
@@ -543,7 +562,7 @@ func _apply_drag_motion(global_point: Vector2) -> void:
 
 
 func _check_hold_cancel() -> void:
-	if global_position.distance_to(_position_for_seat(home_position)) > 8.0:
+	if get_slime_center_global().distance_to(get_home_global()) > 8.0:
 		if _holding:
 			_holding = false
 			_reset_hold_feedback()
@@ -577,6 +596,15 @@ func _reset_slime_visuals() -> void:
 	_reset_hold_feedback()
 
 
+func _global_position_for_seat(seat_center: Vector2) -> Vector2:
+	var parent := get_parent() as CanvasItem
+	if parent:
+		return parent.get_global_transform_with_canvas() * _position_for_seat(seat_center)
+	return _position_for_seat(seat_center)
+
+
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_RESIZED:
 		apply_fixed_layout()
+		if home_position != Vector2.ZERO and not _dragging and _drag_state == DragState.NONE:
+			_apply_home_position()
