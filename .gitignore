@@ -18,4 +18,5 @@ godot_sandbox
 data_*/
 mono_crash.*.json
 *export/
-*.cursor/
+
+bin

@@ -1,0 +1,25 @@
+---
+description: Бой — FSM, HUD, input, C4 background
+globs: src/contexts/game_context/**,src/features/background/game_bomb_background.gd,src/features/explosion/**
+alwaysApply: false
+---
+
+# Бой
+
+**FSM:** choice(~5s roulette) → ready(button) → countdown(5s) → play → explosion → ready|result. First card: `next_card()` end of countdown if null. After boom: next_card→next_player→ready.
+
+**UI init trap:** FSM starts in `initialize()` before child `_ready`. HUD + `game_input` MUST `_sync_to_current_state()` in `_ready`.
+
+**Layout:** `BackgroundBomb` + `MenuBombLayout`/`GameBombBackground` (`Background.png`, cover 1080×1920). Battle UI in `ScaledContent` design coords. Markers: `PlayerName` (name plate + lighten overlay), `RoundWord` (syllable/countdown on dial). No round bomb sprite.
+
+**HUD** (`game_hud.gd`, accent `#F5470A`): PlayerStrip@`PlayerName` · SyllableCard@`RoundWord` · ActionHints(y~1120) · countdown@`RoundWord` · explosion overlay · ResultPanel (screen). No edge vignette.
+
+State UI: choice=«Выбираем первого»+pulse · ready=«Первым ходит»+StartRoundButton · play=full HUD · explosion=name overlay.
+
+**Input** (`game_input.gd`): `mouse_filter=IGNORE`. PLAY: tap→next, swipe→prev (1×/round). RESULT→menu. StartRoundButton: `BackgroundBomb/ScaledContent/StartRoundButton`.
+
+**Visual:** `GameBombBackground` (Control: `PlayerColorBackground` under `BombArt`) — player-color backdrop via `SlimeColors`, alert pulse on bg, bomb-only flash/shake on explosion · particles at (540,1050).
+
+**Audio:** game_sound on PLAY only → audio.mdc.
+
+**Core:** `game_manager.gd` `game_session.gd` `game_sound.gd` `word_condition.gd`

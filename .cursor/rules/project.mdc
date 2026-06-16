@@ -1,0 +1,20 @@
+---
+description: GodBomb — обзор, стек, правила
+alwaysApply: true
+---
+
+# GodBomb
+
+Party hot-potato, слоги. Godot 4.6 GDScript, 1080×1920 portrait, mobile renderer. Entry: `main.tscn` → `MainContext`.
+
+**Цикл:** 2–12 игроков, слог+условие, передача бомбы, скрытый таймер, взрыв = +1 штраф, победа = min score, колода кончилась.
+
+**FSM:** `player_choice` → `ready_to_start` → `countdown` → `play` → `explosion` → … → `result`
+
+**Контексты:** MenuContext (лобби) · GameContext (бой). Детали → `menu-lobby.mdc`, `game-battle.mdc`, `audio.mdc`.
+
+**Папки:** `src/contexts/` экраны · `src/features/` механики · `src/common/` config/events · `core/lib/` FSM · `assets/`
+
+**Промпты:** `architecture.mdc` · `gdscript.mdc` · `menu-lobby.mdc` · `game-battle.mdc` · `audio.mdc` — обновляй при новых механиках.
+
+**Язык:** код EN · UI RU. Игнор: `.godot/`, `*.import`. F6 без crash — см. `architecture.mdc`.

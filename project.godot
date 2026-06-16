@@ -35,3 +35,4 @@ theme/custom="res://src/ui/god_bomb_ui.theme.tres"
 [rendering]
 
 renderer/rendering_method="mobile"
+textures/vram_compression/import_etc2_astc=true

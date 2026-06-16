@@ -1,0 +1,19 @@
+---
+description: GDScript стиль
+globs: **/*.gd
+alwaysApply: false
+---
+
+# GDScript
+
+EN comments · typed `@export` · `class_name` в отдельном файле · минимальный дифф.
+
+**Имена:** PascalCase классы · `ev_snake` сигналы · `_private` методы · snake `@export`.
+
+**EventListener:** `listener.add` в `_ready`, `listener.deinit()` в `_exit_tree`.
+
+**Пути:** механика → `src/features/` · экран → `src/contexts/` · общее → `src/common/` · утилиты → `core/lib/`.
+
+**Механики → `.cursor/rules/`:** lobby `menu-lobby.mdc` · battle `game-battle.mdc` · audio `audio.mdc` · arch `architecture.mdc`.
+
+**Избегать:** autoloads для связи экранов · прямых ссылок между контекстами · хардкода сцен.

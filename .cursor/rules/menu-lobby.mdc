@@ -1,0 +1,27 @@
+---
+description: Лобби — выбор игроков, подсказки, DnD
+globs: src/features/player_selection/**,src/features/menu/**,src/contexts/menu_context/**
+alwaysApply: false
+---
+
+# Лобби
+
+MenuContext + `PlayerSelectionWidget`. Стиль party_kitchen, bg bomb `Background.png` via `MenuBombLayout` (design 1080×1920, cover scale). `ScaledContent` — TopBar, стол, Start, Marker2D для hints. Hint banner центрируется на Marker2D. Resize → всё масштабируется пропорционально бомбе.
+
+**Игроки:** 2–12, `PDataAccount`→`PlayerInfo`(name, preset_id), slimes `party_kitchen/slimes/{id}.svg`, colors `SlimeColors`.
+
+**Порядок:** бейджи на столе (`SeatOrderBadge`), стрелки (`TurnOrderArrowsLayer`, accent, 75% alpha on drag).
+
+**Swap:** drag slime → swap, `ChairSwapRing`. Hints `TableHintBanner`: idle 1×/visit (hide after 5 games), drag = emphasis (full opacity).
+
+**Remove:** `+` → delete mode, ring like swap (`radius_for_half_extent`), delete on slime center in ring (`get_release_slime_center` before `_set_remove_mode(false)`), min_players_for_remove=0, empty table → `_sync_order_badges(0)`.
+
+**Min 2 players:** start disabled, `+` scale pulse, banner hint.
+
+**Hold-edit:** 2s hold → EditPlayerWindow, `HoldProgressRing`, reset move >8px, hints via `hints_seen.hold_edit`, stop after `has_edited_player`.
+
+**Name:** below slime, centered (`layout_name_plate`).
+
+**Settings:** party 1–30min · menu music→Music · sfx→SFX · ModalLayer parent must stay visible.
+
+**Start:** bomb preview → `ev_start_game` → GameContext, `SCOPE_MENU` off.

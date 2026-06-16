@@ -1,0 +1,19 @@
+---
+description: Аудио — шины, menu music, game SFX
+globs: src/**/audio/**/*.gd,main.tscn,default_bus_layout.tres,src/features/menu/settings_window.*
+alwaysApply: false
+---
+
+# Аудио
+
+**Шины:** `Music` = фон меню only · `SFX` = весь геймплей incl. `game_sound.mp3`
+
+**Menu music** (`MusicPlayer`, `background.mp3`): `GameAudioController` → `music_player` on `MusicPlayer`.  
+`set_in_battle(false)` in menu + `music_enabled` → play (loop). `set_in_battle(true)` on game start → stop.
+
+**GameSound** (`game_sound.gd`, SFX bus):
+- `Countdown.wav` — countdown ticks
+- `game_sound.mp3` — loop, start **PLAY** (after countdown), stop on explosion/ready/result/choice/countdown
+- ticks — `ev_alert` · `Explosion.mp3` — explosion
+
+**Правила:** menu bg → Music+scope · gameplay → SFX · не loop на Music bus

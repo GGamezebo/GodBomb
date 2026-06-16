@@ -1,0 +1,19 @@
+---
+description: Контексты, события, FSM, ресурсы
+globs: src/**/*.gd,src/**/*.tscn,core/**/*.gd
+alwaysApply: false
+---
+
+# Архитектура
+
+**Контексты:** `IContext` (`initialize(data)`, `deinit()`). `MainContext.switch_game_context()` — async load. Цепочка: Menu → Game → Menu (`ev_return_to_menu` из `result`). Новый экран = `src/contexts/` + путь в MainContext.
+
+**События:** Resource + `signal ev_*` (MainEvents, GameEvents, MenuEvents). Подписка: `EventListener` + `listener.deinit()` в `_exit_tree()`. Контексты не линковать напрямую.
+
+**FSM:** `core/lib/fsm/`, состояния `StateBase` в `GameManager`, константы `FSMGameEvents`.
+
+**Ресурсы:** `class_name` Resource, save `user://account.tres` via `PersistentDataController`. Дефолты в `.tres`.
+
+**Сервисы:** под `main.tscn`, не autoloads. `@export` для зависимостей, не `get_node("/root/...")`.
+
+**F6:** `@export` дефолты в `.tscn`, тяжёлая логика в `initialize()`, не в `_ready()` контекста до add_child.
