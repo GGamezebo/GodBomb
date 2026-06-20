@@ -659,7 +659,9 @@ func _update_start_button() -> void:
 			if label:
 				label.text = "ГОТОВО"
 			if start_button is StartActionButton:
-				(start_button as StartActionButton).set_pulse_active(can_done)
+				var action_button := start_button as StartActionButton
+				action_button.set_pulse_active(can_done)
+				action_button.refresh_label_layout()
 			else:
 				_kill_start_pulse_tween()
 				start_button.scale = Vector2.ONE

@@ -22,7 +22,7 @@ MenuContext + `PlayerSelectionWidget`. Party kitchen, bomb bg `MenuBombLayout` (
 
 **EditPlayerWindow:** no scroll · margins как settings (32/64 panel, 48 inner, buttons 180) · colors grid под name history · OK add / Apply edit / Cancel · sounds → `audio.mdc`
 
-**Start:** `StartActionButton` (pulse, labels centered, clip_contents=false) · menu Start + battle Done share script · SVG `start_active/inactive` viewBox `-6 0 452 120`
+**Start:** `StartActionButton` (pulse, `refresh_label_layout()` centers label on SVG pill, clip_contents=false) · menu Start + battle Done share script · SVG `start_active/inactive` viewBox `-6 0 452 120`
 
 **Min 2:** start disabled · `+` pulse · banner hint
 
