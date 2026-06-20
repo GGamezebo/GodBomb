@@ -1,7 +1,7 @@
 class_name HoldEditIdleHint
 extends Control
 
-const BADGE_SIZE := Vector2(30, 30)
+const BADGE_SIZE := Vector2(60, 60)
 const RING_COLOR := Color(1.0, 0.82, 0.35, 0.95)
 
 var _pulse: float = 0.0
@@ -31,7 +31,7 @@ func _process(delta: float) -> void:
 func _draw() -> void:
 	var center := size * 0.5
 	var pulse := 0.88 + sin(_pulse * 3.2) * 0.12
-	var radius := 11.0 * pulse
-	draw_arc(center, radius + 1.5, 0.0, TAU, 32, Color(1.0, 0.82, 0.35, 0.18), 3.0, true)
-	draw_arc(center, radius, -PI * 0.15, PI * 1.05, 24, RING_COLOR, 3.0, true)
-	draw_circle(center + Vector2(0.0, 3.0), 2.6, RING_COLOR)
+	var radius := 22.0 * pulse
+	draw_arc(center, radius + 3.0, 0.0, TAU, 32, Color(1.0, 0.82, 0.35, 0.18), 6.0, true)
+	draw_arc(center, radius, -PI * 0.15, PI * 1.05, 24, RING_COLOR, 6.0, true)
+	draw_circle(center + Vector2(0.0, 6.0), 5.2, RING_COLOR)

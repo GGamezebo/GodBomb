@@ -474,7 +474,7 @@ func _update_hint_banner_layout() -> void:
 	if not _table_hint_banner:
 		return
 	var anchor := _get_hint_anchor_design_position()
-	var banner_width := maxf(TableHintBanner.MIN_WIDTH, minf(table_area.size.x - 96.0, 920.0) if table_area else 920.0)
+	var banner_width := maxf(TableHintBanner.MIN_WIDTH, minf(table_area.size.x - 48.0, 1000.0) if table_area else 1000.0)
 	_table_hint_banner.custom_minimum_size = Vector2(banner_width, 0)
 	_table_hint_banner.reset_size()
 	var banner_size := _table_hint_banner.get_combined_minimum_size()

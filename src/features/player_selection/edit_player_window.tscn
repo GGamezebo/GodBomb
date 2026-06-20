@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://src/features/player_selection/edit_player_window.gd" id="1"]
 
-[node name="EditPlayerWindow" type="Control" node_paths=PackedStringArray("name_edit", "name_history_grid", "slime_preview", "ok_button", "apply_button", "cancel_button", "colors_grid", "occupied_label")]
+[node name="EditPlayerWindow" type="Control" node_paths=PackedStringArray("name_edit", "name_history_grid", "slime_preview", "ok_button", "apply_button", "cancel_button", "colors_grid")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -11,14 +11,13 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 0
 script = ExtResource("1")
-name_edit = NodePath("Panel/Margin/VBox/NameEdit")
-name_history_grid = NodePath("Panel/Margin/VBox/NameHistoryGrid")
-slime_preview = NodePath("Panel/Margin/VBox/PreviewRow/SlimePreview")
+name_edit = NodePath("Panel/Margin/VBox/Content/NameEdit")
+name_history_grid = NodePath("Panel/Margin/VBox/Content/NameHistoryGrid")
+slime_preview = NodePath("Panel/Margin/VBox/Content/PreviewRow/SlimePreview")
 ok_button = NodePath("Panel/Margin/VBox/Buttons/OkButton")
 apply_button = NodePath("Panel/Margin/VBox/Buttons/ApplyButton")
 cancel_button = NodePath("Panel/Margin/VBox/Buttons/CancelButton")
-colors_grid = NodePath("Panel/Margin/VBox/ColorsGrid")
-occupied_label = NodePath("Panel/Margin/VBox/OccupiedLabel")
+colors_grid = NodePath("Panel/Margin/VBox/Content/ColorsGrid")
 
 [node name="Dimmer" type="ColorRect" parent="."]
 layout_mode = 1
@@ -32,91 +31,89 @@ color = Color(0.04, 0.03, 0.025, 0.82)
 
 [node name="Panel" type="PanelContainer" parent="."]
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -360.0
-offset_top = -480.0
-offset_right = 360.0
-offset_bottom = 480.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 32.0
+offset_top = 64.0
+offset_right = -32.0
+offset_bottom = -64.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="Margin" type="MarginContainer" parent="Panel"]
 layout_mode = 2
-theme_override_constants/margin_left = 32
-theme_override_constants/margin_top = 32
-theme_override_constants/margin_right = 32
-theme_override_constants/margin_bottom = 32
+theme_override_constants/margin_left = 48
+theme_override_constants/margin_top = 48
+theme_override_constants/margin_right = 48
+theme_override_constants/margin_bottom = 48
 
 [node name="VBox" type="VBoxContainer" parent="Panel/Margin"]
 layout_mode = 2
-theme_override_constants/separation = 16
+theme_override_constants/separation = 28
 
 [node name="Title" type="Label" parent="Panel/Margin/VBox"]
 layout_mode = 2
-theme_type_variation = &"Title"
+theme_type_variation = &"ModalTitle"
 text = "Игрок"
 horizontal_alignment = 1
 
-[node name="ColorHint" type="Label" parent="Panel/Margin/VBox"]
+[node name="Content" type="VBoxContainer" parent="Panel/Margin/VBox"]
 layout_mode = 2
-text = "Выберите свободный цвет"
-horizontal_alignment = 1
+size_flags_vertical = 3
+theme_override_constants/separation = 28
 
-[node name="OccupiedLabel" type="Label" parent="Panel/Margin/VBox"]
-layout_mode = 2
-theme_type_variation = &"Muted"
-text = "Все цвета свободны"
-horizontal_alignment = 1
-autowrap_mode = 3
-
-[node name="PreviewRow" type="HBoxContainer" parent="Panel/Margin/VBox"]
+[node name="PreviewRow" type="HBoxContainer" parent="Panel/Margin/VBox/Content"]
 layout_mode = 2
 alignment = 1
 
-[node name="SlimePreview" type="TextureRect" parent="Panel/Margin/VBox/PreviewRow"]
-custom_minimum_size = Vector2(128, 128)
+[node name="SlimePreview" type="TextureRect" parent="Panel/Margin/VBox/Content/PreviewRow"]
+custom_minimum_size = Vector2(192, 192)
 layout_mode = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="NameEdit" type="LineEdit" parent="Panel/Margin/VBox"]
+[node name="NameEdit" type="LineEdit" parent="Panel/Margin/VBox/Content"]
+custom_minimum_size = Vector2(0, 96)
 layout_mode = 2
+theme_type_variation = &"ModalLineEdit"
 placeholder_text = "Имя игрока (до 16 символов)"
 max_length = 16
 
-[node name="NameHistoryHint" type="Label" parent="Panel/Margin/VBox"]
+[node name="NameHistoryGrid" type="GridContainer" parent="Panel/Margin/VBox/Content"]
 layout_mode = 2
-theme_type_variation = &"Muted"
-text = "Недавние имена — нажми, чтобы подставить"
-horizontal_alignment = 1
-
-[node name="NameHistoryGrid" type="GridContainer" parent="Panel/Margin/VBox"]
-layout_mode = 2
-theme_override_constants/h_separation = 8
-theme_override_constants/v_separation = 8
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 12
 columns = 3
 
-[node name="ColorsGrid" type="GridContainer" parent="Panel/Margin/VBox"]
+[node name="ColorsGrid" type="GridContainer" parent="Panel/Margin/VBox/Content"]
 layout_mode = 2
-theme_override_constants/h_separation = 8
-theme_override_constants/v_separation = 8
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 12
 columns = 6
 
 [node name="Buttons" type="HBoxContainer" parent="Panel/Margin/VBox"]
 layout_mode = 2
 alignment = 1
-theme_override_constants/separation = 16
-
-[node name="OkButton" type="Button" parent="Panel/Margin/VBox/Buttons"]
-layout_mode = 2
-text = "OK"
-
-[node name="ApplyButton" type="Button" parent="Panel/Margin/VBox/Buttons"]
-layout_mode = 2
-text = "Применить"
+theme_override_constants/separation = 20
 
 [node name="CancelButton" type="Button" parent="Panel/Margin/VBox/Buttons"]
+custom_minimum_size = Vector2(220, 96)
 layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"ModalButton"
 text = "Отмена"
+
+[node name="ApplyButton" type="Button" parent="Panel/Margin/VBox/Buttons"]
+custom_minimum_size = Vector2(220, 96)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"ModalButton"
+text = "Применить"
+
+[node name="OkButton" type="Button" parent="Panel/Margin/VBox/Buttons"]
+custom_minimum_size = Vector2(220, 96)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"ModalButton"
+text = "OK"

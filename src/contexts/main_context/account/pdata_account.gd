@@ -3,7 +3,8 @@ extends Resource
 
 const SAVE_PATH := "user://account.tres"
 const CURRENT_VERSION := 1
-const RECENT_NAMES_MAX := 12
+const RECENT_NAMES_STORAGE_MAX := 24
+const RECENT_NAMES_DISPLAY_MAX := 12
 const SWAP_HINT_GAMES_MAX := 5
 const HOLD_EDIT_HINT_MAX_VIEWS := 2
 const DEFAULT_MUSIC_VOLUME := 0.6
@@ -55,7 +56,27 @@ func set_game_time_minutes(minutes: int) -> void:
 
 func get_recent_names() -> Array[String]:
 	ensure_recent_names_initialized()
-	return _to_string_array(data.get("recent_player_names", []))
+	return _trim_recent_names(_to_string_array(data.get("recent_player_names", [])))
+
+
+func get_recent_names_for_display() -> Array[String]:
+	var all := get_recent_names()
+	if all.size() <= RECENT_NAMES_DISPLAY_MAX:
+		return all
+	return all.slice(0, RECENT_NAMES_DISPLAY_MAX)
+
+
+func consume_recent_name(player_name: String) -> void:
+	var trimmed := PlayerInfo.sanitize_name(player_name)
+	if trimmed.is_empty():
+		return
+	ensure_recent_names_initialized()
+	var names := get_recent_names()
+	if not names.has(trimmed):
+		return
+	names.erase(trimmed)
+	data["recent_player_names"] = names
+	emit_changed()
 
 
 func remember_removed_player(player_name: String) -> void:
@@ -66,9 +87,7 @@ func remember_removed_player(player_name: String) -> void:
 	var names := get_recent_names()
 	names.erase(trimmed)
 	names.insert(0, trimmed)
-	if names.size() > RECENT_NAMES_MAX:
-		names = names.slice(0, RECENT_NAMES_MAX)
-	data["recent_player_names"] = names
+	data["recent_player_names"] = _trim_recent_names(names)
 	emit_changed()
 
 
@@ -198,3 +217,9 @@ func _to_string_array(source: Variant) -> Array[String]:
 			if not text.is_empty():
 				result.append(text)
 	return result
+
+
+func _trim_recent_names(names: Array[String]) -> Array[String]:
+	if names.size() <= RECENT_NAMES_STORAGE_MAX:
+		return names
+	return names.slice(0, RECENT_NAMES_STORAGE_MAX)

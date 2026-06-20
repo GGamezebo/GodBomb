@@ -78,10 +78,10 @@ func _setup_edit_hint() -> void:
 	_edit_hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_edit_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_edit_hint.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	_edit_hint.add_theme_font_size_override("font_size", 28)
+	_edit_hint.add_theme_font_size_override("font_size", 56)
 	_edit_hint.add_theme_color_override("font_color", Color(0.95, 0.55, 0.2, 1))
 	_edit_hint.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
-	_edit_hint.offset_top = -8.0
+	_edit_hint.offset_top = -16.0
 	add_child(_edit_hint)
 
 
@@ -107,13 +107,13 @@ func _layout_hold_overlays() -> void:
 		return
 	var seat_anchor := _compute_seat_offset()
 	if _hold_progress_ring:
-		var ring_size := Vector2(122, 122)
+		var ring_size := Vector2(244, 244)
 		_hold_progress_ring.position = seat_anchor - ring_size * 0.5
 		_hold_progress_ring.size = ring_size
 	if _hold_idle_hint:
 		_hold_idle_hint.position = slime_rect.position + Vector2(
-			slime_rect.size.x - _hold_idle_hint.size.x - 4.0,
-			6.0
+			slime_rect.size.x - _hold_idle_hint.size.x - 8.0,
+			12.0
 		)
 
 

@@ -5,7 +5,8 @@ signal player_added(player_name: String, preset_id: int)
 signal player_applied(index: int, player_name: String, preset_id: int)
 
 const SLIME_PATH := "res://assets/party_kitchen/slimes/%d.svg"
-const SWATCH_SIZE := 72
+const SWATCH_SIZE := 112
+const MODAL_PANEL_MARGIN := Vector4(32.0, 64.0, 32.0, 64.0)
 
 @export var account: PDataAccount
 @export var name_edit: LineEdit
@@ -15,7 +16,6 @@ const SWATCH_SIZE := 72
 @export var apply_button: Button
 @export var cancel_button: Button
 @export var colors_grid: GridContainer
-@export var occupied_label: Label
 @export var preset_storage: PlayerPresetStorage
 @export var game_config: GameConfig
 
@@ -24,13 +24,16 @@ var _editable_preset_id: int = -1
 var _selected_preset_id: int = 0
 var _color_buttons: Array[Button] = []
 var _lock_labels: Array[Label] = []
-var _holder_labels: Array[Label] = []
+var _panel: PanelContainer
 
 
 func _ready() -> void:
 	visible = false
+	_panel = get_node_or_null("Panel") as PanelContainer
 	if get_parent() is CanvasLayer:
 		(get_parent() as CanvasLayer).visible = false
+	_apply_modal_layout()
+	resized.connect(_apply_modal_layout)
 	if ok_button:
 		ok_button.pressed.connect(_on_ok_pressed)
 	if apply_button:
@@ -47,38 +50,39 @@ func _ready() -> void:
 func open_add_window() -> void:
 	_player_index = -1
 	_editable_preset_id = -1
-	_show_window("")
 	if ok_button:
 		ok_button.visible = true
 	if apply_button:
 		apply_button.visible = false
+	_open_window()
+	_set_name_field(_pick_default_history_name(), false)
 	_select_first_available_preset()
+	_refresh_name_history()
+	_sync_confirm_buttons()
 
 
 func open_edit_window(index: int, player_name: String, preset_id: int) -> void:
 	_player_index = index
 	_editable_preset_id = preset_id
-	_show_window(player_name)
 	if ok_button:
 		ok_button.visible = false
 	if apply_button:
 		apply_button.visible = true
-	_select_preset(preset_id)
+	_open_window()
+	_set_name_field(player_name, false)
+	_select_first_available_preset()
+	_refresh_name_history()
+	_sync_confirm_buttons()
 
 
-func _show_window(player_name: String) -> void:
+func _open_window() -> void:
+	_apply_modal_layout()
 	visible = true
 	z_index = 1
 	if get_parent() is CanvasLayer:
 		(get_parent() as CanvasLayer).visible = true
-	if name_edit:
-		name_edit.text = PlayerInfo.sanitize_name(player_name)
-		name_edit.grab_focus()
 	_refresh_all_swatches()
 	_sort_color_grid()
-	_update_occupied_summary()
-	_refresh_name_history()
-	_on_name_changed(player_name)
 
 
 func _input(event: InputEvent) -> void:
@@ -112,19 +116,28 @@ func _refresh_name_history() -> void:
 	chip_style.bg_color = Color(0.16, 0.13, 0.11, 1)
 	chip_style.border_color = Color(0.42, 0.34, 0.27, 1)
 	chip_style.set_border_width_all(2)
-	chip_style.set_corner_radius_all(14)
-	chip_style.content_margin_left = 10
-	chip_style.content_margin_right = 10
-	chip_style.content_margin_top = 4
-	chip_style.content_margin_bottom = 4
+	chip_style.set_corner_radius_all(20)
+	chip_style.content_margin_left = 18
+	chip_style.content_margin_right = 18
+	chip_style.content_margin_top = 10
+	chip_style.content_margin_bottom = 10
 
-	for player_name in account.get_recent_names():
+	var selected_style := chip_style.duplicate()
+	selected_style.border_color = Color(1.0, 0.72, 0.35, 1.0)
+	selected_style.set_border_width_all(4)
+
+	var current_name := _get_name_field_text()
+
+	for player_name in account.get_recent_names_for_display():
 		var btn := Button.new()
 		btn.text = player_name
 		btn.focus_mode = Control.FOCUS_NONE
-		btn.add_theme_font_size_override("font_size", 24)
+		btn.custom_minimum_size = Vector2(0, 72)
+		btn.theme_type_variation = &"ModalButton"
+		btn.add_theme_font_size_override("font_size", 36)
 		btn.add_theme_color_override("font_color", Color(0.96, 0.91, 0.84, 1))
-		var btn_style := chip_style.duplicate()
+		var is_selected := player_name == current_name
+		var btn_style := selected_style.duplicate() if is_selected else chip_style.duplicate()
 		btn.add_theme_stylebox_override("normal", btn_style)
 		btn.add_theme_stylebox_override("hover", btn_style.duplicate())
 		btn.add_theme_stylebox_override("pressed", btn_style.duplicate())
@@ -133,13 +146,9 @@ func _refresh_name_history() -> void:
 
 
 func _on_history_name_pressed(player_name: String) -> void:
-	if not name_edit:
-		return
-	var safe_name := PlayerInfo.sanitize_name(player_name)
-	name_edit.text = safe_name
-	name_edit.caret_column = safe_name.length()
-	name_edit.grab_focus()
-	_on_name_changed(safe_name)
+	_set_name_field(player_name, false)
+	_refresh_name_history()
+	_sync_confirm_buttons()
 
 
 func _build_color_buttons() -> void:
@@ -149,12 +158,10 @@ func _build_color_buttons() -> void:
 		child.queue_free()
 	_color_buttons.clear()
 	_lock_labels.clear()
-	_holder_labels.clear()
 
 	for i in game_config.max_players:
 		var cell := VBoxContainer.new()
-		cell.custom_minimum_size = Vector2(SWATCH_SIZE, SWATCH_SIZE + 22)
-		cell.add_theme_constant_override("separation", 2)
+		cell.custom_minimum_size = Vector2(SWATCH_SIZE, SWATCH_SIZE)
 		colors_grid.add_child(cell)
 
 		var btn := Button.new()
@@ -169,21 +176,12 @@ func _build_color_buttons() -> void:
 		lock.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		lock.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		lock.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		lock.add_theme_font_size_override("font_size", 36)
+		lock.add_theme_font_size_override("font_size", 54)
 		lock.add_theme_color_override("font_color", Color(1, 1, 1, 0.95))
 		lock.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		lock.visible = false
 		btn.add_child(lock)
 		_lock_labels.append(lock)
-
-		var holder := Label.new()
-		holder.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		holder.custom_minimum_size = Vector2(SWATCH_SIZE, 18)
-		holder.add_theme_font_size_override("font_size", 22)
-		holder.add_theme_color_override("font_color", Color(0.78, 0.71, 0.62, 1))
-		holder.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-		cell.add_child(holder)
-		_holder_labels.append(holder)
 
 	_refresh_all_swatches()
 
@@ -239,14 +237,9 @@ func _apply_swatch(preset_id: int) -> void:
 	btn.add_theme_stylebox_override("disabled", style.duplicate())
 	btn.disabled = held
 	btn.button_pressed = selected
-	if held:
-		btn.tooltip_text = "%s — занят: %s" % [SlimeColors.get_color_name(preset_id), holder_name]
-	else:
-		btn.tooltip_text = SlimeColors.get_color_name(preset_id)
+	btn.tooltip_text = SlimeColors.get_color_name(preset_id)
 	if preset_id < _lock_labels.size():
 		_lock_labels[preset_id].visible = held
-	if preset_id < _holder_labels.size():
-		_holder_labels[preset_id].text = holder_name if held else ""
 
 
 func _sort_color_grid() -> void:
@@ -271,21 +264,6 @@ func _sort_color_grid() -> void:
 		colors_grid.add_child(cell)
 
 
-func _update_occupied_summary() -> void:
-	if not occupied_label:
-		return
-	var parts: PackedStringArray = PackedStringArray()
-	for i in _color_buttons.size():
-		var holder_name := _get_preset_holder(i)
-		if holder_name.is_empty():
-			continue
-		parts.append("%s (%s)" % [holder_name, SlimeColors.get_color_name(i)])
-	if parts.is_empty():
-		occupied_label.text = "Все цвета свободны"
-	else:
-		occupied_label.text = "Занято: " + ", ".join(parts)
-
-
 func _select_first_available_preset() -> void:
 	for i in _color_buttons.size():
 		if not _is_preset_held(i):
@@ -308,13 +286,45 @@ func _on_color_pressed(preset_id: int) -> void:
 	_select_preset(preset_id)
 
 
-func _on_name_changed(text: String) -> void:
-	var is_empty := text.strip_edges().is_empty()
+func _on_name_changed(_text: String) -> void:
+	_refresh_name_history()
+	_sync_confirm_buttons()
+
+
+func _set_name_field(player_name: String, grab_focus: bool) -> void:
+	if not name_edit:
+		return
+	var safe_name := PlayerInfo.sanitize_name(player_name)
+	name_edit.text = safe_name
+	name_edit.caret_column = safe_name.length()
+	if grab_focus:
+		name_edit.grab_focus()
+	else:
+		name_edit.release_focus()
+
+
+func _get_name_field_text() -> String:
+	if not name_edit:
+		return ""
+	return PlayerInfo.sanitize_name(name_edit.text)
+
+
+func _sync_confirm_buttons() -> void:
+	var has_name := not _read_player_name().is_empty()
 	var color_taken := _is_preset_held(_selected_preset_id)
 	if ok_button:
-		ok_button.disabled = is_empty or color_taken
+		ok_button.disabled = not has_name or color_taken
 	if apply_button:
-		apply_button.disabled = is_empty or color_taken
+		apply_button.disabled = not has_name or color_taken
+
+
+func _pick_default_history_name() -> String:
+	if not account:
+		return ""
+	var names := account.get_recent_names_for_display()
+	if names.is_empty():
+		return ""
+	return names[0]
 
 
 func _try_confirm() -> bool:
@@ -339,6 +349,7 @@ func _on_ok_pressed() -> void:
 	var player_name := _read_player_name()
 	if player_name.is_empty() or _is_preset_held(_selected_preset_id):
 		return
+	_consume_history_name_if_needed(player_name)
 	_close_window()
 	player_added.emit(player_name, _selected_preset_id)
 
@@ -347,15 +358,33 @@ func _on_apply_pressed() -> void:
 	var player_name := _read_player_name()
 	if player_name.is_empty() or _player_index < 0 or _is_preset_held(_selected_preset_id):
 		return
+	_consume_history_name_if_needed(player_name)
 	_close_window()
 	player_applied.emit(_player_index, player_name, _selected_preset_id)
 
 
 func _read_player_name() -> String:
-	if not name_edit:
-		return ""
-	return PlayerInfo.sanitize_name(name_edit.text)
+	return _get_name_field_text()
 
 
 func _on_cancel_pressed() -> void:
 	_close_window()
+
+
+func _consume_history_name_if_needed(player_name: String) -> void:
+	if not account:
+		return
+	var recent := account.get_recent_names()
+	if recent.has(player_name):
+		account.consume_recent_name(player_name)
+
+
+func _apply_modal_layout() -> void:
+	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	if not _panel:
+		return
+	_panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_panel.offset_left = MODAL_PANEL_MARGIN.x
+	_panel.offset_top = MODAL_PANEL_MARGIN.y
+	_panel.offset_right = -MODAL_PANEL_MARGIN.z
+	_panel.offset_bottom = -MODAL_PANEL_MARGIN.w
