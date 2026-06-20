@@ -175,7 +175,10 @@ func persist_account() -> void:
 
 
 func _exit_tree() -> void:
-	_kill_start_pulse_tween()
+	if start_button is StartActionButton:
+		(start_button as StartActionButton).set_pulse_active(false)
+	else:
+		_kill_start_pulse_tween()
 	_kill_add_pulse_tween()
 	listener.deinit()
 
@@ -643,20 +646,25 @@ func _update_start_button() -> void:
 		_refresh_turn_order()
 		if start_button:
 			var count := _player_icons.size()
+			var can_done := count >= _min_players_required()
 			start_button.visible = true
-			start_button.disabled = count < _min_players_required()
-			_kill_start_pulse_tween()
-			start_button.scale = Vector2.ONE
-			start_button.modulate = Color.WHITE if not start_button.disabled else Color(0.88, 0.88, 0.88, 1)
+			start_button.disabled = not can_done
 			var label := start_button.get_node_or_null("StartLabel") as Label
 			if not label:
 				label = start_button.get_node_or_null("DoneLabel") as Label
 			if label:
 				label.text = "ГОТОВО"
-				label.add_theme_color_override(
-					"font_color",
-					Color(1, 1, 1, 1) if not start_button.disabled else Color(0.94, 0.92, 0.9, 1)
-				)
+			if start_button is StartActionButton:
+				(start_button as StartActionButton).set_pulse_active(can_done)
+			else:
+				_kill_start_pulse_tween()
+				start_button.scale = Vector2.ONE
+				start_button.modulate = Color.WHITE if can_done else Color(0.88, 0.88, 0.88, 1)
+				if label:
+					label.add_theme_color_override(
+						"font_color",
+						Color(1, 1, 1, 1) if can_done else Color(0.94, 0.92, 0.9, 1)
+					)
 		return
 	if not start_button:
 		return
@@ -671,6 +679,9 @@ func _update_start_button_animation(can_start: bool) -> void:
 	if not start_button:
 		return
 	_kill_start_pulse_tween()
+	if start_button is StartActionButton:
+		(start_button as StartActionButton).set_pulse_active(can_start)
+		return
 	start_button.scale = Vector2.ONE
 	var label := start_button.get_node_or_null("StartLabel") as Label
 	if can_start:

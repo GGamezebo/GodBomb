@@ -18,6 +18,7 @@
 [ext_resource type="Script" uid="uid://bombs212nuf58" path="res://src/features/menu/menu_bomb_layout.gd" id="16"]
 [ext_resource type="Script" uid="uid://cesm4akuquebh" path="res://src/features/bomb/bomb_lamps.gd" id="17"]
 [ext_resource type="Script" uid="uid://d2t3b5qtwod5n" path="res://src/features/menu/menu_fire_sparks.gd" id="18"]
+[ext_resource type="Script" path="res://src/features/menu/start_action_button.gd" id="19"]
 
 [node name="MenuContext" type="Control" unique_id=1379479129 node_paths=PackedStringArray("start_button", "player_selection_widget", "settings_button", "music_button", "rules_button", "settings_window", "rules_window")]
 layout_mode = 3
@@ -129,14 +130,16 @@ layout_mode = 1
 z_index = 4
 layout_mode = 0
 offset_left = 215.0
-offset_top = 1358.0
+offset_top = 1418.0
 offset_right = 875.0
-offset_bottom = 1538.0
+offset_bottom = 1598.0
 disabled = true
 texture_normal = ExtResource("8")
 texture_disabled = ExtResource("9")
 ignore_texture_size = true
 stretch_mode = 5
+clip_contents = false
+script = ExtResource("19")
 
 [node name="StartLabel" type="Label" parent="BackgroundBomb/ScaledContent/StartButton" unique_id=129669063]
 layout_mode = 1
@@ -145,6 +148,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 theme_type_variation = &"Hero"
 theme_override_font_sizes/font_size = 72
 text = "СТАРТ"

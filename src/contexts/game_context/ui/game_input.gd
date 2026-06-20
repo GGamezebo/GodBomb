@@ -26,6 +26,8 @@ func _ready() -> void:
 
 func _exit_tree() -> void:
 	listener.deinit()
+	if start_round_button is StartActionButton:
+		(start_round_button as StartActionButton).set_pulse_active(false)
 
 
 func _on_start_round_pressed() -> void:
@@ -34,8 +36,12 @@ func _on_start_round_pressed() -> void:
 
 
 func _on_game_state_changed(_from_state: String, to_state: String) -> void:
-	if start_round_button:
-		start_round_button.visible = to_state == FSMGameStates.READY_TO_START
+	if not start_round_button:
+		return
+	var ready := to_state == FSMGameStates.READY_TO_START
+	start_round_button.visible = ready
+	if start_round_button is StartActionButton:
+		(start_round_button as StartActionButton).set_pulse_active(ready)
 
 
 func _sync_to_current_state() -> void:

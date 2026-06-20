@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=3 uid="uid://battle_player_lobby_overlay"]
+[gd_scene load_steps=7 format=3 uid="uid://battle_player_lobby_overlay"]
 
 [ext_resource type="Script" path="res://src/contexts/game_context/ui/battle_player_lobby_overlay.gd" id="1"]
 [ext_resource type="Script" uid="uid://bombs212nuf58" path="res://src/features/menu/menu_bomb_layout.gd" id="3"]
 [ext_resource type="PackedScene" uid="uid://duug5w0r0cqrv" path="res://src/features/player_selection/player_selection_widget.tscn" id="4"]
 [ext_resource type="Texture2D" uid="uid://b27y0jjb7mmmy" path="res://assets/party_kitchen/buttons/start_active.svg" id="5"]
 [ext_resource type="Script" path="res://src/features/menu/menu_fire_sparks.gd" id="6"]
+[ext_resource type="Script" path="res://src/features/menu/start_action_button.gd" id="7"]
 
 [node name="BattlePlayerLobbyOverlay" type="CanvasLayer" node_paths=PackedStringArray("background_color", "layout_host", "bomb_art", "player_selection_widget", "done_button")]
 layer = 12
@@ -83,12 +84,14 @@ layout_mode = 1
 z_index = 4
 layout_mode = 0
 offset_left = 215.0
-offset_top = 1358.0
+offset_top = 1418.0
 offset_right = 875.0
-offset_bottom = 1538.0
+offset_bottom = 1598.0
 texture_normal = ExtResource("5")
 ignore_texture_size = true
 stretch_mode = 5
+clip_contents = false
+script = ExtResource("7")
 
 [node name="DoneLabel" type="Label" parent="Root/LayoutHost/ScaledContent/DoneButton"]
 layout_mode = 1
@@ -97,6 +100,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 theme_type_variation = &"Hero"
 theme_override_font_sizes/font_size = 72
 text = "ГОТОВО"

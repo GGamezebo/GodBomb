@@ -33,6 +33,7 @@
 [ext_resource type="PackedScene" path="res://src/features/menu/exit_confirm_dialog.tscn" id="35"]
 [ext_resource type="PackedScene" path="res://src/contexts/game_context/ui/battle_player_lobby_overlay.tscn" id="36"]
 [ext_resource type="Script" path="res://src/features/menu/menu_fire_sparks.gd" id="37"]
+[ext_resource type="Script" path="res://src/features/menu/start_action_button.gd" id="38"]
 
 [node name="GameContext" type="Control" unique_id=1610270397 node_paths=PackedStringArray("game_manager", "battle_chrome")]
 layout_mode = 3
@@ -220,12 +221,14 @@ visible = false
 z_index = 5
 layout_mode = 0
 offset_left = 215.0
-offset_top = 1358.0
+offset_top = 1418.0
 offset_right = 875.0
-offset_bottom = 1538.0
+offset_bottom = 1598.0
 texture_normal = ExtResource("28")
 ignore_texture_size = true
 stretch_mode = 5
+clip_contents = false
+script = ExtResource("38")
 
 [node name="StartLabel" type="Label" parent="UI/BackgroundBomb/ScaledContent/StartRoundButton" unique_id=129669063]
 layout_mode = 1
@@ -234,6 +237,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 theme_type_variation = &"Hero"
 theme_override_font_sizes/font_size = 72
 text = "Начать раунд"
