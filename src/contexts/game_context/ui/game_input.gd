@@ -88,7 +88,7 @@ func _handle_play_input(event: InputEvent) -> void:
 		else:
 			game_manager.next_player()
 			if game_events:
-				game_events.ev_touch_next_player.emit()
+				game_events.ev_touch_next_player.emit(touch.position)
 	elif event is InputEventMouseButton:
 		var mouse := event as InputEventMouseButton
 		if mouse.button_index != MOUSE_BUTTON_LEFT:
@@ -101,7 +101,7 @@ func _handle_play_input(event: InputEvent) -> void:
 		else:
 			game_manager.next_player()
 			if game_events:
-				game_events.ev_touch_next_player.emit()
+				game_events.ev_touch_next_player.emit(mouse.position)
 
 
 func _handle_result_input(event: InputEvent) -> void:

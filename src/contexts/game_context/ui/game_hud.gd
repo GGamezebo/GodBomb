@@ -236,7 +236,7 @@ func _on_card_changed(card: GameCard) -> void:
 		_syllable_card.set_card(card)
 
 
-func _on_turn_passed() -> void:
+func _on_turn_passed(_touch_position: Vector2 = Vector2.ZERO) -> void:
 	if _syllable_card:
 		_syllable_card.pulse_next_turn()
 

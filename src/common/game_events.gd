@@ -6,6 +6,6 @@ extends Resource
 @warning_ignore("unused_signal") signal ev_countdown_tick_changed(seconds_left: int)
 @warning_ignore("unused_signal") signal ev_player_choice_tick_changed
 @warning_ignore("unused_signal") signal ev_alert
-@warning_ignore("unused_signal") signal ev_touch_next_player
+@warning_ignore("unused_signal") signal ev_touch_next_player(touch_position: Vector2)
 @warning_ignore("unused_signal") signal ev_touch_prev_player
 @warning_ignore("unused_signal") signal ev_card_changed(card: GameCard)

@@ -70,7 +70,7 @@ func _apply_prev_blocked(blocked: bool) -> void:
 		_swipe_label.add_theme_color_override("font_color", ACCENT.lightened(0.18))
 
 
-func _on_tap_next() -> void:
+func _on_tap_next(_touch_position: Vector2 = Vector2.ZERO) -> void:
 	_flash_label(_tap_label)
 	_play_ripple()
 

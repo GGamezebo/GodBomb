@@ -83,7 +83,7 @@ func _on_alert() -> void:
 	_play_tick_timer = INTERVAL_ALERT
 
 
-func _on_touch_pass() -> void:
+func _on_touch_pass(_touch_position: Vector2 = Vector2.ZERO) -> void:
 	if game_manager == null or game_manager.fsm == null:
 		return
 	if game_manager.fsm.get_current_state_name() != FSMGameStates.PLAY:

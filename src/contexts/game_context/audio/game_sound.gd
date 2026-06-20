@@ -59,7 +59,7 @@ func _play_tick_sound() -> void:
 	_play_one_shot(countdown_stream)
 
 
-func _on_touch_next_player() -> void:
+func _on_touch_next_player(_touch_position: Vector2 = Vector2.ZERO) -> void:
 	_play_one_shot(pass_next_stream)
 
 
