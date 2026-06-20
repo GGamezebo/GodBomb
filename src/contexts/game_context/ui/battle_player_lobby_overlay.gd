@@ -3,7 +3,7 @@ extends CanvasLayer
 
 signal closed
 
-const NEUTRAL_BG := Color(0.06, 0.05, 0.04, 1.0)
+const NEUTRAL_BG := Color(0, 0, 0, 1.0)
 const LOBBY_BLUR_SHADER := preload("res://assets/shaders/bomb_background_blur.gdshader")
 const LOBBY_BLUR_RADIUS := 5.0
 
@@ -28,6 +28,8 @@ func _ready() -> void:
 	visible = false
 	_setup_blur_material()
 	_connect_layout()
+	if bomb_art:
+		bomb_art.visible = false
 	if done_button:
 		done_button.pressed.connect(_on_done_pressed)
 	if player_selection_widget:
@@ -57,10 +59,12 @@ func open() -> void:
 	_bind_widget_account()
 	if background_color:
 		background_color.color = NEUTRAL_BG
+	if bomb_art:
+		bomb_art.visible = false
 	if player_selection_widget:
 		player_selection_widget.reload_from_account()
 	_sync_bomb_art_layout()
-	_set_bomb_blur(true)
+	_set_bomb_blur(false)
 	visible = true
 
 

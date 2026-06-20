@@ -10,6 +10,7 @@ signal layout_applied
 @export var game_events: GameEvents
 @export var bomb_art: TextureRect
 @export var player_color_bg: ColorRect
+@export var fire_sparks: Control
 @export var scaled_content: Control
 @export var hint_marker: NodePath
 @export var pulse_speed: float = 6.0
@@ -46,7 +47,6 @@ func _ready() -> void:
 		listener.add(game_events.ev_alert, _on_alert)
 		listener.add(game_events.ev_current_player_changed, _on_current_player_changed)
 	call_deferred("_apply_layout")
-	_apply_state(FSMGameStates.READY_TO_START)
 
 
 func _exit_tree() -> void:
@@ -134,6 +134,7 @@ func _clear_player_tint(immediate: bool = false) -> void:
 
 
 func _apply_state(state: String) -> void:
+	_set_fire_sparks(state == FSMGameStates.EXPLOSION)
 	match state:
 		FSMGameStates.READY_TO_START, FSMGameStates.PLAYER_CHOICE, FSMGameStates.COUNTDOWN, FSMGameStates.PLAY:
 			_alert_active = false
@@ -141,7 +142,7 @@ func _apply_state(state: String) -> void:
 			_set_bomb_modulate(Color.WHITE)
 			if state == FSMGameStates.PLAY:
 				_play_comes_flash()
-			else:
+			elif state in [FSMGameStates.READY_TO_START, FSMGameStates.PLAYER_CHOICE, FSMGameStates.COUNTDOWN]:
 				_play_ready_pulse()
 		FSMGameStates.EXPLOSION:
 			_alert_active = false
@@ -213,3 +214,12 @@ func _kill_tint_tween() -> void:
 	if _tint_tween:
 		_tint_tween.kill()
 		_tint_tween = null
+
+
+func _set_fire_sparks(enabled: bool) -> void:
+	if not fire_sparks:
+		return
+	fire_sparks.visible = enabled
+	for child in fire_sparks.get_children():
+		if child is CPUParticles2D:
+			(child as CPUParticles2D).emitting = enabled

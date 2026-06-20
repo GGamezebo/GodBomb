@@ -1,10 +1,10 @@
 [gd_scene load_steps=6 format=3 uid="uid://battle_player_lobby_overlay"]
 
 [ext_resource type="Script" path="res://src/contexts/game_context/ui/battle_player_lobby_overlay.gd" id="1"]
-[ext_resource type="Texture2D" uid="uid://de4n5e1fxki8i" path="res://assets/textures/Background/Background.png" id="2"]
 [ext_resource type="Script" uid="uid://bombs212nuf58" path="res://src/features/menu/menu_bomb_layout.gd" id="3"]
 [ext_resource type="PackedScene" uid="uid://duug5w0r0cqrv" path="res://src/features/player_selection/player_selection_widget.tscn" id="4"]
 [ext_resource type="Texture2D" uid="uid://b27y0jjb7mmmy" path="res://assets/party_kitchen/buttons/start_active.svg" id="5"]
+[ext_resource type="Script" path="res://src/features/menu/menu_fire_sparks.gd" id="6"]
 
 [node name="BattlePlayerLobbyOverlay" type="CanvasLayer" node_paths=PackedStringArray("background_color", "layout_host", "bomb_art", "player_selection_widget", "done_button")]
 layer = 12
@@ -32,7 +32,17 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-color = Color(0.06, 0.05, 0.04, 1)
+color = Color(0, 0, 0, 1)
+
+[node name="FireSparks" type="Control" parent="Root"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("6")
 
 [node name="LayoutHost" type="TextureRect" parent="Root" node_paths=PackedStringArray("scaled_content")]
 layout_mode = 1
@@ -54,7 +64,6 @@ layout_mode = 0
 offset_right = 1080.0
 offset_bottom = 1920.0
 mouse_filter = 2
-texture = ExtResource("2")
 expand_mode = 1
 stretch_mode = 5
 
