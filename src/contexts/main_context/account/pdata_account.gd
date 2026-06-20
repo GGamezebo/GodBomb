@@ -13,20 +13,12 @@ const DEFAULT_GAME_TIME_MINUTES := 5
 const DEFAULT_MUSIC_ENABLED := true
 const DEFAULT_HAPTICS_ENABLED := true
 
-const DEFAULT_FUNNY_NAMES: Array[String] = [
-	"Котлетка-O'Бомба",
-	"Слайм Уолтер",
-	"Пельмень 3000",
-	"Батон-de-Boom",
-	"Чебурек McCheb",
-	"Тапок Судьбы",
-	"Шлёмп Блым",
-	"Крокодил Бум",
-	"Булка с Фитилём",
-	"КвазиБомба",
-	"Mister Boom",
-	"Пинг-Pong",
-]
+
+static func default_recent_names() -> Array[String]:
+	var names: Array[String] = []
+	for color_name in SlimeColors.NAMES:
+		names.append(color_name)
+	return names
 
 @export var data: Dictionary = {
 	"version": CURRENT_VERSION,
@@ -94,7 +86,7 @@ func remember_removed_player(player_name: String) -> void:
 func ensure_recent_names_initialized() -> void:
 	var stored = data.get("recent_player_names", null)
 	if stored == null or (stored is Array and stored.is_empty()):
-		data["recent_player_names"] = DEFAULT_FUNNY_NAMES.duplicate()
+		data["recent_player_names"] = default_recent_names()
 		emit_changed()
 
 
@@ -186,8 +178,9 @@ func set_haptics_enabled(enabled: bool) -> void:
 
 
 func reset_progress() -> void:
+	data["players"] = []
 	data["games_played"] = 0
-	data["recent_player_names"] = DEFAULT_FUNNY_NAMES.duplicate()
+	data["recent_player_names"] = default_recent_names()
 	data.erase("has_edited_player")
 	data["hints_seen"] = {}
 	data["game_time_minutes"] = DEFAULT_GAME_TIME_MINUTES
