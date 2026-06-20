@@ -5,6 +5,10 @@ const SLIME_PATH := "res://assets/party_kitchen/slimes/%d.svg"
 const ICON_SIZE := Vector2(110, 200)
 const SLIME_SIZE := Vector2(104, 104)
 const SLIME_POSITION := Vector2(3, 32)
+const TOUCH_GRAB_RADIUS := 78.0
+const HOLD_HOME_TOLERANCE := 36.0
+const GRAB_RADIUS_BOOST := 1.12
+const SEAT_RADIUS_SCALE := 0.58
 const NAME_GAP := 6.0
 const NAME_PLATE_PAD_X := 14.0
 const NAME_FONT_MAX := 30
@@ -342,6 +346,21 @@ func get_slime_center_global() -> Vector2:
 	return get_home_global()
 
 
+func get_grab_radius() -> float:
+	var scale_factor := 1.0
+	if slime_rect:
+		scale_factor = slime_rect.scale.x
+	return SLIME_SIZE.x * 0.5 * scale_factor * GRAB_RADIUS_BOOST
+
+
+func get_grab_radius_global() -> float:
+	return get_grab_radius() * get_global_transform_with_canvas().get_scale().x
+
+
+static func seat_interaction_radius(seat_size: Vector2) -> float:
+	return maxf(seat_size.x, seat_size.y) * SEAT_RADIUS_SCALE
+
+
 func has_moved_for_swap() -> bool:
 	return get_slime_center_global().distance_to(get_home_global()) >= swap_activation_distance
 
@@ -357,8 +376,10 @@ func is_slime_over_seat(other: PlayerIcon, seat_size: Vector2) -> bool:
 func is_slime_over_seat_at(other: PlayerIcon, seat_size: Vector2, center: Vector2) -> bool:
 	if other == self:
 		return false
-	var seat_rect := Rect2(other.get_home_global() - seat_size * 0.5, seat_size)
-	return seat_rect.has_point(center)
+	var seat_center := other.get_home_global()
+	var seat_radius := seat_interaction_radius(seat_size) * other.get_global_transform_with_canvas().get_scale().x
+	var grab_radius := get_grab_radius_global()
+	return center.distance_to(seat_center) <= grab_radius + seat_radius
 
 
 func get_release_slime_center() -> Vector2:
@@ -483,7 +504,7 @@ func _is_hold_active_at_home() -> bool:
 	return (
 		_holding
 		and _dragging
-		and get_slime_center_global().distance_to(get_home_global()) <= 8.0
+		and get_slime_center_global().distance_to(get_home_global()) <= HOLD_HOME_TOLERANCE
 	)
 
 
@@ -541,7 +562,7 @@ func _update_hold_haptics(progress: float, delta: float) -> void:
 	if _hold_haptic_timer > 0.0:
 		return
 	Haptics.vibrate_hold_progress(progress)
-	_hold_haptic_timer = lerpf(0.28, 0.11, progress)
+	_hold_haptic_timer = lerpf(0.22, 0.08, progress)
 
 
 func _update_drag_stretch() -> void:
@@ -582,6 +603,7 @@ func _begin_drag_at_parent_local(parent_local: Vector2) -> void:
 	_last_drag_local = position
 	z_index = 10
 	_apply_drag_lift(true)
+	Haptics.vibrate_drag_pickup()
 	drag_started.emit()
 
 
@@ -613,7 +635,7 @@ func _apply_drag_motion(parent_local: Vector2) -> void:
 
 
 func _check_hold_cancel() -> void:
-	if get_slime_center_global().distance_to(get_home_global()) > 8.0:
+	if get_slime_center_global().distance_to(get_home_global()) > HOLD_HOME_TOLERANCE:
 		if _holding:
 			_holding = false
 			_reset_hold_feedback()
@@ -657,6 +679,11 @@ func _global_position_for_seat(seat_center: Vector2) -> Vector2:
 	if parent:
 		return parent.get_global_transform_with_canvas() * _position_for_seat(seat_center)
 	return _position_for_seat(seat_center)
+
+
+func _has_point(point: Vector2) -> bool:
+	var grab_center := _compute_seat_offset()
+	return point.distance_to(grab_center) <= TOUCH_GRAB_RADIUS
 
 
 func _notification(what: int) -> void:

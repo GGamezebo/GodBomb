@@ -34,8 +34,16 @@ static func vibrate_lobby_action(account: PDataAccount = null) -> void:
 
 static func vibrate_hold_progress(progress: float, account: PDataAccount = null) -> void:
 	var clamped := clampf(progress, 0.0, 1.0)
-	var duration := int(lerpf(16.0, 42.0, clamped))
+	var duration := int(lerpf(24.0, 68.0, clamped))
 	vibrate(duration, account)
+
+
+static func vibrate_drag_pickup(account: PDataAccount = null) -> void:
+	vibrate(36, account)
+
+
+static func vibrate_target_lock(account: PDataAccount = null) -> void:
+	vibrate(52, account)
 
 
 static func _resolve_account() -> PDataAccount:

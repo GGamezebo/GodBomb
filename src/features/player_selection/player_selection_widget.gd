@@ -50,6 +50,7 @@ var _turn_order_arrows: TurnOrderArrowsLayer
 var _order_badges_layer: Control
 var _order_badges: Array[SeatOrderBadge] = []
 var _remove_button_ring: ChairSwapRing
+var _remove_zone_haptic_active: bool = false
 var _table_hint_banner: TableHintBanner
 var _swap_drag_hint_active: bool = false
 var _remove_hint_active: bool = false
@@ -225,19 +226,19 @@ func _get_remove_button_center_global() -> Vector2:
 	return add_player_button.global_position + add_player_button.size * 0.5
 
 
-func _is_slime_center_in_remove_ring(slime_center: Vector2) -> bool:
+func _is_grab_over_remove_ring(grab_center: Vector2, grab_radius: float) -> bool:
 	if not add_player_button or not add_player_button.visible:
 		return false
 	if add_player_button.disabled:
 		return false
 	var ring_center := _get_remove_button_center_global()
-	return slime_center.distance_to(ring_center) <= _remove_ring_radius()
+	return grab_center.distance_to(ring_center) <= _remove_ring_radius() + grab_radius
 
 
 func _is_icon_in_remove_ring(icon: PlayerIcon) -> bool:
 	if not _is_remove_mode:
 		return false
-	return _is_slime_center_in_remove_ring(icon.get_slime_center_global())
+	return _is_grab_over_remove_ring(icon.get_slime_center_global(), icon.get_grab_radius_global())
 
 
 func _update_remove_button_highlight(in_zone: bool) -> void:
@@ -752,6 +753,7 @@ func _on_add_player_button_pressed() -> void:
 
 func _on_icon_drag_started(icon: PlayerIcon) -> void:
 	_dragging_icon = icon
+	_remove_zone_haptic_active = false
 	_dismiss_hold_edit_hint()
 	for player_icon in _player_icons:
 		player_icon.set_idle_hold_hint_visible(false)
@@ -822,6 +824,9 @@ func _update_swap_preview(dragging: PlayerIcon) -> void:
 	_update_remove_button_ring(dragging)
 
 	if _is_icon_in_remove_ring(dragging):
+		if not _remove_zone_haptic_active:
+			_remove_zone_haptic_active = true
+			Haptics.vibrate_target_lock(account)
 		for other in _player_icons:
 			if other != dragging and other.swap_target == dragging:
 				other.cancel_swap_preview()
@@ -831,6 +836,7 @@ func _update_swap_preview(dragging: PlayerIcon) -> void:
 		_refresh_table_hint()
 		return
 
+	_remove_zone_haptic_active = false
 	_remove_hint_active = false
 
 	if not dragging.has_moved_for_swap():
@@ -855,7 +861,8 @@ func _update_swap_preview(dragging: PlayerIcon) -> void:
 		_clear_chair_highlights()
 		if overlap_index >= 0:
 			_set_chair_highlight(overlap_index, true)
-			_highlighted_chair_index = overlap_index
+			Haptics.vibrate_target_lock(account)
+		_highlighted_chair_index = overlap_index
 
 	_swap_drag_hint_active = overlap_index >= 0
 
@@ -874,11 +881,12 @@ func _update_swap_preview(dragging: PlayerIcon) -> void:
 func _on_icon_drag_ended(icon: PlayerIcon) -> void:
 	var should_remove := (
 		icon == _dragging_icon
-		and _is_slime_center_in_remove_ring(icon.get_release_slime_center())
+		and _is_grab_over_remove_ring(icon.get_release_slime_center(), icon.get_grab_radius_global())
 	)
 
 	_set_remove_mode(false)
 	_remove_hint_active = false
+	_remove_zone_haptic_active = false
 	_swap_drag_hint_active = false
 	_set_order_markers_drag_dimmed(false)
 	_refresh_turn_order()
