@@ -184,13 +184,15 @@ func _exit_tree() -> void:
 
 
 func _setup_remove_button_ring() -> void:
-	if not table_area or not add_player_button:
+	if not add_player_button:
 		return
 	_remove_button_ring = ChairSwapRing.new()
 	_remove_button_ring.ring_color = ChairSwapRing.DEFAULT_RING_COLOR
-	_remove_button_ring.z_index = 4
+	_remove_button_ring.z_index = 1
 	_remove_button_ring.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	table_area.add_child(_remove_button_ring)
+	add_player_button.add_child(_remove_button_ring)
+	if not add_player_button.resized.is_connected(_layout_remove_button_ring):
+		add_player_button.resized.connect(_layout_remove_button_ring)
 	_apply_remove_ring_radius()
 	_layout_remove_button_ring()
 
@@ -204,12 +206,11 @@ func _apply_remove_ring_radius() -> void:
 
 
 func _layout_remove_button_ring() -> void:
-	if not _remove_button_ring or not add_player_button or not table_area:
+	if not _remove_button_ring or not add_player_button:
 		return
-	var button_center := add_player_button.global_position + add_player_button.size * 0.5
-	var local_center := table_area.get_global_transform_with_canvas().affine_inverse() * button_center
 	var ring_radius := _remove_button_ring.ring_radius
-	_remove_button_ring.position = local_center - Vector2(ring_radius, ring_radius)
+	var button_center := add_player_button.size * 0.5
+	_remove_button_ring.position = button_center - Vector2(ring_radius, ring_radius)
 
 
 func _remove_ring_radius() -> float:
