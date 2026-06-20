@@ -36,7 +36,7 @@
 [ext_resource type="PackedScene" path="res://src/contexts/game_context/ui/battle_player_lobby_overlay.tscn" id="36"]
 [ext_resource type="Script" uid="uid://d2t3b5qtwod5n" path="res://src/features/menu/menu_fire_sparks.gd" id="37"]
 [ext_resource type="Script" uid="uid://ctfwqdpnffwoc" path="res://src/features/menu/start_action_button.gd" id="38"]
-[ext_resource type="Script" path="res://src/features/bomb/pass_bomb_spark_layer.gd" id="39"]
+[ext_resource type="Script" uid="uid://id0rvsyrsne0" path="res://src/features/bomb/pass_bomb_spark_layer.gd" id="39"]
 
 [node name="GameContext" type="Control" unique_id=1610270397 node_paths=PackedStringArray("game_manager", "battle_chrome")]
 layout_mode = 3
@@ -204,10 +204,6 @@ script = ExtResource("24")
 game_events = ExtResource("15")
 particles = NodePath("Particles")
 
-[node name="PassBombSparkLayer" type="Node2D" parent="UI/BackgroundBomb/ScaledContent"]
-script = ExtResource("39")
-game_events = ExtResource("15")
-
 [node name="Particles" type="CPUParticles2D" parent="UI/BackgroundBomb/ScaledContent/ExplosionEffect" unique_id=1757993458]
 emitting = false
 amount = 48
@@ -221,6 +217,10 @@ initial_velocity_max = 420.0
 scale_amount_min = 2.0
 scale_amount_max = 6.0
 color = Color(1, 0.45, 0.15, 1)
+
+[node name="PassBombSparkLayer" type="Node2D" parent="UI/BackgroundBomb/ScaledContent" unique_id=536773508]
+script = ExtResource("39")
+game_events = ExtResource("15")
 
 [node name="StartRoundButton" type="TextureButton" parent="UI/BackgroundBomb/ScaledContent" unique_id=1748637859]
 visible = false

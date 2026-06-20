@@ -16,7 +16,7 @@ alwaysApply: false
 
 State UI: choice=«Выбираем первого»+pulse · ready=«Первым ходит»+StartRoundButton · play=full HUD · explosion=name overlay.
 
-**Input** (`game_input.gd`): `mouse_filter=IGNORE`. PLAY: tap→next (`ev_touch_next_player(screen_pos)`, FastTick, `PassBombSparkLayer` burst) · swipe→prev (SlowTick, 1×/round). RESULT→menu. StartRoundButton: confirm via `UiSounds.bind_button`.
+**Input** (`game_input.gd`): `mouse_filter=IGNORE`. PLAY: multi-touch pass — next only when **all** fingers up within **0.3s** of first touch; hold longer = invalid. Swipe if max finger travel > threshold. tap→next + sparks · swipe→prev (SlowTick, 1×/round). RESULT→menu.
 
 **Pass sparks:** `pass_bomb_spark_layer.gd` on `ScaledContent` — radial additive fire burst at touch (one-shot CPUParticles2D).
 

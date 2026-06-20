@@ -1,6 +1,8 @@
 extends Control
 
 const DEFAULT_GAME_CONFIG := preload("res://src/common/game_config_default.tres")
+const PASS_RELEASE_WINDOW_SEC := 0.3
+const MOUSE_TOUCH_INDEX := -1
 
 @export var game_manager: GameManager
 @export var game_events: GameEvents
@@ -9,7 +11,11 @@ const DEFAULT_GAME_CONFIG := preload("res://src/common/game_config_default.tres"
 @export var start_round_button: BaseButton
 
 var listener: EventListener = EventListener.new()
-var touch_start_position: Vector2 = Vector2.ZERO
+var _active_touches: Dictionary = {}
+var _gesture_fingers: Dictionary = {}
+var _gesture_started_at: float = -1.0
+var _gesture_expired: bool = false
+var _gesture_id: int = 0
 
 
 func _ready() -> void:
@@ -37,6 +43,8 @@ func _on_start_round_pressed() -> void:
 
 
 func _on_game_state_changed(_from_state: String, to_state: String) -> void:
+	if to_state != FSMGameStates.PLAY:
+		_reset_gesture_state()
 	if not start_round_button:
 		return
 	var ready := to_state == FSMGameStates.READY_TO_START
@@ -77,31 +85,111 @@ func _input(event: InputEvent) -> void:
 
 
 func _handle_play_input(event: InputEvent) -> void:
-	var drag_threshold := _drag_prev_player_threshold()
 	if event is InputEventScreenTouch:
 		var touch := event as InputEventScreenTouch
 		if touch.pressed:
-			touch_start_position = touch.position
-		elif touch.position.distance_to(touch_start_position) > drag_threshold:
-			if game_manager.prev_player() and game_events:
-				game_events.ev_touch_prev_player.emit()
+			_on_finger_pressed(touch.index, touch.position)
 		else:
-			game_manager.next_player()
-			if game_events:
-				game_events.ev_touch_next_player.emit(touch.position)
+			_on_finger_released(touch.index, touch.position)
+	elif event is InputEventScreenDrag:
+		var drag := event as InputEventScreenDrag
+		_on_finger_moved(drag.index, drag.position)
 	elif event is InputEventMouseButton:
 		var mouse := event as InputEventMouseButton
 		if mouse.button_index != MOUSE_BUTTON_LEFT:
 			return
 		if mouse.pressed:
-			touch_start_position = mouse.position
-		elif mouse.position.distance_to(touch_start_position) > drag_threshold:
-			if game_manager.prev_player() and game_events:
-				game_events.ev_touch_prev_player.emit()
+			_on_finger_pressed(MOUSE_TOUCH_INDEX, mouse.position)
 		else:
-			game_manager.next_player()
-			if game_events:
-				game_events.ev_touch_next_player.emit(mouse.position)
+			_on_finger_released(MOUSE_TOUCH_INDEX, mouse.position)
+	elif event is InputEventMouseMotion:
+		var motion := event as InputEventMouseMotion
+		if motion.button_mask & MOUSE_BUTTON_MASK_LEFT:
+			_on_finger_moved(MOUSE_TOUCH_INDEX, motion.position)
+
+
+func _on_finger_pressed(index: int, position: Vector2) -> void:
+	if _active_touches.is_empty():
+		_begin_gesture()
+	var finger := {"start": position, "end": position}
+	_active_touches[index] = finger
+	_gesture_fingers[index] = finger
+
+
+func _on_finger_moved(index: int, position: Vector2) -> void:
+	if not _active_touches.has(index):
+		return
+	_active_touches[index]["end"] = position
+	_gesture_fingers[index]["end"] = position
+
+
+func _on_finger_released(index: int, position: Vector2) -> void:
+	if not _active_touches.has(index):
+		return
+	_on_finger_moved(index, position)
+	_active_touches.erase(index)
+	if _active_touches.is_empty():
+		_finalize_gesture()
+
+
+func _begin_gesture() -> void:
+	_gesture_id += 1
+	var gesture_id := _gesture_id
+	_gesture_fingers.clear()
+	_gesture_started_at = Time.get_ticks_msec() / 1000.0
+	_gesture_expired = false
+	get_tree().create_timer(PASS_RELEASE_WINDOW_SEC).timeout.connect(
+		func() -> void: _on_pass_window_timeout(gesture_id),
+		CONNECT_ONE_SHOT
+	)
+
+
+func _finalize_gesture() -> void:
+	var elapsed := Time.get_ticks_msec() / 1000.0 - _gesture_started_at
+	var valid := not _gesture_expired and elapsed <= PASS_RELEASE_WINDOW_SEC
+	if valid:
+		_apply_gesture_result()
+	_reset_gesture_state()
+
+
+func _apply_gesture_result() -> void:
+	if _gesture_fingers.is_empty():
+		return
+	var drag_threshold := _drag_prev_player_threshold()
+	var max_travel := 0.0
+	for finger in _gesture_fingers.values():
+		max_travel = maxf(
+			max_travel,
+			Vector2(finger["start"]).distance_to(Vector2(finger["end"]))
+		)
+	if max_travel > drag_threshold:
+		if game_manager.prev_player() and game_events:
+			game_events.ev_touch_prev_player.emit()
+		return
+	game_manager.next_player()
+	if game_events:
+		game_events.ev_touch_next_player.emit(_gesture_touch_centroid())
+
+
+func _gesture_touch_centroid() -> Vector2:
+	var sum := Vector2.ZERO
+	for finger in _gesture_fingers.values():
+		sum += Vector2(finger["end"])
+	return sum / float(_gesture_fingers.size())
+
+
+func _on_pass_window_timeout(gesture_id: int) -> void:
+	if gesture_id != _gesture_id:
+		return
+	if not _active_touches.is_empty():
+		_gesture_expired = true
+
+
+func _reset_gesture_state() -> void:
+	_active_touches.clear()
+	_gesture_fingers.clear()
+	_gesture_started_at = -1.0
+	_gesture_expired = false
 
 
 func _handle_result_input(event: InputEvent) -> void:
