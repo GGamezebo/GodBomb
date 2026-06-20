@@ -24,7 +24,7 @@ extends Control
 
 const TABLE_SIZE := Vector2(640, 640)
 const SWAP_HINT_MIN_PLAYERS := 3
-const HINT_SWAP_IDLE := "Перетащи на другое место — поменяетесь"
+const HINT_SWAP_IDLE := "Перетащи персонажа на стул другого персонажа для смены места"
 const HINT_SWAP_DRAG := "Отпусти — поменяетесь местами"
 const HINT_REMOVE := "Отпусти — игрок будет удалён"
 const HINT_MIN_PLAYERS := "Для игры нужно минимум 2 игрока"
