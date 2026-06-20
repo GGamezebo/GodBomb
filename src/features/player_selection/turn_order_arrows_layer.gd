@@ -3,7 +3,8 @@ extends Control
 
 const ACCENT := Color(0.96, 0.28, 0.05, 1.0)
 const SEGMENTS := 28
-const RING_MARGIN := 42.0
+const RING_MARGIN := 24.0
+const OUTER_HEAD_EXTENSION := HEAD_LENGTH * 0.55 + STROKE * 0.5
 const GAP_ANGLE := 0.42
 const STROKE := 6.0
 const HEAD_LENGTH := 20.0
@@ -19,8 +20,12 @@ var _drag_alpha: float = 1.0
 var _show_arrows: bool = false
 
 
+static func arc_centerline_radius(center_button_radius: float) -> float:
+	return center_button_radius + RING_MARGIN
+
+
 static func min_clearance_radius(center_button_radius: float) -> float:
-	return center_button_radius + RING_MARGIN + STROKE + 4.0
+	return arc_centerline_radius(center_button_radius) + OUTER_HEAD_EXTENSION + 4.0
 
 
 func _ready() -> void:
@@ -72,7 +77,7 @@ func _draw() -> void:
 		return
 
 	var center := _table_size * 0.5
-	var radius := (_center_button_radius + RING_MARGIN) * _pulse_boost
+	var radius := arc_centerline_radius(_center_button_radius) * _pulse_boost
 	var alpha := clampf(_alpha_scale * _pulse_boost * _drag_alpha, 0.0, 1.0)
 	var color := Color(ACCENT.r, ACCENT.g, ACCENT.b, ACCENT.a * alpha)
 

@@ -1,7 +1,7 @@
 class_name SeatOrderBadge
 extends Control
 
-const BADGE_SIZE := Vector2(48, 48)
+const BADGE_SIZE := Vector2(38, 38)
 
 var _label: Label
 
@@ -16,7 +16,7 @@ func _ready() -> void:
 	_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_label.add_theme_font_size_override("font_size", 32)
+	_label.add_theme_font_size_override("font_size", 26)
 	_label.add_theme_color_override("font_color", TurnOrderArrowsLayer.ACCENT)
 	add_child(_label)
 
@@ -40,4 +40,4 @@ func play_flash(flash_duration: float = 0.14) -> void:
 func _draw() -> void:
 	var center := size * 0.5
 	var radius := minf(size.x, size.y) * 0.44
-	draw_arc(center, radius, 0.0, TAU, 48, TurnOrderArrowsLayer.ACCENT, 3.5, true)
+	draw_arc(center, radius, 0.0, TAU, 48, TurnOrderArrowsLayer.ACCENT, 2.8, true)

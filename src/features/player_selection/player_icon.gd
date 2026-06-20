@@ -32,7 +32,7 @@ enum DragState {
 
 var _display_player_count: int = 0
 var _player_info: PlayerInfo
-@export var hold_time: float = 2.0
+@export var hold_time: float = 1.4
 @export var move_lerp_speed: float = 12.0
 @export var swap_activation_distance: float = 24.0
 
