@@ -17,7 +17,9 @@
 [ext_resource type="Resource" path="res://src/common/game_events.tres" id="15"]
 [ext_resource type="AudioStream" uid="uid://d1y4xnkqph511" path="res://assets/audio/sfx/Countdown.wav" id="17"]
 [ext_resource type="AudioStream" uid="uid://crxatk58oojuw" path="res://assets/audio/music/game_sound.mp3" id="18"]
+[ext_resource type="AudioStream" uid="uid://dwb2n548ooce4" path="res://assets/audio/ui/ui_confirm.wav" id="18_ncfj3"]
 [ext_resource type="AudioStream" uid="uid://h2poc2nqkyng" path="res://assets/audio/sfx/Explosion.mp3" id="19"]
+[ext_resource type="AudioStream" uid="uid://djfi27febt56" path="res://assets/audio/ui/lobby_player_swap.wav" id="19_s1sr6"]
 [ext_resource type="AudioStream" uid="uid://dqfhupfbmeido" path="res://assets/audio/sfx/SlowTick.mp3" id="20"]
 [ext_resource type="AudioStream" uid="uid://7yrpfgssj2v0" path="res://assets/audio/sfx/FastTick.mp3" id="21"]
 [ext_resource type="Script" uid="uid://d26o15jgt3s4y" path="res://src/features/explosion/explosion_effect.gd" id="24"]
@@ -25,15 +27,15 @@
 [ext_resource type="Texture2D" uid="uid://de4n5e1fxki8i" path="res://assets/textures/Background/Background.png" id="26"]
 [ext_resource type="Script" uid="uid://dkplswcbvqptx" path="res://src/features/background/game_bomb_background.gd" id="27"]
 [ext_resource type="Texture2D" uid="uid://b27y0jjb7mmmy" path="res://assets/party_kitchen/buttons/start_active.svg" id="28"]
-[ext_resource type="Script" path="res://src/features/bomb/bomb_lamps.gd" id="29"]
+[ext_resource type="Script" uid="uid://cesm4akuquebh" path="res://src/features/bomb/bomb_lamps.gd" id="29"]
 [ext_resource type="Resource" path="res://src/common/menu_events.tres" id="31"]
-[ext_resource type="Texture2D" path="res://assets/party_kitchen/buttons/icon_exit_menu.svg" id="32"]
-[ext_resource type="Texture2D" path="res://assets/party_kitchen/buttons/icon_players.svg" id="33"]
-[ext_resource type="Script" path="res://src/contexts/game_context/ui/game_battle_chrome.gd" id="34"]
+[ext_resource type="Texture2D" uid="uid://dtg7vc67xhlwk" path="res://assets/party_kitchen/buttons/icon_exit_menu.svg" id="32"]
+[ext_resource type="Texture2D" uid="uid://46dhblt0l34f" path="res://assets/party_kitchen/buttons/icon_players.svg" id="33"]
+[ext_resource type="Script" uid="uid://drq6tfem3yi12" path="res://src/contexts/game_context/ui/game_battle_chrome.gd" id="34"]
 [ext_resource type="PackedScene" path="res://src/features/menu/exit_confirm_dialog.tscn" id="35"]
 [ext_resource type="PackedScene" path="res://src/contexts/game_context/ui/battle_player_lobby_overlay.tscn" id="36"]
-[ext_resource type="Script" path="res://src/features/menu/menu_fire_sparks.gd" id="37"]
-[ext_resource type="Script" path="res://src/features/menu/start_action_button.gd" id="38"]
+[ext_resource type="Script" uid="uid://d2t3b5qtwod5n" path="res://src/features/menu/menu_fire_sparks.gd" id="37"]
+[ext_resource type="Script" uid="uid://ctfwqdpnffwoc" path="res://src/features/menu/start_action_button.gd" id="38"]
 
 [node name="GameContext" type="Control" unique_id=1610270397 node_paths=PackedStringArray("game_manager", "battle_chrome")]
 layout_mode = 3
@@ -71,11 +73,10 @@ script = ExtResource("7")
 [node name="ResultState" type="Node" parent="GameManager" unique_id=652645902]
 script = ExtResource("8")
 
-[node name="HapticsManager" type="Node" parent="." unique_id=1545768573 node_paths=PackedStringArray("game_manager", "account")]
+[node name="HapticsManager" type="Node" parent="." unique_id=1545768573 node_paths=PackedStringArray("game_manager")]
 script = ExtResource("25")
 game_events = ExtResource("15")
 game_manager = NodePath("../GameManager")
-account = ExtResource("13")
 
 [node name="GameSound" type="Node" parent="." unique_id=960212167]
 script = ExtResource("11")
@@ -83,12 +84,14 @@ game_events = ExtResource("15")
 countdown_stream = ExtResource("17")
 round_music_stream = ExtResource("18")
 explosion_stream = ExtResource("19")
+pass_next_stream = ExtResource("18_ncfj3")
+pass_prev_stream = ExtResource("19_s1sr6")
 tick_streams = Array[AudioStream]([ExtResource("20"), ExtResource("21")])
 
 [node name="UI" type="CanvasLayer" parent="." unique_id=1341470968]
 
 [node name="BackgroundBomb" type="Control" parent="UI" unique_id=226861383 node_paths=PackedStringArray("bomb_art", "player_color_bg", "fire_sparks", "scaled_content")]
-layout_mode = 1
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -103,7 +106,7 @@ fire_sparks = NodePath("FireSparks")
 scaled_content = NodePath("ScaledContent")
 hint_marker = NodePath("ScaledContent/PlayerName")
 
-[node name="PlayerColorBackground" type="ColorRect" parent="UI/BackgroundBomb"]
+[node name="PlayerColorBackground" type="ColorRect" parent="UI/BackgroundBomb" unique_id=1110076378]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -113,7 +116,7 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(0.06, 0.05, 0.04, 1)
 
-[node name="FireSparks" type="Control" parent="UI/BackgroundBomb"]
+[node name="FireSparks" type="Control" parent="UI/BackgroundBomb" unique_id=1258871190]
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -124,7 +127,7 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("37")
 
-[node name="BombArt" type="TextureRect" parent="UI/BackgroundBomb"]
+[node name="BombArt" type="TextureRect" parent="UI/BackgroundBomb" unique_id=1252961801]
 layout_mode = 0
 offset_right = 1080.0
 offset_bottom = 1920.0
@@ -139,22 +142,22 @@ offset_right = 1080.0
 offset_bottom = 1920.0
 mouse_filter = 2
 
-[node name="PlayerName" type="Marker2D" parent="UI/BackgroundBomb/ScaledContent"]
+[node name="PlayerName" type="Marker2D" parent="UI/BackgroundBomb/ScaledContent" unique_id=627010936]
 position = Vector2(528, 483)
 
-[node name="RoundWord" type="Marker2D" parent="UI/BackgroundBomb/ScaledContent"]
+[node name="RoundWord" type="Marker2D" parent="UI/BackgroundBomb/ScaledContent" unique_id=1430375530]
 position = Vector2(540, 928)
 
-[node name="BombLamps" type="Control" parent="UI/BackgroundBomb/ScaledContent"]
-layout_mode = 0
+[node name="BombLamps" type="Control" parent="UI/BackgroundBomb/ScaledContent" unique_id=2125516733]
+anchors_preset = 0
 offset_right = 1080.0
 offset_bottom = 1920.0
 mouse_filter = 2
 script = ExtResource("29")
 game_events = ExtResource("15")
 
-[node name="GameBattleChrome" type="Control" parent="UI/BackgroundBomb/ScaledContent" node_paths=PackedStringArray("game_manager", "game_hud", "top_bar", "exit_button", "players_button", "player_lobby_overlay", "exit_confirm_dialog")]
-layout_mode = 0
+[node name="GameBattleChrome" type="Control" parent="UI/BackgroundBomb/ScaledContent" unique_id=1260246590 node_paths=PackedStringArray("top_bar", "exit_button", "players_button", "player_lobby_overlay", "exit_confirm_dialog")]
+anchors_preset = 0
 offset_right = 1080.0
 offset_bottom = 1920.0
 mouse_filter = 2
@@ -163,15 +166,13 @@ main_events = ExtResource("14")
 menu_events = ExtResource("31")
 game_events = ExtResource("15")
 game_config = ExtResource("12")
-game_manager = NodePath("../../../GameManager")
-game_hud = NodePath("../../HUD")
 top_bar = NodePath("TopBar")
 exit_button = NodePath("TopBar/ExitButton")
 players_button = NodePath("TopBar/PlayersButton")
 player_lobby_overlay = NodePath("../../../../BattlePlayerLobbyOverlay")
 exit_confirm_dialog = NodePath("../../../../ModalLayer/ExitConfirmDialog")
 
-[node name="TopBar" type="HBoxContainer" parent="UI/BackgroundBomb/ScaledContent/GameBattleChrome"]
+[node name="TopBar" type="HBoxContainer" parent="UI/BackgroundBomb/ScaledContent/GameBattleChrome" unique_id=1518641917]
 z_index = 8
 layout_mode = 0
 offset_left = 26.0
@@ -181,14 +182,14 @@ offset_bottom = 412.0
 theme_override_constants/separation = 48
 alignment = 1
 
-[node name="ExitButton" type="TextureButton" parent="UI/BackgroundBomb/ScaledContent/GameBattleChrome/TopBar"]
+[node name="ExitButton" type="TextureButton" parent="UI/BackgroundBomb/ScaledContent/GameBattleChrome/TopBar" unique_id=1543324808]
 custom_minimum_size = Vector2(168, 168)
 layout_mode = 2
 texture_normal = ExtResource("32")
 ignore_texture_size = true
 stretch_mode = 5
 
-[node name="PlayersButton" type="TextureButton" parent="UI/BackgroundBomb/ScaledContent/GameBattleChrome/TopBar"]
+[node name="PlayersButton" type="TextureButton" parent="UI/BackgroundBomb/ScaledContent/GameBattleChrome/TopBar" unique_id=659171119]
 custom_minimum_size = Vector2(168, 168)
 layout_mode = 2
 texture_normal = ExtResource("33")
@@ -227,7 +228,6 @@ offset_bottom = 1598.0
 texture_normal = ExtResource("28")
 ignore_texture_size = true
 stretch_mode = 5
-clip_contents = false
 script = ExtResource("38")
 
 [node name="StartLabel" type="Label" parent="UI/BackgroundBomb/ScaledContent/StartRoundButton" unique_id=129669063]
@@ -237,7 +237,6 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
 theme_type_variation = &"Hero"
 theme_override_font_sizes/font_size = 72
 text = "Начать раунд"
@@ -284,12 +283,12 @@ script = ExtResource("10")
 game_manager = NodePath("../../GameManager")
 start_round_button = NodePath("../BackgroundBomb/ScaledContent/StartRoundButton")
 
-[node name="BattlePlayerLobbyOverlay" parent="." instance=ExtResource("36")]
+[node name="BattlePlayerLobbyOverlay" parent="." unique_id=2020208491 instance=ExtResource("36")]
 visible = false
 
-[node name="ModalLayer" type="CanvasLayer" parent="."]
+[node name="ModalLayer" type="CanvasLayer" parent="." unique_id=1670395730]
 layer = 30
 visible = false
 
-[node name="ExitConfirmDialog" parent="ModalLayer" instance=ExtResource("35")]
+[node name="ExitConfirmDialog" parent="ModalLayer" unique_id=1720853715 instance=ExtResource("35")]
 visible = false

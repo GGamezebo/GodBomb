@@ -132,7 +132,11 @@ func prev_player() -> bool:
 
 func _process_player_choice(delta: float) -> void:
 	session.advance_time(delta)
-	session.set_current_player_index(session.get_player_choice_index())
+	var index := session.get_player_choice_index()
+	if index != session.current_player_index:
+		session.set_current_player_index(index)
+		if game_events:
+			game_events.ev_player_choice_tick_changed.emit()
 	if session.state_time > session.game_config.player_choice_time:
 		fsm.add_event(FSMGameEvents.PLAYER_CHOICE_DONE)
 

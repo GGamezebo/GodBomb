@@ -4,6 +4,8 @@ extends Node
 @export var countdown_stream: AudioStream
 @export var round_music_stream: AudioStream
 @export var explosion_stream: AudioStream
+@export var pass_next_stream: AudioStream
+@export var pass_prev_stream: AudioStream
 @export var tick_streams: Array[AudioStream] = []
 
 var listener: EventListener = EventListener.new()
@@ -16,6 +18,9 @@ func _ready() -> void:
 	_setup_round_gameplay_player()
 	if game_events:
 		listener.add(game_events.ev_countdown_tick_changed, _on_countdown_tick)
+		listener.add(game_events.ev_player_choice_tick_changed, _on_player_choice_tick)
+		listener.add(game_events.ev_touch_next_player, _on_touch_next_player)
+		listener.add(game_events.ev_touch_prev_player, _on_touch_prev_player)
 		listener.add(game_events.ev_alert, _on_alert)
 		listener.add(game_events.ev_game_state_changed, _on_game_state_changed)
 
@@ -43,7 +48,23 @@ func _enable_stream_loop(stream: AudioStream) -> void:
 
 
 func _on_countdown_tick(_seconds_left: int) -> void:
+	_play_tick_sound()
+
+
+func _on_player_choice_tick() -> void:
+	_play_tick_sound()
+
+
+func _play_tick_sound() -> void:
 	_play_one_shot(countdown_stream)
+
+
+func _on_touch_next_player() -> void:
+	_play_one_shot(pass_next_stream)
+
+
+func _on_touch_prev_player() -> void:
+	_play_one_shot(pass_prev_stream)
 
 
 func _on_alert() -> void:
