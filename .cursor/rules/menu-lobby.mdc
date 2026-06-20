@@ -26,7 +26,7 @@ MenuContext + `PlayerSelectionWidget`. Party kitchen, bomb bg `MenuBombLayout` (
 
 **Min 2:** start disabled · `+` pulse · banner hint
 
-**Settings:** party 1–30min · music→Music · sfx→SFX (вкл. UI) · reset: 2-step confirm · `reset_progress()` clears `players[]`, recent names = 12 slime names (`SlimeColors` order)
+**Settings:** party 1–30min · music→Music · sfx→SFX · haptics on/off + strength 0–100% (default 100, scales all `Haptics.*`) · reset: 2-step confirm · `reset_progress()` clears players, recent names = slime defaults
 
 **UI sounds:** см. `audio.mdc` · widget: click `+`, lobby add/remove/swap
 

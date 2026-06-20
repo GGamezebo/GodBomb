@@ -7,9 +7,12 @@ static func vibrate(duration_ms: int, account: PDataAccount = null) -> void:
 	var acc := account if account else _resolve_account()
 	if acc and not acc.get_haptics_enabled():
 		return
+	var scaled_ms := _scale_duration(duration_ms, acc)
+	if scaled_ms <= 0:
+		return
 	if not _platform_supports():
 		return
-	Input.vibrate_handheld(duration_ms)
+	Input.vibrate_handheld(scaled_ms)
 
 
 static func vibrate_ambient(account: PDataAccount = null) -> void:
@@ -44,6 +47,19 @@ static func vibrate_drag_pickup(account: PDataAccount = null) -> void:
 
 static func vibrate_target_lock(account: PDataAccount = null) -> void:
 	vibrate(52, account)
+
+
+static func preview_strength(account: PDataAccount = null) -> void:
+	vibrate(80, account)
+
+
+static func _scale_duration(duration_ms: int, account: PDataAccount) -> int:
+	var strength := 1.0
+	if account:
+		strength = account.get_haptics_strength()
+	if strength <= 0.0:
+		return 0
+	return maxi(1, int(round(float(duration_ms) * strength)))
 
 
 static func _resolve_account() -> PDataAccount:

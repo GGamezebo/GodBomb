@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://src/features/menu/settings_window.gd" id="1"]
 
-[node name="SettingsWindow" type="Control" node_paths=PackedStringArray("game_time_slider", "game_time_label", "music_check", "music_slider", "music_value_label", "sfx_slider", "sfx_value_label", "haptics_check", "reset_button", "close_button")]
+[node name="SettingsWindow" type="Control" node_paths=PackedStringArray("game_time_slider", "game_time_label", "music_check", "music_slider", "music_value_label", "sfx_slider", "sfx_value_label", "haptics_check", "haptics_slider", "haptics_value_label", "reset_button", "close_button")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -18,6 +18,8 @@ music_value_label = NodePath("Panel/Margin/VBox/Scroll/Content/MusicRow/MusicVal
 sfx_slider = NodePath("Panel/Margin/VBox/Scroll/Content/SfxRow/SfxSlider")
 sfx_value_label = NodePath("Panel/Margin/VBox/Scroll/Content/SfxRow/SfxValueLabel")
 haptics_check = NodePath("Panel/Margin/VBox/Scroll/Content/HapticsCheck")
+haptics_slider = NodePath("Panel/Margin/VBox/Scroll/Content/HapticsRow/HapticsSlider")
+haptics_value_label = NodePath("Panel/Margin/VBox/Scroll/Content/HapticsRow/HapticsValueLabel")
 reset_button = NodePath("Panel/Margin/VBox/Scroll/Content/ResetButton")
 close_button = NodePath("Panel/Margin/VBox/CloseButton")
 
@@ -142,6 +144,30 @@ layout_mode = 2
 theme_type_variation = &"ModalCheckBox"
 button_pressed = true
 text = "Вибрация"
+
+[node name="HapticsRow" type="HBoxContainer" parent="Panel/Margin/VBox/Scroll/Content"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="HapticsCaption" type="Label" parent="Panel/Margin/VBox/Scroll/Content/HapticsRow"]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+theme_type_variation = &"ModalLabel"
+text = "Мощность вибрации"
+
+[node name="HapticsSlider" type="HSlider" parent="Panel/Margin/VBox/Scroll/Content/HapticsRow"]
+custom_minimum_size = Vector2(0, 88)
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 100.0
+value = 100.0
+
+[node name="HapticsValueLabel" type="Label" parent="Panel/Margin/VBox/Scroll/Content/HapticsRow"]
+custom_minimum_size = Vector2(96, 0)
+layout_mode = 2
+theme_type_variation = &"ModalLabel"
+text = "100%"
+horizontal_alignment = 2
 
 [node name="ResetHint" type="Label" parent="Panel/Margin/VBox/Scroll/Content"]
 layout_mode = 2

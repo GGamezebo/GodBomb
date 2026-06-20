@@ -12,6 +12,7 @@ const DEFAULT_SFX_VOLUME := 1.0
 const DEFAULT_GAME_TIME_MINUTES := 5
 const DEFAULT_MUSIC_ENABLED := true
 const DEFAULT_HAPTICS_ENABLED := true
+const DEFAULT_HAPTICS_STRENGTH := 1.0
 
 
 static func default_recent_names() -> Array[String]:
@@ -177,6 +178,15 @@ func set_haptics_enabled(enabled: bool) -> void:
 	emit_changed()
 
 
+func get_haptics_strength() -> float:
+	return clampf(float(data.get("haptics_strength", DEFAULT_HAPTICS_STRENGTH)), 0.0, 1.0)
+
+
+func set_haptics_strength(linear: float) -> void:
+	data["haptics_strength"] = clampf(linear, 0.0, 1.0)
+	emit_changed()
+
+
 func reset_progress() -> void:
 	data["players"] = []
 	data["games_played"] = 0
@@ -188,6 +198,7 @@ func reset_progress() -> void:
 	data["music_volume"] = DEFAULT_MUSIC_VOLUME
 	data["sfx_volume"] = DEFAULT_SFX_VOLUME
 	data["haptics_enabled"] = DEFAULT_HAPTICS_ENABLED
+	data["haptics_strength"] = DEFAULT_HAPTICS_STRENGTH
 	emit_changed()
 
 

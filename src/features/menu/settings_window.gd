@@ -13,6 +13,8 @@ extends Control
 @export var sfx_slider: HSlider
 @export var sfx_value_label: Label
 @export var haptics_check: CheckBox
+@export var haptics_slider: HSlider
+@export var haptics_value_label: Label
 @export var reset_button: Button
 @export var close_button: Button
 
@@ -36,6 +38,9 @@ func _ready() -> void:
 	if haptics_check:
 		haptics_check.toggled.connect(_on_haptics_toggled)
 		UiSounds.bind_checkbox(haptics_check)
+	if haptics_slider:
+		haptics_slider.value_changed.connect(_on_haptics_strength_changed)
+		UiSounds.bind_slider(haptics_slider, 5.0)
 	if reset_button:
 		reset_button.pressed.connect(_on_reset_pressed)
 		UiSounds.bind_button(reset_button)
@@ -89,6 +94,10 @@ func _sync_from_account() -> void:
 		_update_sfx_label(account.get_sfx_volume())
 	if haptics_check:
 		haptics_check.button_pressed = account.get_haptics_enabled()
+	if haptics_slider:
+		haptics_slider.value = account.get_haptics_strength() * 100.0
+		_update_haptics_label(account.get_haptics_strength())
+	_update_haptics_controls_enabled()
 
 
 func _on_game_time_changed(value: float) -> void:
@@ -130,6 +139,18 @@ func _on_sfx_volume_changed(value: float) -> void:
 func _on_haptics_toggled(enabled: bool) -> void:
 	if account:
 		account.set_haptics_enabled(enabled)
+	_update_haptics_controls_enabled()
+	_save_account()
+
+
+func _on_haptics_strength_changed(value: float) -> void:
+	if not account:
+		return
+	var linear := clampf(value / 100.0, 0.0, 1.0)
+	account.set_haptics_strength(linear)
+	_update_haptics_label(linear)
+	if account.get_haptics_enabled() and linear > 0.0:
+		Haptics.preview_strength(account)
 	_save_account()
 
 
@@ -172,6 +193,20 @@ func _update_music_label(linear: float) -> void:
 func _update_sfx_label(linear: float) -> void:
 	if sfx_value_label:
 		sfx_value_label.text = "%d%%" % int(round(linear * 100.0))
+
+
+func _update_haptics_label(linear: float) -> void:
+	if haptics_value_label:
+		haptics_value_label.text = "%d%%" % int(round(linear * 100.0))
+
+
+func _update_haptics_controls_enabled() -> void:
+	var enabled := account != null and account.get_haptics_enabled()
+	if haptics_slider:
+		haptics_slider.editable = enabled
+		haptics_slider.modulate = Color.WHITE if enabled else Color(0.72, 0.72, 0.72, 1.0)
+	if haptics_value_label:
+		haptics_value_label.modulate = Color.WHITE if enabled else Color(0.72, 0.72, 0.72, 1.0)
 
 
 func _get_audio_controller() -> GameAudioController:
