@@ -23,19 +23,19 @@ script = ExtResource("1")
 account = ExtResource("6")
 game_config = ExtResource("5")
 menu_events = ExtResource("7")
-preset_storage = NodePath("PresetStorage")
 player_icon_scene = ExtResource("3")
+add_player_texture = ExtResource("8")
+remove_player_texture = ExtResource("9")
+preset_storage = NodePath("PresetStorage")
 table_area = NodePath("TableArea")
 icons_layer = NodePath("TableArea/IconsLayer")
 chairs_layer = NodePath("TableArea/ChairsLayer")
 add_player_button = NodePath("TableArea/AddPlayerButton")
 edit_player_window = NodePath("ModalLayer/EditPlayerWindow")
-add_player_texture = ExtResource("8")
-remove_player_texture = ExtResource("9")
 
 [node name="TableArea" type="Control" parent="." unique_id=1947324374]
 custom_minimum_size = Vector2(640, 640)
-layout_mode = 0
+anchors_preset = 0
 offset_left = 220.0
 offset_top = 640.0
 offset_right = 860.0
@@ -98,9 +98,8 @@ menu_events = ExtResource("7")
 
 [node name="ModalLayer" type="CanvasLayer" parent="." unique_id=1213723210]
 layer = 20
+follow_viewport_enabled = true
 
 [node name="EditPlayerWindow" parent="ModalLayer" unique_id=1947908710 instance=ExtResource("4")]
-visible = false
 account = ExtResource("6")
-preset_storage = NodePath("../../PresetStorage")
 game_config = ExtResource("5")

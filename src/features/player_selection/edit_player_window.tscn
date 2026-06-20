@@ -1,35 +1,33 @@
-[gd_scene load_steps=2 format=3 uid="uid://edit_player_window_godbomb"]
+[gd_scene format=3 uid="uid://b56w3ott01iat"]
 
-[ext_resource type="Script" path="res://src/features/player_selection/edit_player_window.gd" id="1"]
+[ext_resource type="Script" uid="uid://bt3a3dds2u7xr" path="res://src/features/player_selection/edit_player_window.gd" id="1"]
 
-[node name="EditPlayerWindow" type="Control" node_paths=PackedStringArray("name_edit", "name_history_grid", "slime_preview", "ok_button", "apply_button", "cancel_button", "colors_grid")]
+[node name="EditPlayerWindow" type="Control" unique_id=929046007 node_paths=PackedStringArray("name_edit", "name_history_grid", "slime_preview", "ok_button", "apply_button", "cancel_button", "colors_grid")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 0
 script = ExtResource("1")
 name_edit = NodePath("Panel/Margin/VBox/Content/NameEdit")
-name_history_grid = NodePath("Panel/Margin/VBox/Content/NameHistoryGrid")
+name_history_grid = NodePath("Panel/Margin/VBox/Content/NameHistoryRow/NameHistoryGrid")
 slime_preview = NodePath("Panel/Margin/VBox/Content/PreviewRow/SlimePreview")
 ok_button = NodePath("Panel/Margin/VBox/Buttons/OkButton")
 apply_button = NodePath("Panel/Margin/VBox/Buttons/ApplyButton")
 cancel_button = NodePath("Panel/Margin/VBox/Buttons/CancelButton")
-colors_grid = NodePath("Panel/Margin/VBox/Content/ColorsGrid")
+colors_grid = NodePath("Panel/Margin/VBox/Content/ColorsRow/ColorsGrid")
 
-[node name="Dimmer" type="ColorRect" parent="."]
+[node name="Dimmer" type="ColorRect" parent="." unique_id=281518387]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 0
 color = Color(0.04, 0.03, 0.025, 0.82)
 
-[node name="Panel" type="PanelContainer" parent="."]
+[node name="Panel" type="PanelContainer" parent="." unique_id=1976709935]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -41,77 +39,89 @@ offset_bottom = -64.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Margin" type="MarginContainer" parent="Panel"]
+[node name="Margin" type="MarginContainer" parent="Panel" unique_id=388310013]
 layout_mode = 2
 theme_override_constants/margin_left = 48
 theme_override_constants/margin_top = 48
 theme_override_constants/margin_right = 48
 theme_override_constants/margin_bottom = 48
 
-[node name="VBox" type="VBoxContainer" parent="Panel/Margin"]
+[node name="VBox" type="VBoxContainer" parent="Panel/Margin" unique_id=1159154095]
 layout_mode = 2
 theme_override_constants/separation = 28
 
-[node name="Title" type="Label" parent="Panel/Margin/VBox"]
+[node name="Title" type="Label" parent="Panel/Margin/VBox" unique_id=473761282]
 layout_mode = 2
 theme_type_variation = &"ModalTitle"
 text = "Игрок"
 horizontal_alignment = 1
 
-[node name="Content" type="VBoxContainer" parent="Panel/Margin/VBox"]
+[node name="Content" type="VBoxContainer" parent="Panel/Margin/VBox" unique_id=214750414]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_constants/separation = 28
+theme_override_constants/separation = 20
 
-[node name="PreviewRow" type="HBoxContainer" parent="Panel/Margin/VBox/Content"]
+[node name="PreviewRow" type="HBoxContainer" parent="Panel/Margin/VBox/Content" unique_id=957933097]
 layout_mode = 2
 alignment = 1
 
-[node name="SlimePreview" type="TextureRect" parent="Panel/Margin/VBox/Content/PreviewRow"]
-custom_minimum_size = Vector2(192, 192)
+[node name="SlimePreview" type="TextureRect" parent="Panel/Margin/VBox/Content/PreviewRow" unique_id=1601024633]
+custom_minimum_size = Vector2(128, 128)
 layout_mode = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="NameEdit" type="LineEdit" parent="Panel/Margin/VBox/Content"]
+[node name="NameEdit" type="LineEdit" parent="Panel/Margin/VBox/Content" unique_id=2050233676]
 custom_minimum_size = Vector2(0, 96)
 layout_mode = 2
 theme_type_variation = &"ModalLineEdit"
-placeholder_text = "Имя игрока (до 16 символов)"
-max_length = 16
+placeholder_text = "Имя игрока (до 12 символов)"
+max_length = 12
 
-[node name="NameHistoryGrid" type="GridContainer" parent="Panel/Margin/VBox/Content"]
-layout_mode = 2
-theme_override_constants/h_separation = 12
-theme_override_constants/v_separation = 12
-columns = 3
-
-[node name="ColorsGrid" type="GridContainer" parent="Panel/Margin/VBox/Content"]
-layout_mode = 2
-theme_override_constants/h_separation = 12
-theme_override_constants/v_separation = 12
-columns = 6
-
-[node name="Buttons" type="HBoxContainer" parent="Panel/Margin/VBox"]
+[node name="NameHistoryRow" type="HBoxContainer" parent="Panel/Margin/VBox/Content"]
 layout_mode = 2
 alignment = 1
-theme_override_constants/separation = 20
 
-[node name="CancelButton" type="Button" parent="Panel/Margin/VBox/Buttons"]
+[node name="NameHistoryGrid" type="GridContainer" parent="Panel/Margin/VBox/Content/NameHistoryRow" unique_id=2009576000]
+layout_mode = 2
+theme_override_constants/h_separation = 18
+theme_override_constants/v_separation = 18
+columns = 2
+
+[node name="ColorsRow" type="HBoxContainer" parent="Panel/Margin/VBox/Content"]
+layout_mode = 2
+alignment = 1
+
+[node name="ColorsGrid" type="GridContainer" parent="Panel/Margin/VBox/Content/ColorsRow" unique_id=688564407]
+layout_mode = 2
+theme_override_constants/h_separation = 18
+theme_override_constants/v_separation = 18
+columns = 6
+
+[node name="Spacer" type="Control" parent="Panel/Margin/VBox/Content"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Buttons" type="HBoxContainer" parent="Panel/Margin/VBox" unique_id=2047278286]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="CancelButton" type="Button" parent="Panel/Margin/VBox/Buttons" unique_id=422438833]
 custom_minimum_size = Vector2(0, 180)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"ModalButton"
 text = "Отмена"
 
-[node name="ApplyButton" type="Button" parent="Panel/Margin/VBox/Buttons"]
+[node name="ApplyButton" type="Button" parent="Panel/Margin/VBox/Buttons" unique_id=1125762236]
 custom_minimum_size = Vector2(0, 180)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"ModalButton"
 text = "Применить"
 
-[node name="OkButton" type="Button" parent="Panel/Margin/VBox/Buttons"]
+[node name="OkButton" type="Button" parent="Panel/Margin/VBox/Buttons" unique_id=845437274]
 custom_minimum_size = Vector2(0, 180)
 layout_mode = 2
 size_flags_horizontal = 3

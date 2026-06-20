@@ -5,8 +5,14 @@ signal player_added(player_name: String, preset_id: int)
 signal player_applied(index: int, player_name: String, preset_id: int)
 
 const SLIME_PATH := "res://assets/party_kitchen/slimes/%d.svg"
-const SWATCH_SIZE := 112
-const MODAL_PANEL_MARGIN := Vector4(32.0, 64.0, 32.0, 64.0)
+const SWATCH_SIZE := 120
+const NAME_CHIP_HEIGHT := 84
+const NAME_CHIP_FONT_SIZE := 48
+const GRID_SEPARATION := 18
+const NAME_CHIP_CORNER_RADIUS := 30
+const NAME_CHIP_MARGIN_H := 27
+const NAME_CHIP_MARGIN_V := 15
+const LOCK_FONT_SIZE := 66
 
 @export var account: PDataAccount
 @export var name_edit: LineEdit
@@ -24,16 +30,12 @@ var _editable_preset_id: int = -1
 var _selected_preset_id: int = 0
 var _color_buttons: Array[Button] = []
 var _lock_labels: Array[Label] = []
-var _panel: PanelContainer
 
 
 func _ready() -> void:
 	visible = false
-	_panel = get_node_or_null("Panel") as PanelContainer
 	if get_parent() is CanvasLayer:
 		(get_parent() as CanvasLayer).visible = false
-	_apply_modal_layout()
-	resized.connect(_apply_modal_layout)
 	if ok_button:
 		ok_button.pressed.connect(_on_ok_pressed)
 	if apply_button:
@@ -76,7 +78,6 @@ func open_edit_window(index: int, player_name: String, preset_id: int) -> void:
 
 
 func _open_window() -> void:
-	_apply_modal_layout()
 	visible = true
 	z_index = 1
 	if get_parent() is CanvasLayer:
@@ -116,15 +117,15 @@ func _refresh_name_history() -> void:
 	chip_style.bg_color = Color(0.16, 0.13, 0.11, 1)
 	chip_style.border_color = Color(0.42, 0.34, 0.27, 1)
 	chip_style.set_border_width_all(2)
-	chip_style.set_corner_radius_all(20)
-	chip_style.content_margin_left = 18
-	chip_style.content_margin_right = 18
-	chip_style.content_margin_top = 10
-	chip_style.content_margin_bottom = 10
+	chip_style.set_corner_radius_all(NAME_CHIP_CORNER_RADIUS)
+	chip_style.content_margin_left = NAME_CHIP_MARGIN_H
+	chip_style.content_margin_right = NAME_CHIP_MARGIN_H
+	chip_style.content_margin_top = NAME_CHIP_MARGIN_V
+	chip_style.content_margin_bottom = NAME_CHIP_MARGIN_V
 
 	var selected_style := chip_style.duplicate()
 	selected_style.border_color = Color(1.0, 0.72, 0.35, 1.0)
-	selected_style.set_border_width_all(4)
+	selected_style.set_border_width_all(6)
 
 	var current_name := _get_name_field_text()
 
@@ -132,9 +133,9 @@ func _refresh_name_history() -> void:
 		var btn := Button.new()
 		btn.text = player_name
 		btn.focus_mode = Control.FOCUS_NONE
-		btn.custom_minimum_size = Vector2(0, 72)
+		btn.custom_minimum_size = Vector2(0, NAME_CHIP_HEIGHT)
 		btn.theme_type_variation = &"ModalButton"
-		btn.add_theme_font_size_override("font_size", 36)
+		btn.add_theme_font_size_override("font_size", NAME_CHIP_FONT_SIZE)
 		btn.add_theme_color_override("font_color", Color(0.96, 0.91, 0.84, 1))
 		var is_selected := player_name == current_name
 		var btn_style := selected_style.duplicate() if is_selected else chip_style.duplicate()
@@ -176,7 +177,7 @@ func _build_color_buttons() -> void:
 		lock.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		lock.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		lock.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		lock.add_theme_font_size_override("font_size", 54)
+		lock.add_theme_font_size_override("font_size", LOCK_FONT_SIZE)
 		lock.add_theme_color_override("font_color", Color(1, 1, 1, 0.95))
 		lock.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		lock.visible = false
@@ -210,10 +211,10 @@ func _make_swatch_style(preset_id: int, selected: bool, held: bool) -> StyleBoxF
 		color = color.darkened(0.35)
 		color.a = 0.45
 	style.bg_color = color
-	var border := 6 if selected else 3
+	var border := 9 if selected else 5
 	style.set_border_width_all(border)
 	style.border_color = Color.WHITE if selected else Color("#2A2118")
-	style.shadow_size = 4 if selected else 2
+	style.shadow_size = 6 if selected else 3
 	style.shadow_color = Color(0, 0, 0, 0.25)
 	return style
 
@@ -377,14 +378,3 @@ func _consume_history_name_if_needed(player_name: String) -> void:
 	var recent := account.get_recent_names()
 	if recent.has(player_name):
 		account.consume_recent_name(player_name)
-
-
-func _apply_modal_layout() -> void:
-	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	if not _panel:
-		return
-	_panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	_panel.offset_left = MODAL_PANEL_MARGIN.x
-	_panel.offset_top = MODAL_PANEL_MARGIN.y
-	_panel.offset_right = -MODAL_PANEL_MARGIN.z
-	_panel.offset_bottom = -MODAL_PANEL_MARGIN.w

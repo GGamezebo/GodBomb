@@ -1,7 +1,7 @@
 class_name PlayerInfo
 extends Resource
 
-const MAX_NAME_LENGTH := 16
+const MAX_NAME_LENGTH := 12
 
 @export var name: String = ""
 @export var preset_id: int = 0
