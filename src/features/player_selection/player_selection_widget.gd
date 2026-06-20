@@ -747,6 +747,7 @@ func _set_remove_mode(enabled: bool) -> void:
 func _on_add_player_button_pressed() -> void:
 	if _is_remove_mode:
 		return
+	UiSounds.play_click()
 	if preset_storage and account:
 		preset_storage.rebuild_locks(account.get_players())
 	if edit_player_window:
@@ -950,6 +951,7 @@ func _on_player_added_from_window(player_name: String, preset_id: int) -> void:
 	if preset_storage:
 		preset_storage.rebuild_locks(players)
 	menu_events.ev_player_added.emit(info)
+	UiSounds.play_lobby_add()
 	_save_account()
 	_update_add_button()
 	_update_start_button()
@@ -994,6 +996,7 @@ func _remove_player(icon: PlayerIcon) -> void:
 	if preset_storage:
 		preset_storage.rebuild_locks(players)
 	menu_events.ev_player_removed.emit(info, index)
+	UiSounds.play_lobby_remove()
 	Haptics.vibrate_lobby_action(account)
 	_save_account()
 	_update_add_button()
@@ -1018,6 +1021,7 @@ func _swap_players(icon_a: PlayerIcon, icon_b: PlayerIcon) -> void:
 	if preset_storage:
 		preset_storage.rebuild_locks(players)
 	menu_events.ev_player_swapped.emit(index_a, index_b)
+	UiSounds.play_lobby_swap()
 	Haptics.vibrate_lobby_action(account)
 	_save_account()
 	for i in _player_icons.size():

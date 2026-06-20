@@ -30,17 +30,20 @@ func _ready() -> void:
 		rules_text.text = RULES_TEXT
 	if close_button:
 		close_button.pressed.connect(close)
+		UiSounds.bind_button(close_button)
 	call_deferred("_update_modal_layer_visibility")
 
 
 func open() -> void:
 	visible = true
 	_show_modal_layer()
+	UiSounds.play_modal_open()
 
 
 func close() -> void:
 	visible = false
 	_update_modal_layer_visibility()
+	UiSounds.play_modal_close()
 
 
 func _input(event: InputEvent) -> void:

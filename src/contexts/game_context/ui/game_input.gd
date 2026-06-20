@@ -19,6 +19,7 @@ func _ready() -> void:
 		game_events = load("res://src/common/game_events.tres") as GameEvents
 	if start_round_button:
 		start_round_button.pressed.connect(_on_start_round_pressed)
+		UiSounds.bind_button(start_round_button, &"confirm")
 	if game_events:
 		listener.add(game_events.ev_game_state_changed, _on_game_state_changed)
 	_sync_to_current_state()

@@ -21,12 +21,16 @@ var listener: EventListener = EventListener.new()
 func _ready() -> void:
 	if start_button:
 		start_button.pressed.connect(_on_start_pressed)
+		UiSounds.bind_button(start_button, &"confirm")
 	if settings_button:
 		settings_button.pressed.connect(_on_settings_pressed)
+		UiSounds.bind_button(settings_button)
 	if music_button:
 		music_button.pressed.connect(_on_music_pressed)
+		UiSounds.bind_button(music_button, &"toggle")
 	if rules_button:
 		rules_button.pressed.connect(_on_rules_pressed)
+		UiSounds.bind_button(rules_button)
 	if menu_events:
 		listener.add(menu_events.ev_player_added, _on_player_list_changed)
 		listener.add(menu_events.ev_player_removed, _on_player_list_changed)

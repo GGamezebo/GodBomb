@@ -166,7 +166,9 @@ func _on_done_pressed() -> void:
 		return
 	player_selection_widget.commit_roster_to_account()
 	if player_selection_widget.get_roster_size() < min_players:
+		UiSounds.play_click()
 		return
+	UiSounds.play_confirm()
 	close_overlay()
 
 

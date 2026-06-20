@@ -18,8 +18,10 @@ func _ready() -> void:
 	_panel = get_node_or_null("Panel") as PanelContainer
 	if cancel_button:
 		cancel_button.pressed.connect(_on_cancel_pressed)
+		UiSounds.bind_button(cancel_button)
 	if confirm_button:
 		confirm_button.pressed.connect(_on_confirm_pressed)
+		UiSounds.bind_button(confirm_button, &"confirm")
 	resized.connect(_apply_panel_layout)
 	call_deferred("_apply_panel_layout")
 	call_deferred("_update_modal_layer_visibility")
@@ -29,6 +31,7 @@ func open() -> void:
 	_apply_panel_layout()
 	visible = true
 	_show_modal_layer()
+	UiSounds.play_modal_open()
 
 
 func close() -> void:

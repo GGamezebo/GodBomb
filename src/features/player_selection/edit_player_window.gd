@@ -82,6 +82,7 @@ func _open_window() -> void:
 	z_index = 1
 	if get_parent() is CanvasLayer:
 		(get_parent() as CanvasLayer).visible = true
+	UiSounds.play_modal_open()
 	_refresh_all_swatches()
 	_sort_color_grid()
 
@@ -284,6 +285,7 @@ func _select_preset(preset_id: int) -> void:
 func _on_color_pressed(preset_id: int) -> void:
 	if _is_preset_held(preset_id):
 		return
+	UiSounds.play_click()
 	_select_preset(preset_id)
 
 
@@ -340,10 +342,12 @@ func _try_confirm() -> bool:
 	return false
 
 
-func _close_window() -> void:
+func _close_window(play_close_sound: bool = false) -> void:
 	visible = false
 	if get_parent() is CanvasLayer:
 		(get_parent() as CanvasLayer).visible = false
+	if play_close_sound:
+		UiSounds.play_modal_close()
 
 
 func _on_ok_pressed() -> void:
@@ -351,7 +355,8 @@ func _on_ok_pressed() -> void:
 	if player_name.is_empty() or _is_preset_held(_selected_preset_id):
 		return
 	_consume_history_name_if_needed(player_name)
-	_close_window()
+	UiSounds.play_confirm()
+	_close_window(false)
 	player_added.emit(player_name, _selected_preset_id)
 
 
@@ -360,7 +365,8 @@ func _on_apply_pressed() -> void:
 	if player_name.is_empty() or _player_index < 0 or _is_preset_held(_selected_preset_id):
 		return
 	_consume_history_name_if_needed(player_name)
-	_close_window()
+	UiSounds.play_confirm()
+	_close_window(false)
 	player_applied.emit(_player_index, player_name, _selected_preset_id)
 
 
@@ -369,7 +375,7 @@ func _read_player_name() -> String:
 
 
 func _on_cancel_pressed() -> void:
-	_close_window()
+	_close_window(true)
 
 
 func _consume_history_name_if_needed(player_name: String) -> void:

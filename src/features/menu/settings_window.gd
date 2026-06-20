@@ -23,18 +23,25 @@ func _ready() -> void:
 	visible = false
 	if game_time_slider:
 		game_time_slider.value_changed.connect(_on_game_time_changed)
+		UiSounds.bind_slider(game_time_slider, 1.0)
 	if music_check:
 		music_check.toggled.connect(_on_music_toggled)
+		UiSounds.bind_checkbox(music_check)
 	if music_slider:
 		music_slider.value_changed.connect(_on_music_volume_changed)
+		UiSounds.bind_slider(music_slider, 5.0)
 	if sfx_slider:
 		sfx_slider.value_changed.connect(_on_sfx_volume_changed)
+		UiSounds.bind_slider(sfx_slider, 5.0)
 	if haptics_check:
 		haptics_check.toggled.connect(_on_haptics_toggled)
+		UiSounds.bind_checkbox(haptics_check)
 	if reset_button:
 		reset_button.pressed.connect(_on_reset_pressed)
+		UiSounds.bind_button(reset_button)
 	if close_button:
 		close_button.pressed.connect(close)
+		UiSounds.bind_button(close_button)
 	call_deferred("_update_modal_layer_visibility")
 
 
@@ -47,11 +54,13 @@ func open() -> void:
 		account.changed.connect(_sync_from_account)
 	visible = true
 	_show_modal_layer()
+	UiSounds.play_modal_open()
 
 
 func close() -> void:
 	visible = false
 	_update_modal_layer_visibility()
+	UiSounds.play_modal_close()
 
 
 func _input(event: InputEvent) -> void:
@@ -136,6 +145,7 @@ func _on_reset_pressed() -> void:
 	if reset_button:
 		reset_button.text = "Сбросить прогресс"
 	account.reset_progress()
+	UiSounds.play_confirm()
 	_sync_from_account()
 	if menu_events:
 		menu_events.ev_game_time_changed.emit(account.get_game_time_minutes())
