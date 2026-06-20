@@ -150,13 +150,13 @@ text = "Сброс вернёт подсказки, настройки и спи
 autowrap_mode = 3
 
 [node name="ResetButton" type="Button" parent="Panel/Margin/VBox/Scroll/Content"]
-custom_minimum_size = Vector2(0, 96)
+custom_minimum_size = Vector2(0, 180)
 layout_mode = 2
 theme_type_variation = &"ModalButton"
 text = "Сбросить прогресс"
 
 [node name="CloseButton" type="Button" parent="Panel/Margin/VBox"]
-custom_minimum_size = Vector2(0, 96)
+custom_minimum_size = Vector2(0, 180)
 layout_mode = 2
 theme_type_variation = &"ModalButton"
 text = "Закрыть"

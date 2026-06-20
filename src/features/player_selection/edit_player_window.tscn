@@ -98,21 +98,21 @@ alignment = 1
 theme_override_constants/separation = 20
 
 [node name="CancelButton" type="Button" parent="Panel/Margin/VBox/Buttons"]
-custom_minimum_size = Vector2(220, 96)
+custom_minimum_size = Vector2(0, 180)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"ModalButton"
 text = "Отмена"
 
 [node name="ApplyButton" type="Button" parent="Panel/Margin/VBox/Buttons"]
-custom_minimum_size = Vector2(220, 96)
+custom_minimum_size = Vector2(0, 180)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"ModalButton"
 text = "Применить"
 
 [node name="OkButton" type="Button" parent="Panel/Margin/VBox/Buttons"]
-custom_minimum_size = Vector2(220, 96)
+custom_minimum_size = Vector2(0, 180)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"ModalButton"
