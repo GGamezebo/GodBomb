@@ -95,28 +95,28 @@ script = ExtResource("17")
 [node name="TopBar" type="HBoxContainer" parent="BackgroundBomb/ScaledContent" unique_id=2074903033]
 layout_mode = 0
 offset_left = 26.0
-offset_top = 268.0
+offset_top = 244.0
 offset_right = 1026.0
-offset_bottom = 388.0
-theme_override_constants/separation = 20
+offset_bottom = 412.0
+theme_override_constants/separation = 48
 alignment = 1
 
 [node name="SettingsButton" type="TextureButton" parent="BackgroundBomb/ScaledContent/TopBar" unique_id=2066844004]
-custom_minimum_size = Vector2(112, 112)
+custom_minimum_size = Vector2(168, 168)
 layout_mode = 2
 texture_normal = ExtResource("12")
 ignore_texture_size = true
 stretch_mode = 5
 
 [node name="MusicButton" type="TextureButton" parent="BackgroundBomb/ScaledContent/TopBar" unique_id=934041470]
-custom_minimum_size = Vector2(112, 112)
+custom_minimum_size = Vector2(168, 168)
 layout_mode = 2
 texture_normal = ExtResource("13")
 ignore_texture_size = true
 stretch_mode = 5
 
 [node name="RulesButton" type="TextureButton" parent="BackgroundBomb/ScaledContent/TopBar" unique_id=1636588019]
-custom_minimum_size = Vector2(112, 112)
+custom_minimum_size = Vector2(168, 168)
 layout_mode = 2
 texture_normal = ExtResource("15")
 ignore_texture_size = true
