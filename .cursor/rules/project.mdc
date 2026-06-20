@@ -5,7 +5,7 @@ alwaysApply: true
 
 # GodBomb
 
-Party hot-potato, слоги. Godot 4.6 GDScript, 1080×1920 portrait, mobile renderer. Entry: `main.tscn` → `MainContext`.
+Party hot-potato, слоги. Godot **4.7** GDScript, 1080×1920 portrait, mobile renderer. Entry: `main.tscn` → `MainContext`.
 
 **Цикл:** 2–12 игроков, слог+условие, передача бомбы, скрытый таймер, взрыв = +1 штраф, победа = min score, колода кончилась.
 
@@ -13,8 +13,8 @@ Party hot-potato, слоги. Godot 4.6 GDScript, 1080×1920 portrait, mobile re
 
 **Контексты:** MenuContext (лобби) · GameContext (бой). Детали → `menu-lobby.mdc`, `game-battle.mdc`, `audio.mdc`.
 
-**Папки:** `src/contexts/` экраны · `src/features/` механики · `src/common/` config/events · `core/lib/` FSM · `assets/`
+**Папки:** `src/contexts/` экраны · `src/features/` механики · `src/common/` config/events · `core/` FSM+systems · `assets/` · `tools/` (генераторы)
 
-**Промпты:** `architecture.mdc` · `gdscript.mdc` · `menu-lobby.mdc` · `game-battle.mdc` · `audio.mdc` — обновляй при новых механиках.
+**Правила контекста:** `.cursor/rules/*.mdc` — **агент обновляет сам** при изменениях UI/механик/audio (кратко, без дублирования между файлами).
 
 **Язык:** код EN · UI RU. Игнор: `.godot/`, `*.import`. F6 без crash — см. `architecture.mdc`.

@@ -16,10 +16,12 @@ alwaysApply: false
 
 State UI: choice=«Выбираем первого»+pulse · ready=«Первым ходит»+StartRoundButton · play=full HUD · explosion=name overlay.
 
-**Input** (`game_input.gd`): `mouse_filter=IGNORE`. PLAY: tap→next, swipe→prev (1×/round). RESULT→menu. StartRoundButton: `BackgroundBomb/ScaledContent/StartRoundButton`.
+**Input** (`game_input.gd`): `mouse_filter=IGNORE`. PLAY: tap→next, swipe→prev (1×/round). RESULT→menu. StartRoundButton: confirm via `UiSounds.bind_button` · `BackgroundBomb/ScaledContent/StartRoundButton`.
 
-**Visual:** `GameBombBackground` (Control: `PlayerColorBackground` under `BombArt`) — player-color backdrop via `SlimeColors`, alert pulse on bg, bomb-only flash/shake on explosion · particles at (540,1050).
+**Battle lobby overlay:** `BattlePlayerLobbyOverlay` — edit roster mid-game · Done = confirm if roster ok else click · reuses `PlayerSelectionWidget` + `StartActionButton`.
 
-**Audio:** game_sound on PLAY only → audio.mdc.
+**Visual:** `GameBombBackground` — player-color backdrop via `SlimeColors`, alert pulse, bomb flash/shake on explosion · particles at (540,1050).
+
+**Audio:** gameplay → `GameSound` · UI buttons → `UiSounds` → `audio.mdc`.
 
 **Core:** `game_manager.gd` `game_session.gd` `game_sound.gd` `word_condition.gd`

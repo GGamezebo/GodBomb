@@ -1,27 +1,33 @@
 ---
-description: Лобби — выбор игроков, подсказки, DnD
-globs: src/features/player_selection/**,src/features/menu/**,src/contexts/menu_context/**
+description: Лобби — игроки, DnD, edit window, UI sounds
+globs: src/features/player_selection/**,src/features/menu/**,src/contexts/menu_context/**,src/contexts/game_context/ui/battle_player_lobby_overlay.*
 alwaysApply: false
 ---
 
 # Лобби
 
-MenuContext + `PlayerSelectionWidget`. Стиль party_kitchen, bg bomb `Background.png` via `MenuBombLayout` (design 1080×1920, cover scale). `ScaledContent` — TopBar, стол, Start, Marker2D для hints. Hint banner центрируется на Marker2D. Resize → всё масштабируется пропорционально бомбе.
+MenuContext + `PlayerSelectionWidget`. Party kitchen, bomb bg `MenuBombLayout` (1080×1920 cover). `ScaledContent`: TopBar, стол, Start, hint Marker2D. `ModalLayer.follow_viewport_enabled = true` в `player_selection_widget.tscn`.
 
-**Игроки:** 2–12, `PDataAccount`→`PlayerInfo`(name, preset_id), slimes `party_kitchen/slimes/{id}.svg`, colors `SlimeColors`.
+**Игроки:** 2–12 · `PDataAccount`→`PlayerInfo`(name, **max 12 chars**, preset_id) · slimes `party_kitchen/slimes/{id}.svg` · `SlimeColors`
 
-**Порядок:** бейджи на столе (`SeatOrderBadge`), стрелки (`TurnOrderArrowsLayer`, accent, 75% alpha on drag).
+**Порядок:** `SeatOrderBadge` 38×38 font 26 · стрелки `TurnOrderArrowsLayer` (`RING_MARGIN=24`, accent 75% on drag) · badges gap `BADGE_GAP_AFTER_ARROWS=10`
 
-**Swap:** drag slime → swap, `ChairSwapRing`. Hints `TableHintBanner`: idle 1×/visit (hide after 5 games), drag = emphasis (full opacity).
+**Swap:** drag slime → swap · hint: «Перетащи персонажа на стул другого…» · hit: circle–circle (`get_grab_radius_global`, `seat_interaction_radius`)
 
-**Remove:** `+` → delete mode, ring like swap (`radius_for_half_extent`), delete on slime center in ring (`get_release_slime_center` before `_set_remove_mode(false)`), min_players_for_remove=0, empty table → `_sync_order_badges(0)`.
+**Remove:** `+` → delete mode · dashed ring **child of `add_player_button`** (не table_area) · drop slime center in ring · min_players_for_remove=0
 
-**Min 2 players:** start disabled, `+` scale pulse, banner hint.
+**Touch:** `TOUCH_GRAB_RADIUS=78` · `HOLD_HOME_TOLERANCE=36` · haptics on drag pickup / target lock / lobby action
 
-**Hold-edit:** 2s hold → EditPlayerWindow, `HoldProgressRing`, reset move >8px, hints via `hints_seen.hold_edit`, stop after `has_edited_player`.
+**Hold-edit:** `hold_time=1.4` (hint «1,5 сек») · `HoldProgressRing` · move > tolerance cancels · `EditPlayerWindow` · hints until `has_edited_player`
 
-**Name:** below slime, centered (`layout_name_plate`).
+**EditPlayerWindow:** no scroll · margins как settings (32/64 panel, 48 inner, buttons 180) · colors grid под name history · OK add / Apply edit / Cancel · sounds → `audio.mdc`
 
-**Settings:** party 1–30min · menu music→Music · sfx→SFX · ModalLayer parent must stay visible.
+**Start:** `StartActionButton` (pulse, labels centered, clip_contents=false) · menu Start + battle Done share script · SVG `start_active/inactive` viewBox `-6 0 452 120`
 
-**Start:** bomb preview → `ev_start_game` → GameContext, `SCOPE_MENU` off.
+**Min 2:** start disabled · `+` pulse · banner hint
+
+**Settings:** party 1–30min · music→Music · sfx→SFX (вкл. UI) · reset: 2-step confirm · `reset_progress()` clears `players[]`, recent names = 12 slime names (`SlimeColors` order)
+
+**UI sounds:** см. `audio.mdc` · widget: click `+`, lobby add/remove/swap
+
+**Start game:** bomb preview → `ev_start_game` → GameContext · `SCOPE_MENU` off

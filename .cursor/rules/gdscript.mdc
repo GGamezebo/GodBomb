@@ -14,6 +14,6 @@ EN comments · typed `@export` · `class_name` в отдельном файле 
 
 **Пути:** механика → `src/features/` · экран → `src/contexts/` · общее → `src/common/` · утилиты → `core/lib/`.
 
-**Механики → `.cursor/rules/`:** lobby `menu-lobby.mdc` · battle `game-battle.mdc` · audio `audio.mdc` · arch `architecture.mdc`.
+**Контекст для агента:** после изменений механик/UI/audio — **сразу** обнови нужный `.cursor/rules/*.mdc` (кратко, факты+пути, без дублирования). lobby · battle · audio · arch.
 
 **Избегать:** autoloads для связи экранов · прямых ссылок между контекстами · хардкода сцен.

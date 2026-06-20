@@ -1,19 +1,44 @@
 ---
-description: Аудио — шины, menu music, game SFX
-globs: src/**/audio/**/*.gd,main.tscn,default_bus_layout.tres,src/features/menu/settings_window.*
+description: Аудио — шины, music, gameplay SFX, UI sounds
+globs: core/systems/audio/**,assets/audio/**,tools/generate_ui_sounds.py,src/features/menu/**,src/features/player_selection/**,src/contexts/menu_context/**,src/contexts/game_context/ui/game_input.gd,src/contexts/game_context/ui/battle_player_lobby_overlay.gd,main.tscn,default_bus_layout.tres
 alwaysApply: false
 ---
 
 # Аудио
 
-**Шины:** `Music` = фон меню only · `SFX` = весь геймплей incl. `game_sound.mp3`
+**Шины:** `Music` = фон меню only · `SFX` = геймплей **+ весь UI**
 
-**Menu music** (`MusicPlayer`, `background.mp3`): `GameAudioController` → `music_player` on `MusicPlayer`.  
-`set_in_battle(false)` in menu + `music_enabled` → play (loop). `set_in_battle(true)` on game start → stop.
+## Menu music
 
-**GameSound** (`game_sound.gd`, SFX bus):
-- `Countdown.wav` — countdown ticks
-- `game_sound.mp3` — loop, start **PLAY** (after countdown), stop on explosion/ready/result/choice/countdown
-- ticks — `ev_alert` · `Explosion.mp3` — explosion
+`GameAudioController` → `music_player` on `MusicPlayer` (`background.mp3`).  
+`set_in_battle(false)` + `music_enabled` → loop. `set_in_battle(true)` → stop.
 
-**Правила:** menu bg → Music+scope · gameplay → SFX · не loop на Music bus
+## Gameplay SFX — `GameSound` (`game_sound.gd`)
+
+- `Countdown.wav` — ticks · `game_sound.mp3` — loop только в **PLAY**
+- `Explosion.mp3` — взрыв · stop loop on explosion/ready/result/choice/countdown
+
+## UI SFX — `UiSounds` (`core/systems/audio/ui_sounds.gd`)
+
+Static API, bus `SFX`, one-shot `AudioStreamPlayer` on root.
+
+**Assets:** `assets/audio/ui/*.wav` · regen: `py -3 tools/generate_ui_sounds.py`
+
+| id | файл | когда |
+|----|------|-------|
+| click | ui_click | обычные кнопки |
+| confirm | ui_confirm | Старт, OK, раунд, Готово |
+| toggle | ui_toggle | CheckBox, музыка |
+| slider_tick | ui_slider_tick | слайдеры |
+| modal_open/close | ui_modal_* | модалки |
+| lobby_add/remove/swap | lobby_player_* | add/remove/swap в лобби |
+
+**API:** `play_*()` · `bind_button(btn, id?)` · `bind_slider(range, step)` · `bind_checkbox(cb)`
+
+**Интеграция (не дублировать звук):**
+- `bind_button` — menu/settings/rules/exit; Start/StartRound = confirm
+- модалки: `play_modal_open()` в open · cancel → `play_modal_close()` · OK/Apply → `play_confirm()` **в handler после валидации** (не bind)
+- лобби: click на `+` · `play_lobby_*` в `_on_player_added` / `_remove_player` / `_swap_players`
+- battle overlay Done: confirm если ok, click если < min_players
+
+**Не смешивать:** gameplay → `GameSound` · UI → `UiSounds` · menu bg → Music bus only
