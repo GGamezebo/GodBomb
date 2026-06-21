@@ -23,6 +23,7 @@ var _avatar_ring: PanelContainer
 var _slime: TextureRect
 var _name_label: Label
 var _built: bool = false
+var _visual_scale := 1.0
 
 
 func _ready() -> void:
@@ -31,58 +32,85 @@ func _ready() -> void:
 	_build_content()
 
 
+func set_visual_scale(visual_scale: float) -> void:
+	if is_equal_approx(_visual_scale, visual_scale):
+		return
+	_visual_scale = visual_scale
+	for child in get_children():
+		child.queue_free()
+	_frame = null
+	_avatar_ring = null
+	_slime = null
+	_name_label = null
+	_built = false
+	_build_content()
+
+
+func _vx(value: float) -> float:
+	return value * _visual_scale
+
+
+func _vi(value: float) -> int:
+	return int(roundf(value * _visual_scale))
+
+
 func _build_content() -> void:
 	if _built:
 		return
 	_built = true
+
+	var frame_height := _vx(FRAME_HEIGHT)
+	var avatar_size := _vx(AVATAR_RING_SIZE)
+	var slime_size := _vx(SLIME_SIZE)
 
 	_frame = PanelContainer.new()
 	_frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var pill := StyleBoxFlat.new()
 	pill.bg_color = Color(1.0, 0.99, 0.97, 0.44)
 	pill.border_color = Color(1.0, 1.0, 1.0, 0.34)
-	pill.set_border_width_all(2)
-	pill.set_corner_radius_all(int(FRAME_HEIGHT * 0.5))
+	pill.set_border_width_all(max(_vi(2.0), 2))
+	pill.set_corner_radius_all(int(frame_height * 0.5))
 	pill.shadow_color = Color(0.05, 0.03, 0.02, 0.28)
-	pill.shadow_size = 10
-	pill.shadow_offset = Vector2(0.0, 4.0)
+	pill.shadow_size = _vi(10.0)
+	pill.shadow_offset = Vector2(0.0, _vx(4.0))
 	_frame.add_theme_stylebox_override("panel", pill)
 	add_child(_frame)
 
 	var margin := MarginContainer.new()
-	margin.add_theme_constant_override("margin_left", int(MARGIN_LEFT))
-	margin.add_theme_constant_override("margin_top", int(MARGIN_V))
-	margin.add_theme_constant_override("margin_right", int(MARGIN_RIGHT))
-	margin.add_theme_constant_override("margin_bottom", int(MARGIN_V))
+	margin.add_theme_constant_override("margin_left", _vi(MARGIN_LEFT))
+	margin.add_theme_constant_override("margin_top", _vi(MARGIN_V))
+	margin.add_theme_constant_override("margin_right", _vi(MARGIN_RIGHT))
+	margin.add_theme_constant_override("margin_bottom", _vi(MARGIN_V))
 	_frame.add_child(margin)
 
 	var row := HBoxContainer.new()
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
-	row.add_theme_constant_override("separation", int(NAME_GAP))
+	row.add_theme_constant_override("separation", _vi(NAME_GAP))
 	margin.add_child(row)
 
 	_avatar_ring = PanelContainer.new()
-	_avatar_ring.custom_minimum_size = Vector2(AVATAR_RING_SIZE, AVATAR_RING_SIZE)
+	_avatar_ring.custom_minimum_size = Vector2(avatar_size, avatar_size)
 	var ring := StyleBoxFlat.new()
 	ring.bg_color = Color(1.0, 1.0, 1.0, 0.22)
 	ring.border_color = Color(1.0, 1.0, 1.0, 0.72)
-	ring.set_border_width_all(3)
-	ring.set_corner_radius_all(int(AVATAR_RING_SIZE * 0.5))
+	ring.set_border_width_all(max(_vi(3.0), 3))
+	ring.set_corner_radius_all(int(avatar_size * 0.5))
 	ring.shadow_color = Color(1.0, 0.98, 0.92, 0.35)
-	ring.shadow_size = 6
+	ring.shadow_size = _vi(6.0)
 	_avatar_ring.add_theme_stylebox_override("panel", ring)
 	row.add_child(_avatar_ring)
 
 	var avatar_pad := MarginContainer.new()
-	avatar_pad.add_theme_constant_override("margin_left", 8)
-	avatar_pad.add_theme_constant_override("margin_top", 8)
-	avatar_pad.add_theme_constant_override("margin_right", 8)
-	avatar_pad.add_theme_constant_override("margin_bottom", 8)
+	var avatar_inset := _vi(8.0)
+	avatar_pad.add_theme_constant_override("margin_left", avatar_inset)
+	avatar_pad.add_theme_constant_override("margin_top", avatar_inset)
+	avatar_pad.add_theme_constant_override("margin_right", avatar_inset)
+	avatar_pad.add_theme_constant_override("margin_bottom", avatar_inset)
 	_avatar_ring.add_child(avatar_pad)
 
 	_slime = TextureRect.new()
-	_slime.custom_minimum_size = Vector2(SLIME_SIZE, SLIME_SIZE)
-	_slime.size = Vector2(SLIME_SIZE, SLIME_SIZE)
+	_slime.custom_minimum_size = Vector2(slime_size, slime_size)
+	_slime.size = Vector2(slime_size, slime_size)
 	_slime.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_slime.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	avatar_pad.add_child(_slime)
@@ -92,15 +120,15 @@ func _build_content() -> void:
 	_name_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_name_label.autowrap_mode = TextServer.AUTOWRAP_OFF
 	_name_label.clip_text = false
-	_name_label.add_theme_font_size_override("font_size", NAME_FONT_MAX)
+	_name_label.add_theme_font_size_override("font_size", _vi(NAME_FONT_MAX))
 	_name_label.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0, 1.0))
 	_name_label.add_theme_color_override("font_outline_color", Color(0.04, 0.03, 0.02, 0.5))
-	_name_label.add_theme_constant_override("outline_size", 2)
+	_name_label.add_theme_constant_override("outline_size", max(_vi(2.0), 2))
 	row.add_child(_name_label)
 
 
 func _pill_width_for_name(name_width: float) -> float:
-	return MARGIN_LEFT + AVATAR_RING_SIZE + NAME_GAP + name_width + MARGIN_RIGHT
+	return _vx(MARGIN_LEFT + AVATAR_RING_SIZE + NAME_GAP) + name_width + _vx(MARGIN_RIGHT)
 
 
 func _measure_name_width(text: String, font_size: int) -> float:
@@ -112,18 +140,24 @@ func _measure_name_width(text: String, font_size: int) -> float:
 
 func _fit_name_layout() -> void:
 	var display := _name_label.text
-	var chosen_size := NAME_FONT_MIN
-	var chosen_width := _measure_name_width(display, NAME_FONT_MIN)
-	for font_size in range(NAME_FONT_MAX, NAME_FONT_MIN - 1, -2):
+	var font_min := _vi(NAME_FONT_MIN)
+	var font_max := _vi(NAME_FONT_MAX)
+	var avatar_size := _vx(AVATAR_RING_SIZE)
+	var frame_height := _vx(FRAME_HEIGHT)
+	var max_width := _vx(MAX_PILL_WIDTH)
+
+	var chosen_size := font_min
+	var chosen_width := _measure_name_width(display, font_min)
+	for font_size in range(font_max, font_min - 1, -2):
 		var name_width := _measure_name_width(display, font_size)
-		if _pill_width_for_name(name_width) <= MAX_PILL_WIDTH:
+		if _pill_width_for_name(name_width) <= max_width:
 			chosen_size = font_size
 			chosen_width = name_width
 			break
 	_name_label.add_theme_font_size_override("font_size", chosen_size)
-	_name_label.custom_minimum_size = Vector2(chosen_width, AVATAR_RING_SIZE)
+	_name_label.custom_minimum_size = Vector2(chosen_width, avatar_size)
 	var pill_width := _pill_width_for_name(chosen_width)
-	custom_minimum_size = Vector2(pill_width, FRAME_HEIGHT)
+	custom_minimum_size = Vector2(pill_width, frame_height)
 	size = custom_minimum_size
 
 

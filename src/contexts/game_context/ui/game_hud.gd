@@ -19,9 +19,7 @@ var _hint_banner: TableHintBanner
 var _action_hints: GameActionHints
 var _battle_layer: Control
 var _countdown_label: Label
-var _explosion_panel: PanelContainer
-var _explosion_title: Label
-var _explosion_subtitle: Label
+var _explosion_overlay: GameExplosionOverlay
 var _current_state: String = ""
 var _last_choice_player_index: int = -1
 
@@ -139,38 +137,8 @@ func _build_ui() -> void:
 
 
 func _build_explosion_overlay(design_root: Control) -> void:
-	_explosion_panel = PanelContainer.new()
-	_explosion_panel.set_anchors_preset(Control.PRESET_TOP_LEFT)
-	_explosion_panel.size = DESIGN_SIZE
-	_explosion_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.06, 0.03, 0.02, 0.62)
-	_explosion_panel.add_theme_stylebox_override("panel", style)
-	_explosion_panel.z_index = 4
-	design_root.add_child(_explosion_panel)
-
-	var center := CenterContainer.new()
-	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	_explosion_panel.add_child(center)
-
-	var col := VBoxContainer.new()
-	col.add_theme_constant_override("separation", 12)
-	center.add_child(col)
-
-	_explosion_title = Label.new()
-	_explosion_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_explosion_title.add_theme_font_size_override("font_size", 72)
-	_explosion_title.add_theme_color_override("font_color", Color(1, 0.94, 0.88, 1))
-	_explosion_title.add_theme_color_override("font_outline_color", Color(0.08, 0.04, 0.02, 0.9))
-	_explosion_title.add_theme_constant_override("outline_size", 6)
-	col.add_child(_explosion_title)
-
-	_explosion_subtitle = Label.new()
-	_explosion_subtitle.text = "Вас подорвало!"
-	_explosion_subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_explosion_subtitle.add_theme_font_size_override("font_size", 40)
-	_explosion_subtitle.add_theme_color_override("font_color", TurnOrderArrowsLayer.ACCENT.lightened(0.15))
-	col.add_child(_explosion_subtitle)
+	_explosion_overlay = GameExplosionOverlay.new()
+	design_root.add_child(_explosion_overlay)
 
 
 func set_lobby_overlay_active(active: bool) -> void:
@@ -193,8 +161,8 @@ func _hide_all() -> void:
 		_action_hints.visible = false
 	if _countdown_label:
 		_countdown_label.visible = false
-	if _explosion_panel:
-		_explosion_panel.visible = false
+	if _explosion_overlay:
+		_explosion_overlay.hide_overlay()
 	if result_panel:
 		result_panel.visible = false
 
@@ -326,11 +294,10 @@ func _show_play() -> void:
 
 
 func _show_explosion() -> void:
-	if not _explosion_panel or not game_manager:
+	if not _explosion_overlay or not game_manager:
 		return
 	var player := game_manager.session.get_current_player()
-	_explosion_title.text = player.info.name
-	_explosion_panel.visible = true
+	_explosion_overlay.show_for_player(player)
 
 
 func _show_result() -> void:
