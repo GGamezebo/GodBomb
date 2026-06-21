@@ -1,10 +1,11 @@
 extends Control
 
 const DESIGN_SIZE := MenuBombLayout.DESIGN_SIZE
-const PLAYER_NAME_MARKER := &"PlayerName"
 const ROUND_WORD_MARKER := &"RoundWord"
-const FALLBACK_PLAYER_NAME := Vector2(528, 483)
 const FALLBACK_ROUND_WORD := Vector2(540, 928)
+const TABLE_CENTER := GamePlayerStrip.TABLE_CENTER
+const FALLBACK_HINT_MARKER := Vector2(528, 483)
+const PASS_HINT_RECT := Rect2(48.0, 1410.0, 984.0, 96.0)
 
 @export var game_manager: GameManager
 @export var game_events: GameEvents
@@ -14,6 +15,7 @@ const FALLBACK_ROUND_WORD := Vector2(540, 928)
 var listener: EventListener = EventListener.new()
 var _player_strip: GamePlayerStrip
 var _syllable_card: GameSyllableCard
+var _hint_banner: TableHintBanner
 var _action_hints: GameActionHints
 var _battle_layer: Control
 var _countdown_label: Label
@@ -63,22 +65,23 @@ func _connect_layout_reposition() -> void:
 	call_deferred("_reposition_battle_ui")
 
 
-func _get_player_name_anchor() -> Vector2:
+func _get_round_word_center() -> Vector2:
+	var design_root := _get_design_root()
+	return BombMarkerLayout.get_marker_position(design_root, ROUND_WORD_MARKER, FALLBACK_ROUND_WORD)
+
+
+func _get_hint_marker_position() -> Vector2:
 	var layout := _find_bomb_layout()
 	if layout:
 		return layout.get_hint_marker_design_position()
-	var design_root := _get_design_root()
-	return BombMarkerLayout.get_marker_position(design_root, PLAYER_NAME_MARKER, FALLBACK_PLAYER_NAME)
+	return FALLBACK_HINT_MARKER
 
 
 func _reposition_battle_ui() -> void:
 	var design_root := _get_design_root()
+	var word_center := _get_round_word_center()
 	if _player_strip:
-		var anchor := _get_player_name_anchor()
-		var size := _player_strip.size
-		if size.x <= 0.0 or size.y <= 0.0:
-			size = _player_strip.custom_minimum_size
-		_player_strip.position = anchor - size * 0.5
+		GamePlayerStrip.place_on_dial(_player_strip, word_center, TABLE_CENTER)
 	if _syllable_card:
 		BombMarkerLayout.place_control_at_marker(
 			_syllable_card, design_root, ROUND_WORD_MARKER, FALLBACK_ROUND_WORD
@@ -87,6 +90,11 @@ func _reposition_battle_ui() -> void:
 		BombMarkerLayout.place_control_at_marker(
 			_countdown_label, design_root, ROUND_WORD_MARKER, FALLBACK_ROUND_WORD
 		)
+	if _hint_banner:
+		TableHintBanner.place_centered_at(_hint_banner, _get_hint_marker_position())
+	if _action_hints:
+		_action_hints.position = PASS_HINT_RECT.position
+		_action_hints.size = PASS_HINT_RECT.size
 
 
 func _build_ui() -> void:
@@ -106,13 +114,13 @@ func _build_ui() -> void:
 	_syllable_card = GameSyllableCard.new()
 	_battle_layer.add_child(_syllable_card)
 
+	_hint_banner = TableHintBanner.new()
+	_hint_banner.z_index = 5
+	_battle_layer.add_child(_hint_banner)
+
 	_action_hints = GameActionHints.new()
 	_action_hints.game_events = game_events
-	_action_hints.set_anchors_preset(Control.PRESET_TOP_LEFT)
-	_action_hints.offset_left = 80.0
-	_action_hints.offset_top = 1120.0
-	_action_hints.offset_right = 1000.0
-	_action_hints.offset_bottom = 1240.0
+	_action_hints.z_index = 4
 	_battle_layer.add_child(_action_hints)
 
 	_countdown_label = Label.new()
@@ -179,6 +187,10 @@ func sync_from_session() -> void:
 func _hide_all() -> void:
 	if _battle_layer:
 		_battle_layer.visible = false
+	if _hint_banner:
+		_hint_banner.hide_message(false)
+	if _action_hints:
+		_action_hints.visible = false
 	if _countdown_label:
 		_countdown_label.visible = false
 	if _explosion_panel:
@@ -203,8 +215,7 @@ func _on_game_state_changed(_from_state: String, to_state: String) -> void:
 		FSMGameStates.READY_TO_START:
 			_show_ready_to_start()
 		FSMGameStates.COUNTDOWN:
-			if _countdown_label:
-				_countdown_label.visible = true
+			_show_countdown()
 		FSMGameStates.PLAY:
 			_show_play()
 		FSMGameStates.EMERGENCY:
@@ -218,6 +229,7 @@ func _on_game_state_changed(_from_state: String, to_state: String) -> void:
 func _on_current_player_changed(player: GamePlayer) -> void:
 	if _player_strip:
 		_player_strip.set_player(player)
+		call_deferred("_reposition_battle_ui")
 	if _current_state == FSMGameStates.PLAYER_CHOICE and player.index != _last_choice_player_index:
 		_last_choice_player_index = player.index
 		_player_strip.pulse_choice_tick()
@@ -235,6 +247,8 @@ func _on_countdown_tick(seconds_left: int) -> void:
 func _on_card_changed(card: GameCard) -> void:
 	if _syllable_card:
 		_syllable_card.set_card(card)
+	if _current_state == FSMGameStates.PLAY:
+		_show_play_hint()
 
 
 func _on_turn_passed(_touch_position: Vector2 = Vector2.ZERO) -> void:
@@ -242,41 +256,73 @@ func _on_turn_passed(_touch_position: Vector2 = Vector2.ZERO) -> void:
 		_syllable_card.pulse_next_turn()
 
 
+func _show_hint(text: String) -> void:
+	if _hint_banner:
+		_hint_banner.show_message(text, false, true)
+
+
+func _show_play_hint() -> void:
+	if game_manager and game_manager.session.current_card:
+		var condition := WordCondition.get_label(game_manager.session.current_card.condition)
+		if not condition.is_empty():
+			_show_hint(condition)
+			return
+	if _hint_banner:
+		_hint_banner.hide_message(false)
+
+
+func _sync_current_player() -> void:
+	if game_manager:
+		_on_current_player_changed(game_manager.session.get_current_player())
+
+
 func _show_player_choice() -> void:
 	_battle_layer.visible = true
 	_player_strip.visible = true
-	_action_hints.visible = false
 	_last_choice_player_index = -1
-	if _player_strip:
-		_player_strip.set_turn_caption("Выбираем первого...")
 	if _syllable_card:
-		_syllable_card.set_message("?", "Кто ходит первым?")
-	if game_manager:
-		_on_current_player_changed(game_manager.session.get_current_player())
+		_syllable_card.visible = true
+		_syllable_card.set_message("?")
+	_show_hint("Кто ходит первым?")
+	_sync_current_player()
+	call_deferred("_reposition_battle_ui")
 
 
 func _show_ready_to_start() -> void:
 	_battle_layer.visible = true
 	_player_strip.visible = true
-	_action_hints.visible = false
-	if _player_strip:
-		_player_strip.set_turn_caption("Первым ходит")
 	if _syllable_card:
-		_syllable_card.set_message("Готовы?", "Нажми «Начать раунд»")
-	if game_manager:
-		_on_current_player_changed(game_manager.session.get_current_player())
+		_syllable_card.visible = true
+		_syllable_card.set_message("Готовы?")
+	_show_hint("Нажми «Начать раунд»")
+	_sync_current_player()
+	call_deferred("_reposition_battle_ui")
+
+
+func _show_countdown() -> void:
+	_battle_layer.visible = true
+	_player_strip.visible = true
+	if _syllable_card:
+		_syllable_card.visible = false
+	if _countdown_label:
+		_countdown_label.visible = true
+	_sync_current_player()
+	call_deferred("_reposition_battle_ui")
 
 
 func _show_play() -> void:
 	_battle_layer.visible = true
 	_player_strip.visible = true
-	_action_hints.visible = true
-	if _player_strip:
-		_player_strip.set_turn_caption("Сейчас ходит")
-	if game_manager:
-		_on_current_player_changed(game_manager.session.get_current_player())
-		if game_manager.session.current_card:
-			_on_card_changed(game_manager.session.current_card)
+	if _action_hints:
+		_action_hints.visible = true
+	if _syllable_card:
+		_syllable_card.visible = true
+	_sync_current_player()
+	call_deferred("_reposition_battle_ui")
+	if game_manager and game_manager.session.current_card:
+		_on_card_changed(game_manager.session.current_card)
+	else:
+		_show_play_hint()
 
 
 func _show_explosion() -> void:

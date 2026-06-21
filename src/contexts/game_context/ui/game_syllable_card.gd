@@ -3,61 +3,51 @@ extends Control
 
 const ACCENT := TurnOrderArrowsLayer.ACCENT
 const DIAL_SIZE := Vector2(440, 440)
+const MAIN_TEXT_MAX_WIDTH := 400.0
 
-var _condition_label: Label
-var _syllable_label: Label
-var _pattern_label: Label
+var _main_label: RichTextLabel
 
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	custom_minimum_size = DIAL_SIZE
 	size = DIAL_SIZE
+	z_index = 2
 
-	var center := CenterContainer.new()
-	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	add_child(center)
+	var margin := MarginContainer.new()
+	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	margin.add_theme_constant_override("margin_top", 36)
+	margin.add_theme_constant_override("margin_bottom", 162)
+	margin.add_theme_constant_override("margin_left", 20)
+	margin.add_theme_constant_override("margin_right", 20)
+	add_child(margin)
 
-	var col := VBoxContainer.new()
-	col.add_theme_constant_override("separation", 10)
-	col.alignment = BoxContainer.ALIGNMENT_CENTER
-	center.add_child(col)
+	var main_host := CenterContainer.new()
+	main_host.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	margin.add_child(main_host)
 
-	_condition_label = Label.new()
-	_condition_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_condition_label.add_theme_font_size_override("font_size", 24)
-	_condition_label.add_theme_color_override("font_color", Color(0.82, 0.68, 0.48, 0.95))
-	col.add_child(_condition_label)
-
-	_syllable_label = Label.new()
-	_syllable_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_syllable_label.add_theme_font_size_override("font_size", 92)
-	_syllable_label.add_theme_color_override("font_color", Color(0.98, 0.94, 0.86, 1))
-	_syllable_label.add_theme_color_override("font_outline_color", Color(0.04, 0.03, 0.02, 0.75))
-	_syllable_label.add_theme_constant_override("outline_size", 3)
-	col.add_child(_syllable_label)
-
-	_pattern_label = Label.new()
-	_pattern_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_pattern_label.add_theme_font_size_override("font_size", 32)
-	_pattern_label.add_theme_color_override("font_color", Color(0.72, 0.58, 0.42, 0.9))
-	col.add_child(_pattern_label)
+	_main_label = RichTextLabel.new()
+	_main_label.bbcode_enabled = true
+	_main_label.fit_content = true
+	_main_label.scroll_active = false
+	_main_label.autowrap_mode = TextServer.AUTOWRAP_OFF
+	_main_label.custom_minimum_size = Vector2(MAIN_TEXT_MAX_WIDTH, 0)
+	_main_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	main_host.add_child(_main_label)
 
 
 func set_card(card: GameCard) -> void:
 	if not is_inside_tree():
 		await ready
-	_condition_label.text = WordCondition.get_label(card.condition)
-	_syllable_label.text = card.word
-	_pattern_label.text = WordCondition.get_pattern_hint(card.word, card.condition)
+	_main_label.text = WordCondition.get_pattern_display_bbcode(
+		card.word, card.condition, MAIN_TEXT_MAX_WIDTH
+	)
 
 
-func set_message(title: String, subtitle: String = "") -> void:
+func set_message(title: String) -> void:
 	if not is_inside_tree():
 		await ready
-	_condition_label.text = subtitle
-	_syllable_label.text = title
-	_pattern_label.text = ""
+	_main_label.text = WordCondition.get_message_display_bbcode(title, MAIN_TEXT_MAX_WIDTH)
 
 
 func pulse_next_turn() -> void:

@@ -12,7 +12,7 @@ var _ripple: Control
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	custom_minimum_size = Vector2(920, 80)
+	custom_minimum_size = Vector2(920, 96)
 	if not game_events:
 		game_events = load("res://src/common/game_events.tres") as GameEvents
 	if game_events:
@@ -24,11 +24,11 @@ func _ready() -> void:
 
 	_tap_label = Label.new()
 	_tap_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_tap_label.text = "Нажми экран — передать ход →"
-	_tap_label.add_theme_font_size_override("font_size", 26)
-	_tap_label.add_theme_color_override("font_color", Color(0.96, 0.9, 0.82, 0.95))
-	_tap_label.add_theme_color_override("font_outline_color", Color(0.05, 0.03, 0.02, 0.7))
-	_tap_label.add_theme_constant_override("outline_size", 2)
+	_tap_label.text = "Нажми экран — передать ход"
+	_tap_label.add_theme_font_size_override("font_size", 32)
+	_tap_label.add_theme_color_override("font_color", Color(0.96, 0.9, 0.82, 0.92))
+	_tap_label.add_theme_color_override("font_outline_color", Color(0.05, 0.03, 0.02, 0.75))
+	_tap_label.add_theme_constant_override("outline_size", 3)
 	col.add_child(_tap_label)
 
 	_ripple = _Ripple.new()

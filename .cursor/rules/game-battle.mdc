@@ -10,11 +10,11 @@ alwaysApply: false
 
 **UI init trap:** FSM starts in `initialize()` before child `_ready`. HUD + `game_input` MUST `_sync_to_current_state()` in `_ready`.
 
-**Layout:** `BackgroundBomb` + `MenuBombLayout`/`GameBombBackground` (`Background.png`, cover 1080×1920). Battle UI in `ScaledContent` design coords. Markers: `PlayerName` (name plate + lighten overlay), `RoundWord` (syllable/countdown on dial). No round bomb sprite.
+**Layout:** dial@`RoundWord` · player pill on lower dial · `TableHintBanner`@`PlayerName` · pass hint y≈1410 (`GameActionHints`).
 
-**HUD** (`game_hud.gd`, accent `#F5470A`): PlayerStrip@`PlayerName` · SyllableCard@`RoundWord` · ActionHints(y~1120) · countdown@`RoundWord` · explosion overlay · ResultPanel (screen). No edge vignette.
+**HUD:** SyllableCard — fitted single-line center text · hints via `TableHintBanner` · PlayerStrip on dial.
 
-State UI: choice=«Выбираем первого»+pulse · ready=«Первым ходит»+StartRoundButton · play=full HUD · explosion=name overlay.
+State UI: choice/ready/countdown/play share dial layout · ready=«Готовы?»+StartRoundButton · play=full HUD.
 
 **Input** (`game_input.gd`): `mouse_filter=IGNORE`. PLAY: multi-touch pass — next only when **all** fingers up within **0.3s**; hold longer = invalid · tap→next + sparks. **Emergency** button (PLAY only) → `EMERGENCY` state, pause game+audio, overlay to re-pick current player · continue → `try_add_bonus_bomb_time()`. RESULT→menu.
 

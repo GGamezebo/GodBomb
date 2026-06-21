@@ -4,6 +4,9 @@ extends PanelContainer
 const FADE_IN := 0.38
 const FADE_OUT := 0.28
 const MIN_WIDTH := 840.0
+const TABLE_HINT_WIDTH := 920.0
+const PANEL_MARGIN_H := 24
+const PANEL_MARGIN_V := 10
 
 var _label: Label
 var _fade_tween: Tween
@@ -17,10 +20,10 @@ func _ready() -> void:
 	_apply_panel_style()
 
 	var margin := MarginContainer.new()
-	margin.add_theme_constant_override("margin_left", 44)
-	margin.add_theme_constant_override("margin_top", 24)
-	margin.add_theme_constant_override("margin_right", 44)
-	margin.add_theme_constant_override("margin_bottom", 24)
+	margin.add_theme_constant_override("margin_left", PANEL_MARGIN_H)
+	margin.add_theme_constant_override("margin_top", PANEL_MARGIN_V)
+	margin.add_theme_constant_override("margin_right", PANEL_MARGIN_H)
+	margin.add_theme_constant_override("margin_bottom", PANEL_MARGIN_V)
 	add_child(margin)
 
 	_label = Label.new()
@@ -31,7 +34,7 @@ func _ready() -> void:
 	_label.add_theme_font_size_override("font_size", 44)
 	_label.add_theme_color_override("font_color", Color(0.18, 0.13, 0.1, 1))
 	_label.add_theme_color_override("font_outline_color", Color(1, 0.99, 0.97, 0.85))
-	_label.add_theme_constant_override("outline_size", 6)
+	_label.add_theme_constant_override("outline_size", 4)
 	margin.add_child(_label)
 
 
@@ -106,12 +109,26 @@ func _kill_fade_tween() -> void:
 
 
 func _apply_panel_style() -> void:
+	apply_panel_style(self)
+
+
+static func apply_panel_style(panel: PanelContainer) -> void:
 	var style := StyleBoxFlat.new()
 	style.bg_color = Color(1, 0.99, 0.96, 0.94)
 	style.border_color = Color(0.88, 0.62, 0.38, 0.55)
 	style.set_border_width_all(4)
-	style.set_corner_radius_all(36)
+	style.set_corner_radius_all(28)
 	style.shadow_color = Color(0.14, 0.08, 0.04, 0.18)
 	style.shadow_size = 12
 	style.shadow_offset = Vector2(0, 6)
-	add_theme_stylebox_override("panel", style)
+	panel.add_theme_stylebox_override("panel", style)
+
+
+static func place_centered_at(banner: PanelContainer, anchor: Vector2, width: float = TABLE_HINT_WIDTH) -> void:
+	if banner == null:
+		return
+	banner.custom_minimum_size = Vector2(maxf(MIN_WIDTH, width), 0.0)
+	banner.reset_size()
+	var banner_size := banner.get_combined_minimum_size()
+	banner.size = banner_size
+	banner.position = anchor - banner_size * 0.5
