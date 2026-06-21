@@ -129,7 +129,7 @@ func _build_ui() -> void:
 	_countdown_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_countdown_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_countdown_label.add_theme_font_size_override("font_size", 140)
-	_countdown_label.add_theme_color_override("font_color", TurnOrderArrowsLayer.ACCENT)
+	_countdown_label.add_theme_color_override("font_color", Color.WHITE)
 	_countdown_label.add_theme_color_override("font_outline_color", Color(0.04, 0.03, 0.02, 0.85))
 	_countdown_label.add_theme_constant_override("outline_size", 10)
 	_countdown_label.z_index = 3

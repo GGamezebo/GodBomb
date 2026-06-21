@@ -17,7 +17,7 @@ const MESSAGE_FONT_MAX := 112
 const MESSAGE_FONT_MIN := 56
 const PATTERN_HI_FONT_MAX := 140
 const PATTERN_HI_FONT_MIN := 72
-const PATTERN_DIM_RATIO := 0.38
+const PATTERN_DIM_RATIO := 0.72
 
 
 static func random() -> int:
@@ -45,11 +45,11 @@ static func get_pattern_display_bbcode(syllable: String, condition: int, max_wid
 	var hi_size := PATTERN_HI_FONT_MAX
 	var dim_size := int(float(hi_size) * PATTERN_DIM_RATIO)
 	while hi_size >= PATTERN_HI_FONT_MIN:
-		dim_size = maxi(int(float(hi_size) * PATTERN_DIM_RATIO), 32)
+		dim_size = maxi(int(float(hi_size) * PATTERN_DIM_RATIO), 56)
 		if _measure_pattern_width(syllable, condition, hi_size, dim_size) <= max_width:
 			return _build_pattern_bbcode(syllable, condition, hi_size, dim_size)
 		hi_size -= 4
-	return _build_pattern_bbcode(syllable, condition, PATTERN_HI_FONT_MIN, 32)
+	return _build_pattern_bbcode(syllable, condition, PATTERN_HI_FONT_MIN, 56)
 
 
 static func get_message_display_bbcode(title: String, max_width: float = 400.0) -> String:
@@ -65,7 +65,7 @@ static func _build_message_bbcode(title: String, font_size: int) -> String:
 
 static func _build_pattern_bbcode(syllable: String, condition: int, hi_size: int, dim_size: int) -> String:
 	var hi := "[font_size=%d][color=#FFFFFF]%s[/color][/font_size]" % [hi_size, syllable]
-	var dim := "[font_size=%d][color=#8A7460]%s[/color][/font_size]" % [dim_size, "%s"]
+	var dim := "[font_size=%d][color=#FFFFFF]%s[/color][/font_size]" % [dim_size, "%s"]
 	match condition:
 		Type.BEGIN:
 			return hi + (dim % "___")
