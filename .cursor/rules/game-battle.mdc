@@ -16,7 +16,7 @@ alwaysApply: false
 
 State UI: choice/ready/countdown/play share dial layout · ready=«Готовы?»+StartRoundButton · play=full HUD.
 
-**Input** (`game_input.gd`): `mouse_filter=IGNORE`. PLAY: multi-touch pass — next only when **all** fingers up within **0.3s**; hold longer = invalid · tap→next + sparks. **Emergency** button (PLAY only) → `EMERGENCY` state, pause game+audio, overlay to re-pick current player · continue → `try_add_bonus_bomb_time()`. RESULT→menu.
+**Input** (`game_input.gd`): `mouse_filter=IGNORE`. PLAY: multi-touch pass — next only when **all** fingers up within **0.3s**; hold longer = invalid · tap→next + sparks. **Emergency** button (PLAY only) → `EMERGENCY` state, pause game+audio, overlay to re-pick current player · continue → `try_add_bonus_bomb_time()`. RESULT→`GameResultOverlay` «В МЕНЮ» button (10s reveal, haptics, no tap-skip).
 
 **Pass sparks:** `pass_bomb_spark_layer.gd` on `ScaledContent` — radial additive fire burst at touch (one-shot CPUParticles2D).
 
@@ -24,7 +24,7 @@ State UI: choice/ready/countdown/play share dial layout · ready=«Готовы?
 
 **Battle lobby overlay:** `BattlePlayerLobbyOverlay` — edit roster mid-game · Done = confirm if roster ok else click · reuses `PlayerSelectionWidget` + `StartActionButton`.
 
-**Visual:** `GameBombBackground` — player-color backdrop · alert pulse · bomb flash/shake on explosion · `ExplosionEffect` dense radial burst · `GameExplosionOverlay` white headline + enlarged player pill.
+**Visual:** `GameBombBackground` — player-color backdrop · alert pulse · bomb flash/shake on explosion · `ExplosionEffect` · `GameResultOverlay` full-screen winner tint, rank scroll only, celebration particles.
 
 **Audio:** gameplay → `GameSound` · UI buttons → `UiSounds` → `audio.mdc`.
 

@@ -3,18 +3,21 @@ extends Node
 @export var game_events: GameEvents
 @export var countdown_stream: AudioStream
 @export var round_music_stream: AudioStream
+@export var win_music_stream: AudioStream
 @export var explosion_stream: AudioStream
 @export var pass_next_stream: AudioStream
 @export var tick_streams: Array[AudioStream] = []
 
 var listener: EventListener = EventListener.new()
 var _round_gameplay_player: AudioStreamPlayer
+var _win_music_player: AudioStreamPlayer
 
 
 func _ready() -> void:
 	if not game_events:
 		game_events = load("res://src/common/game_events.tres") as GameEvents
 	_setup_round_gameplay_player()
+	_setup_win_music_player()
 	if game_events:
 		listener.add(game_events.ev_countdown_tick_changed, _on_countdown_tick)
 		listener.add(game_events.ev_player_choice_tick_changed, _on_player_choice_tick)
@@ -26,6 +29,7 @@ func _ready() -> void:
 func _exit_tree() -> void:
 	listener.deinit()
 	_stop_round_gameplay_sound()
+	_stop_win_music()
 
 
 func _setup_round_gameplay_player() -> void:
@@ -36,6 +40,16 @@ func _setup_round_gameplay_player() -> void:
 	if round_music_stream:
 		_enable_stream_loop(round_music_stream)
 		_round_gameplay_player.stream = round_music_stream
+
+
+func _setup_win_music_player() -> void:
+	_win_music_player = AudioStreamPlayer.new()
+	_win_music_player.bus = &"SFX"
+	_win_music_player.name = "WinMusicPlayer"
+	add_child(_win_music_player)
+	if win_music_stream:
+		_enable_stream_loop(win_music_stream)
+		_win_music_player.stream = win_music_stream
 
 
 func _enable_stream_loop(stream: AudioStream) -> void:
@@ -69,6 +83,7 @@ func _on_alert() -> void:
 func _on_game_state_changed(from_state: String, to_state: String) -> void:
 	match to_state:
 		FSMGameStates.PLAY:
+			_stop_win_music()
 			if from_state == FSMGameStates.EMERGENCY:
 				_resume_round_gameplay_sound()
 			else:
@@ -76,9 +91,14 @@ func _on_game_state_changed(from_state: String, to_state: String) -> void:
 		FSMGameStates.EMERGENCY:
 			_pause_round_gameplay_sound()
 		FSMGameStates.EXPLOSION:
+			_stop_win_music()
 			_stop_round_gameplay_sound()
 			_play_one_shot(explosion_stream)
-		FSMGameStates.READY_TO_START, FSMGameStates.RESULT, FSMGameStates.PLAYER_CHOICE, FSMGameStates.COUNTDOWN:
+		FSMGameStates.RESULT:
+			_stop_round_gameplay_sound()
+			_start_win_music()
+		FSMGameStates.READY_TO_START, FSMGameStates.PLAYER_CHOICE, FSMGameStates.COUNTDOWN:
+			_stop_win_music()
 			_stop_round_gameplay_sound()
 
 
@@ -105,6 +125,20 @@ func _resume_round_gameplay_sound() -> void:
 func _stop_round_gameplay_sound() -> void:
 	if _round_gameplay_player and _round_gameplay_player.playing:
 		_round_gameplay_player.stop()
+
+
+func _start_win_music() -> void:
+	if win_music_stream == null:
+		return
+	if _win_music_player.stream != win_music_stream:
+		_enable_stream_loop(win_music_stream)
+		_win_music_player.stream = win_music_stream
+	_win_music_player.play()
+
+
+func _stop_win_music() -> void:
+	if _win_music_player and _win_music_player.playing:
+		_win_music_player.stop()
 
 
 func _play_one_shot(stream: AudioStream) -> void:

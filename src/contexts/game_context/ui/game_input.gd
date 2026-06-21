@@ -77,8 +77,6 @@ func _input(event: InputEvent) -> void:
 	var state := game_manager.fsm.get_current_state_name()
 	if state == FSMGameStates.PLAY:
 		_handle_play_input(event)
-	elif state == FSMGameStates.RESULT:
-		_handle_result_input(event)
 
 
 func _handle_play_input(event: InputEvent) -> void:
@@ -195,15 +193,3 @@ func _reset_gesture_state() -> void:
 	_gesture_fingers.clear()
 	_gesture_started_at = -1.0
 	_gesture_expired = false
-
-
-func _handle_result_input(event: InputEvent) -> void:
-	var released := false
-	if event is InputEventScreenTouch:
-		released = not (event as InputEventScreenTouch).pressed
-	elif event is InputEventMouseButton:
-		var mouse := event as InputEventMouseButton
-		released = mouse.button_index == MOUSE_BUTTON_LEFT and not mouse.pressed
-
-	if released and main_events:
-		main_events.ev_return_to_menu.emit()

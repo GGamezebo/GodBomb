@@ -149,9 +149,8 @@ func _apply_state(state: String) -> void:
 			_play_explosion()
 		FSMGameStates.RESULT:
 			_alert_active = false
-			_set_bomb_visible(true)
-			_set_bomb_modulate(Color.WHITE)
-			_clear_player_tint()
+			_set_bomb_visible(false)
+			_set_fire_sparks(false)
 
 
 func _set_bomb_visible(visible: bool) -> void:

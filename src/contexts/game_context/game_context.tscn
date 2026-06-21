@@ -39,6 +39,7 @@
 [ext_resource type="Script" uid="uid://bhmt3sxmxiwlg" path="res://src/contexts/game_context/game_logic/game_manager/game_states/emergency_state.gd" id="40"]
 [ext_resource type="PackedScene" path="res://src/contexts/game_context/ui/battle_emergency_overlay.tscn" id="41"]
 [ext_resource type="Texture2D" uid="uid://dhcclubtdmtpd" path="res://assets/party_kitchen/buttons/icon_emergency.svg" id="42"]
+[ext_resource type="AudioStream" path="res://assets/audio/music/win.mp3" id="43"]
 
 [node name="GameContext" type="Control" unique_id=1610270397 node_paths=PackedStringArray("game_manager", "battle_chrome")]
 layout_mode = 3
@@ -89,6 +90,7 @@ script = ExtResource("11")
 game_events = ExtResource("15")
 countdown_stream = ExtResource("17")
 round_music_stream = ExtResource("18")
+win_music_stream = ExtResource("43")
 explosion_stream = ExtResource("19")
 pass_next_stream = ExtResource("18_ncfj3")
 tick_streams = Array[AudioStream]([ExtResource("20"), ExtResource("21")])

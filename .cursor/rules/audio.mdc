@@ -18,6 +18,7 @@ alwaysApply: false
 - `Countdown.wav` — roulette + countdown ticks
 - `ui_confirm.wav` — tap pass (`ev_touch_next_player`) · `FastTick.mp3` / `SlowTick.mp3` — bomb alert (random)
 - `game_sound.mp3` — loop in **PLAY** (paused in **EMERGENCY**)
+- `win.mp3` — loop in **RESULT**
 - `Explosion.mp3` — взрыв
 
 ## UI SFX — `UiSounds` (`core/systems/audio/ui_sounds.gd`)

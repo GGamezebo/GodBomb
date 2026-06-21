@@ -20,6 +20,7 @@ var _action_hints: GameActionHints
 var _battle_layer: Control
 var _countdown_label: Label
 var _explosion_overlay: GameExplosionOverlay
+var _result_overlay: GameResultOverlay
 var _current_state: String = ""
 var _last_choice_player_index: int = -1
 
@@ -35,7 +36,7 @@ func _ready() -> void:
 		listener.add(game_events.ev_countdown_tick_changed, _on_countdown_tick)
 		listener.add(game_events.ev_card_changed, _on_card_changed)
 		listener.add(game_events.ev_touch_next_player, _on_turn_passed)
-	_sync_to_current_state()
+	call_deferred("_sync_to_current_state")
 
 
 func _exit_tree() -> void:
@@ -134,11 +135,21 @@ func _build_ui() -> void:
 	design_root.add_child(_countdown_label)
 
 	_build_explosion_overlay(design_root)
+	_build_result_overlay()
 
 
 func _build_explosion_overlay(design_root: Control) -> void:
 	_explosion_overlay = GameExplosionOverlay.new()
 	design_root.add_child(_explosion_overlay)
+
+
+func _build_result_overlay() -> void:
+	_result_overlay = GameResultOverlay.new()
+	var ui_layer := get_parent()
+	if ui_layer:
+		ui_layer.add_child.call_deferred(_result_overlay)
+	else:
+		add_child.call_deferred(_result_overlay)
 
 
 func set_lobby_overlay_active(active: bool) -> void:
@@ -163,6 +174,8 @@ func _hide_all() -> void:
 		_countdown_label.visible = false
 	if _explosion_overlay:
 		_explosion_overlay.hide_overlay()
+	if _result_overlay:
+		_result_overlay.hide_overlay()
 	if result_panel:
 		result_panel.visible = false
 
@@ -301,15 +314,7 @@ func _show_explosion() -> void:
 
 
 func _show_result() -> void:
-	if not result_panel or not result_label or not game_manager:
+	if not _result_overlay or not game_manager:
 		return
-	result_panel.visible = true
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.08, 0.06, 0.05, 0.88)
-	result_panel.add_theme_stylebox_override("panel", style)
-	var lines: PackedStringArray = PackedStringArray()
 	var sorted := game_manager.session.get_sorted_results()
-	for i in sorted.size():
-		var player: GamePlayer = sorted[i]
-		lines.append("%d. %s — %d" % [i + 1, player.info.name, player.score])
-	result_label.text = "[center][font_size=52][color=#F5E6D3]Результаты[/color][/font_size]\n[font_size=38][color=#FFF8F0]%s[/color][/font_size]\n\n[font_size=28][color=#E8A04A]Нажми, чтобы вернуться в меню[/color][/font_size][/center]" % "\n".join(lines)
+	_result_overlay.show_results(sorted)
