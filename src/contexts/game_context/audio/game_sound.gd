@@ -5,7 +5,6 @@ extends Node
 @export var round_music_stream: AudioStream
 @export var explosion_stream: AudioStream
 @export var pass_next_stream: AudioStream
-@export var pass_prev_stream: AudioStream
 @export var tick_streams: Array[AudioStream] = []
 
 var listener: EventListener = EventListener.new()
@@ -20,7 +19,6 @@ func _ready() -> void:
 		listener.add(game_events.ev_countdown_tick_changed, _on_countdown_tick)
 		listener.add(game_events.ev_player_choice_tick_changed, _on_player_choice_tick)
 		listener.add(game_events.ev_touch_next_player, _on_touch_next_player)
-		listener.add(game_events.ev_touch_prev_player, _on_touch_prev_player)
 		listener.add(game_events.ev_alert, _on_alert)
 		listener.add(game_events.ev_game_state_changed, _on_game_state_changed)
 
@@ -63,19 +61,20 @@ func _on_touch_next_player(_touch_position: Vector2 = Vector2.ZERO) -> void:
 	_play_one_shot(pass_next_stream)
 
 
-func _on_touch_prev_player() -> void:
-	_play_one_shot(pass_prev_stream)
-
-
 func _on_alert() -> void:
 	if tick_streams.size() > 0:
 		_play_one_shot(tick_streams[randi() % tick_streams.size()])
 
 
-func _on_game_state_changed(_from_state: String, to_state: String) -> void:
+func _on_game_state_changed(from_state: String, to_state: String) -> void:
 	match to_state:
 		FSMGameStates.PLAY:
-			_start_round_gameplay_sound()
+			if from_state == FSMGameStates.EMERGENCY:
+				_resume_round_gameplay_sound()
+			else:
+				_start_round_gameplay_sound()
+		FSMGameStates.EMERGENCY:
+			_pause_round_gameplay_sound()
 		FSMGameStates.EXPLOSION:
 			_stop_round_gameplay_sound()
 			_play_one_shot(explosion_stream)
@@ -89,7 +88,18 @@ func _start_round_gameplay_sound() -> void:
 	if _round_gameplay_player.stream != round_music_stream:
 		_enable_stream_loop(round_music_stream)
 		_round_gameplay_player.stream = round_music_stream
+	_round_gameplay_player.stream_paused = false
 	_round_gameplay_player.play()
+
+
+func _pause_round_gameplay_sound() -> void:
+	if _round_gameplay_player and _round_gameplay_player.playing:
+		_round_gameplay_player.stream_paused = true
+
+
+func _resume_round_gameplay_sound() -> void:
+	if _round_gameplay_player:
+		_round_gameplay_player.stream_paused = false
 
 
 func _stop_round_gameplay_sound() -> void:

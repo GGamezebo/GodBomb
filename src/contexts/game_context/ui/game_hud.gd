@@ -207,6 +207,8 @@ func _on_game_state_changed(_from_state: String, to_state: String) -> void:
 				_countdown_label.visible = true
 		FSMGameStates.PLAY:
 			_show_play()
+		FSMGameStates.EMERGENCY:
+			_hide_all()
 		FSMGameStates.EXPLOSION:
 			_show_explosion()
 		FSMGameStates.RESULT:
@@ -219,7 +221,6 @@ func _on_current_player_changed(player: GamePlayer) -> void:
 	if _current_state == FSMGameStates.PLAYER_CHOICE and player.index != _last_choice_player_index:
 		_last_choice_player_index = player.index
 		_player_strip.pulse_choice_tick()
-	_sync_prev_hint()
 
 
 func _on_countdown_tick(seconds_left: int) -> void:
@@ -239,12 +240,6 @@ func _on_card_changed(card: GameCard) -> void:
 func _on_turn_passed(_touch_position: Vector2 = Vector2.ZERO) -> void:
 	if _syllable_card:
 		_syllable_card.pulse_next_turn()
-
-
-func _sync_prev_hint() -> void:
-	if not _action_hints or not game_manager:
-		return
-	_action_hints.set_prev_blocked(game_manager.session.is_blocked_prev_player)
 
 
 func _show_player_choice() -> void:
@@ -278,7 +273,6 @@ func _show_play() -> void:
 	_action_hints.visible = true
 	if _player_strip:
 		_player_strip.set_turn_caption("Сейчас ходит")
-	_sync_prev_hint()
 	if game_manager:
 		_on_current_player_changed(game_manager.session.get_current_player())
 		if game_manager.session.current_card:

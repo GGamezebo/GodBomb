@@ -15,8 +15,10 @@ alwaysApply: false
 
 ## Gameplay SFX — `GameSound` (`game_sound.gd`)
 
-- `Countdown.wav` — ticks · `game_sound.mp3` — loop только в **PLAY**
-- `Explosion.mp3` — взрыв · stop loop on explosion/ready/result/choice/countdown
+- `Countdown.wav` — roulette + countdown ticks
+- `ui_confirm.wav` — tap pass (`ev_touch_next_player`) · `FastTick.mp3` / `SlowTick.mp3` — bomb alert (random)
+- `game_sound.mp3` — loop in **PLAY** (paused in **EMERGENCY**)
+- `Explosion.mp3` — взрыв
 
 ## UI SFX — `UiSounds` (`core/systems/audio/ui_sounds.gd`)
 

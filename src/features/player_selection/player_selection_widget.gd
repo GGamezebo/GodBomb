@@ -58,7 +58,11 @@ var _swap_idle_intro_played: bool = false
 var _swap_idle_hint_showing: bool = false
 var _hold_edit_hint_showing: bool = false
 var _battle_mode: bool = false
+var _emergency_mode: bool = false
+var _emergency_selected_index: int = 0
 var listener: EventListener = EventListener.new()
+
+signal emergency_selection_changed(index: int, info: PlayerInfo)
 
 
 func _ready() -> void:
@@ -143,6 +147,36 @@ func bind_account(p_account: PDataAccount, p_controller: Node = null) -> void:
 	if p_controller:
 		pdata_controller = p_controller
 	_sync_edit_window_refs()
+
+
+func set_emergency_mode(enabled: bool, initial_index: int = 0) -> void:
+	_emergency_mode = enabled
+	if _player_icons.is_empty():
+		_emergency_selected_index = 0
+	else:
+		_emergency_selected_index = clampi(initial_index, 0, _player_icons.size() - 1)
+	if enabled:
+		_set_remove_mode(false)
+	_apply_emergency_interaction_state()
+	if enabled:
+		_apply_emergency_selection_visuals()
+		_emit_emergency_selection()
+
+
+func load_from_session_players(players: Array) -> void:
+	_clear_icons()
+	for player in players:
+		if player is GamePlayer:
+			_create_player_icon(player.info)
+	_schedule_position_update()
+	if _emergency_mode:
+		_apply_emergency_interaction_state()
+		_apply_emergency_selection_visuals()
+		_emit_emergency_selection()
+
+
+func get_emergency_selected_index() -> int:
+	return _emergency_selected_index
 
 
 func get_roster_size() -> int:
@@ -332,6 +366,7 @@ func _create_player_icon(info: PlayerInfo) -> PlayerIcon:
 	icon.drag_started.connect(_on_icon_drag_started.bind(icon))
 	icon.drag_ended.connect(_on_icon_drag_ended.bind(icon))
 	icon.hold_edit_requested.connect(_on_icon_hold_edit)
+	icon.selection_pressed.connect(_on_icon_emergency_selected.bind(icon))
 	icons_layer.add_child(icon)
 	_player_icons.append(icon)
 
@@ -628,6 +663,9 @@ func _mark_hold_edit_learned() -> void:
 
 func _update_add_button() -> void:
 	if not add_player_button or not game_config:
+		return
+	if _emergency_mode:
+		add_player_button.visible = false
 		return
 	var count := _player_icons.size()
 	var at_max := count >= game_config.max_players
@@ -1101,3 +1139,49 @@ func _notification(what: int) -> void:
 		_update_hint_banner_layout()
 		_apply_remove_ring_radius()
 		_layout_remove_button_ring()
+
+
+func _apply_emergency_interaction_state() -> void:
+	if add_player_button:
+		add_player_button.visible = not _emergency_mode
+	if _turn_order_arrows:
+		_refresh_turn_order()
+		_turn_order_arrows.visible = _player_icons.size() >= 2
+	if _order_badges_layer:
+		_order_badges_layer.visible = not _emergency_mode
+	if _table_hint_banner and _emergency_mode:
+		_table_hint_banner.hide_message(false)
+	for icon in _player_icons:
+		icon.set_selection_only(_emergency_mode)
+	if not _emergency_mode:
+		_apply_emergency_selection_visuals()
+		_update_add_button()
+
+
+func _apply_emergency_selection_visuals() -> void:
+	for i in _chair_rings.size():
+		var ring := _chair_rings[i]
+		var selected := _emergency_mode and i == _emergency_selected_index
+		ring.solid = selected
+		ring.line_width = 6.0 if selected else 3.5
+		ring.ring_color = Color(1.0, 0.35, 0.05, 1.0) if selected else ChairSwapRing.DEFAULT_RING_COLOR
+		ring.visible_ring = selected
+
+
+func _on_icon_emergency_selected(icon: PlayerIcon) -> void:
+	if not _emergency_mode:
+		return
+	var index := _player_icons.find(icon)
+	if index < 0:
+		return
+	_emergency_selected_index = index
+	_apply_emergency_selection_visuals()
+	_emit_emergency_selection()
+	UiSounds.play_click()
+
+
+func _emit_emergency_selection() -> void:
+	if not _emergency_mode or _emergency_selected_index < 0 or _emergency_selected_index >= _player_icons.size():
+		return
+	var info := _player_icons[_emergency_selected_index].get_player_info()
+	emergency_selection_changed.emit(_emergency_selected_index, info)

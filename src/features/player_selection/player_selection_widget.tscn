@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://bjj4g3ci1tbso" path="res://src/features/player_selection/player_selection_widget.gd" id="1"]
 [ext_resource type="Script" uid="uid://dj5ppmnmqwair" path="res://src/features/player_selection/player_preset_storage.gd" id="2"]
 [ext_resource type="PackedScene" uid="uid://cj182qgfmj11t" path="res://src/features/player_selection/player_icon.tscn" id="3"]
-[ext_resource type="PackedScene" path="res://src/features/player_selection/edit_player_window.tscn" id="4"]
+[ext_resource type="PackedScene" uid="uid://b56w3ott01iat" path="res://src/features/player_selection/edit_player_window.tscn" id="4"]
 [ext_resource type="Resource" path="res://src/common/game_config_default.tres" id="5"]
 [ext_resource type="Resource" path="res://src/contexts/main_context/account/pdata_account.tres" id="6"]
 [ext_resource type="Resource" path="res://src/common/menu_events.tres" id="7"]
@@ -23,15 +23,15 @@ script = ExtResource("1")
 account = ExtResource("6")
 game_config = ExtResource("5")
 menu_events = ExtResource("7")
-player_icon_scene = ExtResource("3")
-add_player_texture = ExtResource("8")
-remove_player_texture = ExtResource("9")
 preset_storage = NodePath("PresetStorage")
+player_icon_scene = ExtResource("3")
 table_area = NodePath("TableArea")
 icons_layer = NodePath("TableArea/IconsLayer")
 chairs_layer = NodePath("TableArea/ChairsLayer")
 add_player_button = NodePath("TableArea/AddPlayerButton")
 edit_player_window = NodePath("ModalLayer/EditPlayerWindow")
+add_player_texture = ExtResource("8")
+remove_player_texture = ExtResource("9")
 
 [node name="TableArea" type="Control" parent="." unique_id=1947324374]
 custom_minimum_size = Vector2(640, 640)
@@ -101,5 +101,6 @@ layer = 20
 follow_viewport_enabled = true
 
 [node name="EditPlayerWindow" parent="ModalLayer" unique_id=1947908710 instance=ExtResource("4")]
+visible = false
 account = ExtResource("6")
 game_config = ExtResource("5")

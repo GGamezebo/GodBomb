@@ -8,6 +8,7 @@ const MOUSE_TOUCH_INDEX := -1
 @export var game_events: GameEvents
 @export var main_events: MainEvents
 @export var game_config: GameConfig
+@export var game_battle_chrome: GameBattleChrome
 @export var start_round_button: BaseButton
 
 var listener: EventListener = EventListener.new()
@@ -69,10 +70,6 @@ func _ensure_game_config() -> GameConfig:
 	return game_config
 
 
-func _drag_prev_player_threshold() -> float:
-	return _ensure_game_config().drag_prev_player_threshold
-
-
 func _input(event: InputEvent) -> void:
 	if not game_manager:
 		return
@@ -109,6 +106,8 @@ func _handle_play_input(event: InputEvent) -> void:
 
 
 func _on_finger_pressed(index: int, position: Vector2) -> void:
+	if _is_pass_blocked_at(position):
+		return
 	if _active_touches.is_empty():
 		_begin_gesture()
 	var finger := {"start": position, "end": position}
@@ -155,20 +154,26 @@ func _finalize_gesture() -> void:
 func _apply_gesture_result() -> void:
 	if _gesture_fingers.is_empty():
 		return
-	var drag_threshold := _drag_prev_player_threshold()
-	var max_travel := 0.0
-	for finger in _gesture_fingers.values():
-		max_travel = maxf(
-			max_travel,
-			Vector2(finger["start"]).distance_to(Vector2(finger["end"]))
-		)
-	if max_travel > drag_threshold:
-		if game_manager.prev_player() and game_events:
-			game_events.ev_touch_prev_player.emit()
+	if _gesture_started_on_blocked_ui():
 		return
 	game_manager.next_player()
 	if game_events:
 		game_events.ev_touch_next_player.emit(_gesture_touch_centroid())
+
+
+func _is_pass_blocked_at(position: Vector2) -> bool:
+	if game_battle_chrome and game_battle_chrome.is_pass_blocked_at(position):
+		return true
+	if start_round_button and start_round_button.visible:
+		return start_round_button.get_global_rect().has_point(position)
+	return false
+
+
+func _gesture_started_on_blocked_ui() -> bool:
+	for finger in _gesture_fingers.values():
+		if _is_pass_blocked_at(Vector2(finger["start"])):
+			return true
+	return false
 
 
 func _gesture_touch_centroid() -> Vector2:

@@ -36,6 +36,8 @@ func initialize(data: Dictionary) -> void:
 			game_manager.game_events = game_events
 		game_manager.setup_session(game_config, session_account)
 	if battle_chrome:
+		battle_chrome.game_manager = game_manager
+		battle_chrome.game_events = game_events
 		battle_chrome.configure(data)
 
 

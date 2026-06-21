@@ -7,6 +7,8 @@ const DEFAULT_RING_COLOR := Color(1.0, 0.82, 0.35, 0.95)
 @export var ring_radius: float = DEFAULT_RING_RADIUS
 @export var ring_color: Color = DEFAULT_RING_COLOR
 @export var dash_count: int = 16
+@export var solid: bool = false
+@export var line_width: float = 3.5
 
 var visible_ring: bool = false:
 	set(value):
@@ -39,6 +41,9 @@ func _draw() -> void:
 	if not visible_ring:
 		return
 	var center := size * 0.5
+	if solid:
+		draw_arc(center, ring_radius, 0.0, TAU, 64, ring_color, line_width, true)
+		return
 	for i in dash_count:
 		if i % 2 != 0:
 			continue

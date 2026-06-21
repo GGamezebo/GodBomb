@@ -9,7 +9,6 @@ var current_card: GameCard = null
 var current_player_index: int = 0
 var state_time: float = 0.0
 var last_second: int = -1
-var is_blocked_prev_player: bool = false
 var max_rand_player_choices: int = 0
 
 var bomb_alive_time: float = 0.0
@@ -121,7 +120,6 @@ func _build_card_deck(game_time_minutes: int) -> void:
 func reset_round() -> void:
 	state_time = 0.0
 	last_second = -1
-	is_blocked_prev_player = true
 
 
 func reset_bomb() -> void:
@@ -148,25 +146,11 @@ func set_current_player_index(index: int) -> void:
 
 
 func next_player() -> void:
-	is_blocked_prev_player = false
 	if current_player_index >= players.size() - 1:
 		set_current_player_index(0)
 	else:
 		set_current_player_index(current_player_index + 1)
 	try_add_bonus_bomb_time()
-
-
-func prev_player() -> bool:
-	if is_blocked_prev_player:
-		return false
-
-	if current_player_index == 0:
-		set_current_player_index(players.size() - 1)
-	else:
-		set_current_player_index(current_player_index - 1)
-
-	is_blocked_prev_player = true
-	return true
 
 
 func try_add_bonus_bomb_time() -> void:

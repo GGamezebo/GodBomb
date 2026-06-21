@@ -136,7 +136,7 @@ func _clear_player_tint(immediate: bool = false) -> void:
 func _apply_state(state: String) -> void:
 	_set_fire_sparks(state == FSMGameStates.EXPLOSION)
 	match state:
-		FSMGameStates.READY_TO_START, FSMGameStates.PLAYER_CHOICE, FSMGameStates.COUNTDOWN, FSMGameStates.PLAY:
+		FSMGameStates.READY_TO_START, FSMGameStates.PLAYER_CHOICE, FSMGameStates.COUNTDOWN, FSMGameStates.PLAY, FSMGameStates.EMERGENCY:
 			_alert_active = false
 			_set_bomb_visible(true)
 			_set_bomb_modulate(Color.WHITE)

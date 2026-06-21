@@ -26,7 +26,6 @@ func _ready() -> void:
 		listener.add(game_events.ev_game_state_changed, _on_game_state_changed)
 		listener.add(game_events.ev_alert, _on_alert)
 		listener.add(game_events.ev_touch_next_player, _on_touch_pass)
-		listener.add(game_events.ev_touch_prev_player, _on_touch_pass)
 	set_process(false)
 
 
@@ -69,7 +68,7 @@ func _on_game_state_changed(from_state: String, to_state: String) -> void:
 			_in_play = false
 			set_process(false)
 			_play_explosion_fade()
-		FSMGameStates.READY_TO_START, FSMGameStates.RESULT, FSMGameStates.PLAYER_CHOICE, FSMGameStates.COUNTDOWN:
+		FSMGameStates.READY_TO_START, FSMGameStates.RESULT, FSMGameStates.PLAYER_CHOICE, FSMGameStates.COUNTDOWN, FSMGameStates.EMERGENCY:
 			_cancel_explosion_fade()
 			_cancel_battle_start_haptic()
 			_in_play = false

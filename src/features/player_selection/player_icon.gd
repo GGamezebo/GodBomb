@@ -20,6 +20,7 @@ const NAME_NEIGHBOR_MARGIN := 0.86
 signal drag_started
 signal drag_ended
 signal hold_edit_requested(index: int)
+signal selection_pressed
 
 enum DragState {
 	NONE,
@@ -58,6 +59,8 @@ var _last_drag_local: Vector2 = Vector2.ZERO
 var _release_slime_center: Vector2 = Vector2.ZERO
 var _table_center_global: Vector2 = Vector2.ZERO
 var _active_touch_index: int = -1
+var selection_only: bool = false
+var _selection_press_local: Vector2 = Vector2.ZERO
 
 
 func _ready() -> void:
@@ -139,6 +142,19 @@ func set_player_data(info: PlayerInfo, index: int, player_count: int = -1) -> vo
 
 func get_player_info() -> PlayerInfo:
 	return _player_info
+
+
+func set_selection_only(enabled: bool) -> void:
+	selection_only = enabled
+	if enabled:
+		stop_motion()
+		_dragging = false
+		_holding = false
+		_active_touch_index = -1
+		_reset_hold_feedback()
+		z_index = 0
+		_apply_drag_lift(false)
+		set_idle_hold_hint_visible(false)
 
 
 func set_order_index(index: int, player_count: int = -1) -> void:
@@ -406,6 +422,9 @@ func stop_motion() -> void:
 
 
 func _gui_input(event: InputEvent) -> void:
+	if selection_only:
+		_handle_selection_input(event)
+		return
 	if event is InputEventMouseButton:
 		var mouse := event as InputEventMouseButton
 		if mouse.button_index != MOUSE_BUTTON_LEFT:
@@ -425,6 +444,32 @@ func _gui_input(event: InputEvent) -> void:
 		elif _active_touch_index < 0 or touch.index == _active_touch_index:
 			accept_event()
 			_end_drag()
+
+
+func _handle_selection_input(event: InputEvent) -> void:
+	const TAP_MAX_DISTANCE := 28.0
+	if event is InputEventMouseButton:
+		var mouse := event as InputEventMouseButton
+		if mouse.button_index != MOUSE_BUTTON_LEFT:
+			return
+		if mouse.pressed:
+			accept_event()
+			_selection_press_local = _parent_local_from_event(mouse)
+		else:
+			accept_event()
+			if _parent_local_from_event(mouse).distance_to(_selection_press_local) <= TAP_MAX_DISTANCE:
+				selection_pressed.emit()
+	elif event is InputEventScreenTouch:
+		var touch := event as InputEventScreenTouch
+		if touch.pressed:
+			accept_event()
+			_active_touch_index = touch.index
+			_selection_press_local = _parent_local_from_event(touch)
+		elif _active_touch_index < 0 or touch.index == _active_touch_index:
+			accept_event()
+			_active_touch_index = -1
+			if _parent_local_from_event(touch).distance_to(_selection_press_local) <= TAP_MAX_DISTANCE:
+				selection_pressed.emit()
 
 
 func _input(event: InputEvent) -> void:

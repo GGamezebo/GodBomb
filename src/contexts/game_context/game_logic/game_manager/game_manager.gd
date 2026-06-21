@@ -82,6 +82,16 @@ func _start_fsm() -> void:
 			},
 			{
 				"src": FSMGameStates.PLAY,
+				"dst": FSMGameStates.EMERGENCY,
+				"event": FSMGameEvents.ENTER_EMERGENCY,
+			},
+			{
+				"src": FSMGameStates.EMERGENCY,
+				"dst": FSMGameStates.PLAY,
+				"event": FSMGameEvents.EMERGENCY_CONTINUE,
+			},
+			{
+				"src": FSMGameStates.PLAY,
 				"dst": FSMGameStates.EXPLOSION,
 				"event": FSMGameEvents.EXPLODE,
 			},
@@ -126,8 +136,22 @@ func next_player() -> void:
 	session.next_player()
 
 
-func prev_player() -> bool:
-	return session.prev_player()
+func enter_emergency() -> void:
+	if fsm == null or fsm.get_current_state_name() != FSMGameStates.PLAY:
+		return
+	set_paused(true)
+	fsm.add_event(FSMGameEvents.ENTER_EMERGENCY)
+
+
+func continue_emergency(player_index: int) -> void:
+	if fsm == null or fsm.get_current_state_name() != FSMGameStates.EMERGENCY:
+		return
+	session.set_current_player_index(player_index)
+	session.try_add_bonus_bomb_time()
+	fsm.add_event(FSMGameEvents.EMERGENCY_CONTINUE)
+	set_paused(false)
+	if session.bomb_is_alerted and game_events:
+		game_events.ev_alert.emit()
 
 
 func _process_player_choice(delta: float) -> void:

@@ -1,0 +1,150 @@
+[gd_scene format=3 uid="uid://c00gnh7dac78a"]
+
+[ext_resource type="Script" uid="uid://bwyye1iomklbx" path="res://src/contexts/game_context/ui/battle_emergency_overlay.gd" id="1"]
+[ext_resource type="Script" uid="uid://bombs212nuf58" path="res://src/features/menu/menu_bomb_layout.gd" id="2"]
+[ext_resource type="PackedScene" uid="uid://duug5w0r0cqrv" path="res://src/features/player_selection/player_selection_widget.tscn" id="4"]
+[ext_resource type="Texture2D" uid="uid://b27y0jjb7mmmy" path="res://assets/party_kitchen/buttons/start_active.svg" id="5"]
+[ext_resource type="Script" uid="uid://ctfwqdpnffwoc" path="res://src/features/menu/start_action_button.gd" id="6"]
+[ext_resource type="Script" uid="uid://d2t3b5qtwod5n" path="res://src/features/menu/menu_fire_sparks.gd" id="7"]
+
+[node name="BattleEmergencyOverlay" type="CanvasLayer" unique_id=83156434 node_paths=PackedStringArray("background_color", "layout_host", "player_selection_widget", "explanation_banner", "preview_column", "preview_slime", "preview_name", "continue_button")]
+layer = 13
+script = ExtResource("1")
+background_color = NodePath("Root/BackgroundColor")
+layout_host = NodePath("Root/LayoutHost")
+player_selection_widget = NodePath("Root/LayoutHost/ScaledContent/PlayerSelectionWidget")
+explanation_banner = NodePath("Root/LayoutHost/ScaledContent/ExplanationBanner")
+preview_column = NodePath("Root/LayoutHost/ScaledContent/PreviewColumn")
+preview_slime = NodePath("Root/LayoutHost/ScaledContent/PreviewColumn/PreviewSlime")
+preview_name = NodePath("Root/LayoutHost/ScaledContent/PreviewColumn/PreviewName")
+continue_button = NodePath("Root/LayoutHost/ScaledContent/ContinueButton")
+
+[node name="Root" type="Control" parent="." unique_id=1313510014]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="BackgroundColor" type="ColorRect" parent="Root" unique_id=1017479983]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+
+[node name="FireSparks" type="Control" parent="Root" unique_id=2048266148]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("7")
+
+[node name="LayoutHost" type="TextureRect" parent="Root" unique_id=1656624952 node_paths=PackedStringArray("scaled_content")]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
+script = ExtResource("2")
+scaled_content = NodePath("ScaledContent")
+hint_marker = NodePath("ScaledContent/Marker2D")
+
+[node name="ScaledContent" type="Control" parent="Root/LayoutHost" unique_id=302365101]
+anchors_preset = 0
+offset_right = 1080.0
+offset_bottom = 1920.0
+
+[node name="Marker2D" type="Marker2D" parent="Root/LayoutHost/ScaledContent" unique_id=510875066]
+position = Vector2(528, 483)
+
+[node name="ExplanationBanner" type="PanelContainer" parent="Root/LayoutHost/ScaledContent" unique_id=1804694599]
+layout_mode = 0
+offset_left = 32.0
+offset_top = 64.0
+offset_right = 1048.0
+offset_bottom = 520.0
+
+[node name="Margin" type="MarginContainer" parent="Root/LayoutHost/ScaledContent/ExplanationBanner" unique_id=477833408]
+layout_mode = 2
+theme_override_constants/margin_left = 48
+theme_override_constants/margin_top = 48
+theme_override_constants/margin_right = 48
+theme_override_constants/margin_bottom = 48
+
+[node name="VBox" type="VBoxContainer" parent="Root/LayoutHost/ScaledContent/ExplanationBanner/Margin" unique_id=271675626]
+layout_mode = 2
+theme_override_constants/separation = 28
+
+[node name="Title" type="Label" parent="Root/LayoutHost/ScaledContent/ExplanationBanner/Margin/VBox" unique_id=1942092072]
+layout_mode = 2
+theme_type_variation = &"ModalTitle"
+text = "Экстренная ситуация"
+horizontal_alignment = 1
+
+[node name="ExplanationText" type="RichTextLabel" parent="Root/LayoutHost/ScaledContent/ExplanationBanner/Margin/VBox" unique_id=120906736]
+layout_mode = 2
+theme_type_variation = &"ModalRichText"
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
+
+[node name="PreviewColumn" type="VBoxContainer" parent="Root/LayoutHost/ScaledContent" unique_id=1100767216]
+z_index = 5
+layout_mode = 0
+mouse_filter = 2
+theme_override_constants/separation = 25
+alignment = 1
+
+[node name="PreviewSlime" type="TextureRect" parent="Root/LayoutHost/ScaledContent/PreviewColumn" unique_id=348230835]
+custom_minimum_size = Vector2(88, 88)
+layout_mode = 2
+size_flags_horizontal = 4
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PreviewName" type="Label" parent="Root/LayoutHost/ScaledContent/PreviewColumn" unique_id=2061630865]
+layout_mode = 2
+theme_type_variation = &"Hero"
+theme_override_font_sizes/font_size = 44
+text = "Игрок"
+horizontal_alignment = 1
+
+[node name="PlayerSelectionWidget" parent="Root/LayoutHost/ScaledContent" unique_id=1320156995 instance=ExtResource("4")]
+layout_mode = 1
+
+[node name="ContinueButton" type="TextureButton" parent="Root/LayoutHost/ScaledContent" unique_id=2048266147]
+z_index = 4
+layout_mode = 0
+offset_left = 215.0
+offset_top = 1418.0
+offset_right = 875.0
+offset_bottom = 1598.0
+texture_normal = ExtResource("5")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("6")
+
+[node name="ContinueLabel" type="Label" parent="Root/LayoutHost/ScaledContent/ContinueButton" unique_id=752978959]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_type_variation = &"Hero"
+theme_override_font_sizes/font_size = 56
+text = "Продолжить игру"
+horizontal_alignment = 1
+vertical_alignment = 1

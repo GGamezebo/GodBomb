@@ -19,7 +19,6 @@
 [ext_resource type="AudioStream" uid="uid://crxatk58oojuw" path="res://assets/audio/music/game_sound.mp3" id="18"]
 [ext_resource type="AudioStream" uid="uid://dwb2n548ooce4" path="res://assets/audio/ui/ui_confirm.wav" id="18_ncfj3"]
 [ext_resource type="AudioStream" uid="uid://h2poc2nqkyng" path="res://assets/audio/sfx/Explosion.mp3" id="19"]
-[ext_resource type="AudioStream" uid="uid://djfi27febt56" path="res://assets/audio/ui/lobby_player_swap.wav" id="19_s1sr6"]
 [ext_resource type="AudioStream" uid="uid://dqfhupfbmeido" path="res://assets/audio/sfx/SlowTick.mp3" id="20"]
 [ext_resource type="AudioStream" uid="uid://7yrpfgssj2v0" path="res://assets/audio/sfx/FastTick.mp3" id="21"]
 [ext_resource type="Script" uid="uid://d26o15jgt3s4y" path="res://src/features/explosion/explosion_effect.gd" id="24"]
@@ -37,6 +36,9 @@
 [ext_resource type="Script" uid="uid://d2t3b5qtwod5n" path="res://src/features/menu/menu_fire_sparks.gd" id="37"]
 [ext_resource type="Script" uid="uid://ctfwqdpnffwoc" path="res://src/features/menu/start_action_button.gd" id="38"]
 [ext_resource type="Script" uid="uid://id0rvsyrsne0" path="res://src/features/bomb/pass_bomb_spark_layer.gd" id="39"]
+[ext_resource type="Script" uid="uid://bhmt3sxmxiwlg" path="res://src/contexts/game_context/game_logic/game_manager/game_states/emergency_state.gd" id="40"]
+[ext_resource type="PackedScene" path="res://src/contexts/game_context/ui/battle_emergency_overlay.tscn" id="41"]
+[ext_resource type="Texture2D" uid="uid://dhcclubtdmtpd" path="res://assets/party_kitchen/buttons/icon_emergency.svg" id="42"]
 
 [node name="GameContext" type="Control" unique_id=1610270397 node_paths=PackedStringArray("game_manager", "battle_chrome")]
 layout_mode = 3
@@ -68,6 +70,9 @@ script = ExtResource("5")
 [node name="PlayState" type="Node" parent="GameManager" unique_id=1073636327]
 script = ExtResource("6")
 
+[node name="EmergencyState" type="Node" parent="GameManager" unique_id=837807244]
+script = ExtResource("40")
+
 [node name="ExplosionState" type="Node" parent="GameManager" unique_id=1879540108]
 script = ExtResource("7")
 
@@ -86,7 +91,6 @@ countdown_stream = ExtResource("17")
 round_music_stream = ExtResource("18")
 explosion_stream = ExtResource("19")
 pass_next_stream = ExtResource("18_ncfj3")
-pass_prev_stream = ExtResource("19_s1sr6")
 tick_streams = Array[AudioStream]([ExtResource("20"), ExtResource("21")])
 
 [node name="UI" type="CanvasLayer" parent="." unique_id=1341470968]
@@ -157,7 +161,7 @@ mouse_filter = 2
 script = ExtResource("29")
 game_events = ExtResource("15")
 
-[node name="GameBattleChrome" type="Control" parent="UI/BackgroundBomb/ScaledContent" unique_id=1260246590 node_paths=PackedStringArray("top_bar", "exit_button", "players_button", "player_lobby_overlay", "exit_confirm_dialog")]
+[node name="GameBattleChrome" type="Control" parent="UI/BackgroundBomb/ScaledContent" unique_id=1260246590 node_paths=PackedStringArray("top_bar", "exit_button", "players_button", "emergency_button", "player_lobby_overlay", "emergency_overlay", "exit_confirm_dialog")]
 anchors_preset = 0
 offset_right = 1080.0
 offset_bottom = 1920.0
@@ -170,7 +174,9 @@ game_config = ExtResource("12")
 top_bar = NodePath("TopBar")
 exit_button = NodePath("TopBar/ExitButton")
 players_button = NodePath("TopBar/PlayersButton")
+emergency_button = NodePath("TopBar/EmergencyButton")
 player_lobby_overlay = NodePath("../../../../BattlePlayerLobbyOverlay")
+emergency_overlay = NodePath("../../../../BattleEmergencyOverlay")
 exit_confirm_dialog = NodePath("../../../../ModalLayer/ExitConfirmDialog")
 
 [node name="TopBar" type="HBoxContainer" parent="UI/BackgroundBomb/ScaledContent/GameBattleChrome" unique_id=1518641917]
@@ -194,6 +200,14 @@ stretch_mode = 5
 custom_minimum_size = Vector2(168, 168)
 layout_mode = 2
 texture_normal = ExtResource("33")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="EmergencyButton" type="TextureButton" parent="UI/BackgroundBomb/ScaledContent/GameBattleChrome/TopBar" unique_id=120579250]
+visible = false
+custom_minimum_size = Vector2(168, 168)
+layout_mode = 2
+texture_normal = ExtResource("42")
 ignore_texture_size = true
 stretch_mode = 5
 
@@ -276,7 +290,7 @@ bbcode_enabled = true
 fit_content = true
 horizontal_alignment = 1
 
-[node name="InputLayer" type="Control" parent="UI" unique_id=784988468 node_paths=PackedStringArray("game_manager", "start_round_button")]
+[node name="InputLayer" type="Control" parent="UI" unique_id=784988468 node_paths=PackedStringArray("game_manager", "game_battle_chrome", "start_round_button")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -286,10 +300,15 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("10")
 game_manager = NodePath("../../GameManager")
+game_battle_chrome = NodePath("../BackgroundBomb/ScaledContent/GameBattleChrome")
 start_round_button = NodePath("../BackgroundBomb/ScaledContent/StartRoundButton")
 
 [node name="BattlePlayerLobbyOverlay" parent="." unique_id=2020208491 instance=ExtResource("36")]
 visible = false
+
+[node name="BattleEmergencyOverlay" parent="." unique_id=671341361 instance=ExtResource("41")]
+visible = false
+game_events = ExtResource("15")
 
 [node name="ModalLayer" type="CanvasLayer" parent="." unique_id=1670395730]
 layer = 30

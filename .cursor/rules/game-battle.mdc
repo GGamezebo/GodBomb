@@ -6,7 +6,7 @@ alwaysApply: false
 
 # Бой
 
-**FSM:** choice(~5s roulette) → ready(button) → countdown(5s) → play → explosion → ready|result. First card: `next_card()` end of countdown if null. After boom: next_card→next_player→ready.
+**FSM:** choice → ready → countdown → play ⇄ **emergency** → explosion → ready|result. First card at countdown end if null. After boom: next_card→next_player→ready.
 
 **UI init trap:** FSM starts in `initialize()` before child `_ready`. HUD + `game_input` MUST `_sync_to_current_state()` in `_ready`.
 
@@ -16,9 +16,11 @@ alwaysApply: false
 
 State UI: choice=«Выбираем первого»+pulse · ready=«Первым ходит»+StartRoundButton · play=full HUD · explosion=name overlay.
 
-**Input** (`game_input.gd`): `mouse_filter=IGNORE`. PLAY: multi-touch pass — next only when **all** fingers up within **0.3s** of first touch; hold longer = invalid. Swipe if max finger travel > threshold. tap→next + sparks · swipe→prev (SlowTick, 1×/round). RESULT→menu.
+**Input** (`game_input.gd`): `mouse_filter=IGNORE`. PLAY: multi-touch pass — next only when **all** fingers up within **0.3s**; hold longer = invalid · tap→next + sparks. **Emergency** button (PLAY only) → `EMERGENCY` state, pause game+audio, overlay to re-pick current player · continue → `try_add_bonus_bomb_time()`. RESULT→menu.
 
 **Pass sparks:** `pass_bomb_spark_layer.gd` on `ScaledContent` — radial additive fire burst at touch (one-shot CPUParticles2D).
+
+**Emergency:** `BattleEmergencyOverlay` + `EmergencyState` · `PlayerSelectionWidget.set_emergency_mode()` · `GameBattleChrome/EmergencyButton` · icon `icon_emergency.svg`.
 
 **Battle lobby overlay:** `BattlePlayerLobbyOverlay` — edit roster mid-game · Done = confirm if roster ok else click · reuses `PlayerSelectionWidget` + `StartActionButton`.
 
