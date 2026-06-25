@@ -7,7 +7,7 @@
 [ext_resource type="Resource" path="res://src/common/menu_events.tres" id="5"]
 [ext_resource type="PackedScene" uid="uid://duug5w0r0cqrv" path="res://src/features/player_selection/player_selection_widget.tscn" id="6"]
 [ext_resource type="Texture2D" uid="uid://b27y0jjb7mmmy" path="res://assets/party_kitchen/buttons/start_active.svg" id="8"]
-[ext_resource type="Texture2D" uid="uid://de4n5e1fxki8i" path="res://assets/textures/Background/Background.png" id="8_ksiyf"]
+[ext_resource type="Texture2D" uid="uid://1ihkwl0g3cg3" path="res://assets/textures/Background/Background1.png" id="8_ksiyf"]
 [ext_resource type="Texture2D" uid="uid://cjgo8et40dwnd" path="res://assets/party_kitchen/buttons/start_inactive.svg" id="9"]
 [ext_resource type="PackedScene" path="res://src/features/menu/settings_window.tscn" id="10"]
 [ext_resource type="PackedScene" path="res://src/features/menu/rules_window.tscn" id="11"]
@@ -16,7 +16,7 @@
 [ext_resource type="Texture2D" uid="uid://cbb8gsai6lwuy" path="res://assets/party_kitchen/buttons/icon_music_off.svg" id="14"]
 [ext_resource type="Texture2D" uid="uid://ci0nbi42m75wm" path="res://assets/party_kitchen/buttons/icon_rules.svg" id="15"]
 [ext_resource type="Script" uid="uid://bombs212nuf58" path="res://src/features/menu/menu_bomb_layout.gd" id="16"]
-[ext_resource type="Script" path="res://src/features/bomb/bomb_dial_glass.gd" id="16_glass"]
+[ext_resource type="Script" uid="uid://b4n1w2jmpoutu" path="res://src/features/bomb/bomb_dial_glass.gd" id="16_glass"]
 [ext_resource type="Script" uid="uid://cesm4akuquebh" path="res://src/features/bomb/bomb_lamps.gd" id="17"]
 [ext_resource type="Script" uid="uid://d2t3b5qtwod5n" path="res://src/features/menu/menu_fire_sparks.gd" id="18"]
 [ext_resource type="Script" uid="uid://ctfwqdpnffwoc" path="res://src/features/menu/start_action_button.gd" id="19"]
@@ -76,7 +76,6 @@ layout_mode = 0
 offset_right = 800.0
 offset_bottom = 800.0
 mouse_filter = 2
-color = Color(1, 1, 1, 1)
 script = ExtResource("16_glass")
 
 [node name="BackgroundBomb" type="TextureRect" parent="Bomb" unique_id=226861383 node_paths=PackedStringArray("scaled_content")]
