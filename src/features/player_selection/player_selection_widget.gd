@@ -516,12 +516,15 @@ func _update_hint_banner_layout() -> void:
 	if not _table_hint_banner:
 		return
 	var anchor := _get_hint_anchor_design_position()
-	var banner_width := maxf(TableHintBanner.MIN_WIDTH, minf(table_area.size.x - 48.0, 1000.0) if table_area else 1000.0)
-	_table_hint_banner.custom_minimum_size = Vector2(banner_width, 0)
-	_table_hint_banner.reset_size()
-	var banner_size := _table_hint_banner.get_combined_minimum_size()
-	_table_hint_banner.size = banner_size
-	_table_hint_banner.position = anchor - banner_size * 0.5
+	var bounds := _get_hint_bounds()
+	_table_hint_banner.fit_layout(anchor, TableHintBanner.TABLE_HINT_WIDTH, bounds)
+
+
+func _get_hint_bounds() -> Rect2:
+	var layout := _find_layout_host()
+	if layout is Control:
+		return TableHintBanner.visible_design_rect((layout as Control).size)
+	return Rect2(Vector2.ZERO, size)
 
 
 func _refresh_turn_order() -> void:

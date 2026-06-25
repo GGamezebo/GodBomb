@@ -76,6 +76,13 @@ func _get_hint_marker_position() -> Vector2:
 	return FALLBACK_HINT_MARKER
 
 
+func _get_hint_bounds() -> Rect2:
+	var layout := _find_bomb_layout()
+	if layout:
+		return TableHintBanner.visible_design_rect(layout.size)
+	return Rect2(Vector2.ZERO, DESIGN_SIZE)
+
+
 func _reposition_battle_ui() -> void:
 	var design_root := _get_design_root()
 	var word_center := _get_round_word_center()
@@ -90,7 +97,8 @@ func _reposition_battle_ui() -> void:
 			_countdown_label, design_root, ROUND_WORD_MARKER, FALLBACK_ROUND_WORD
 		)
 	if _hint_banner:
-		TableHintBanner.place_centered_at(_hint_banner, _get_hint_marker_position())
+		var bounds := _get_hint_bounds()
+		TableHintBanner.place_centered_at(_hint_banner, _get_hint_marker_position(), bounds)
 	if _action_hints:
 		_action_hints.position = PASS_HINT_RECT.position
 		_action_hints.size = PASS_HINT_RECT.size
