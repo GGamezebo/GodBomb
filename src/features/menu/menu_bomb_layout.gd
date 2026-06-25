@@ -45,4 +45,6 @@ func _apply_layout() -> void:
 	scaled_content.scale = Vector2.ONE * scale_factor
 	scaled_content.position = offset
 	scaled_content.size = DESIGN_SIZE
+	var dial := get_parent().get_node_or_null("DisplayBomb") as Control
+	BombDialLayout.apply_to(dial, size)
 	layout_applied.emit()

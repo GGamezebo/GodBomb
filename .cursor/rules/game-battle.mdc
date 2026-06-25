@@ -24,7 +24,7 @@ State UI: choice/ready/countdown/play share dial layout · ready=«Готовы?
 
 **Battle lobby overlay:** `BattlePlayerLobbyOverlay` — edit roster mid-game · Done = confirm if roster ok else click · reuses `PlayerSelectionWidget` + `StartActionButton`.
 
-**Visual:** `GameBombBackground` — player-color backdrop · `DisplayBomb`/`BombDialGlass` dial glass (hides with bomb on explosion/result) · alert pulse · bomb flash/shake on explosion · `ExplosionEffect` · `GameResultOverlay` full-screen winner tint, rank scroll only, celebration particles.
+**Visual:** `GameBombBackground` — player-color backdrop · `DisplayBomb`/`BombDialGlass` dial glass (`BombDialLayout` cover-scale 800@138,550) · hides with bomb on explosion/result · alert pulse · bomb flash/shake on explosion · `ExplosionEffect` · `GameResultOverlay` full-screen winner tint, rank scroll only, celebration particles.
 
 **Audio:** gameplay → `GameSound` · UI buttons → `UiSounds` → `audio.mdc`.
 

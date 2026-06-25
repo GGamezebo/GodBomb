@@ -85,6 +85,8 @@ func _apply_layout() -> void:
 		bomb_art.scale = Vector2.ONE * scale_factor
 		bomb_art.position = offset
 		bomb_art.size = DESIGN_SIZE
+	if dial_glass is Control:
+		BombDialLayout.apply_to(dial_glass as Control, size)
 	_content_base_pos = scaled_content.position
 	layout_applied.emit()
 
