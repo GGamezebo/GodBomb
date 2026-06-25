@@ -1,9 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
-  <ellipse cx="60" cy="66" rx="48" ry="10" fill="#000000" opacity="0.12"/>
-  <circle cx="60" cy="56" r="48" fill="#FFFDF8" stroke="#E8D5C4" stroke-width="4"/>
-  <circle cx="60" cy="56" r="36" fill="#8B7355" opacity="0.12"/>
-  <circle cx="60" cy="56" r="18" fill="none" stroke="#6B5344" stroke-width="5"/>
-  <circle cx="60" cy="56" r="7" fill="#6B5344"/>
-  <rect x="57" y="28" width="6" height="16" rx="3" fill="#6B5344"/>
+  <defs>
+    <linearGradient id="bezel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#5a4838"/>
+      <stop offset="50%" stop-color="#3a2e24"/>
+      <stop offset="100%" stop-color="#221a14"/>
+    </linearGradient>
+    <linearGradient id="well" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2a221c"/>
+      <stop offset="100%" stop-color="#120e0b"/>
+    </linearGradient>
+    <linearGradient id="copper" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#e8a45c"/>
+      <stop offset="100%" stop-color="#8a5528"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="60" cy="68" rx="50" ry="11" fill="#000000" opacity="0.32"/>
+  <ellipse cx="60" cy="58" rx="54" ry="50" fill="url(#bezel)" stroke="#6b4a2a" stroke-width="4"/>
+  <ellipse cx="60" cy="56" rx="44" ry="40" fill="url(#well)" stroke="#8a5a32" stroke-width="2"/>
+  <circle cx="60" cy="56" r="30" fill="none" stroke="url(#copper)" stroke-width="3" opacity="0.55"/>
+  <circle cx="60" cy="56" r="16" fill="none" stroke="#c47a3a" stroke-width="4"/>
+  <circle cx="60" cy="56" r="6.5" fill="#c47a3a"/>
+  <rect x="57.5" y="30" width="5" height="14" rx="2.5" fill="#d48a48"/>
+  <rect x="57.5" y="68" width="5" height="14" rx="2.5" fill="#a86830"/>
+  <rect x="30" y="53.5" width="14" height="5" rx="2.5" fill="#d48a48"/>
+  <rect x="76" y="53.5" width="14" height="5" rx="2.5" fill="#a86830"/>
+  <rect x="38.5" y="38.5" width="10" height="5" rx="2.5" fill="#b87238" transform="rotate(-45 43.5 41)"/>
+  <rect x="71.5" y="38.5" width="10" height="5" rx="2.5" fill="#b87238" transform="rotate(45 76.5 41)"/>
+  <rect x="38.5" y="76.5" width="10" height="5" rx="2.5" fill="#8a5528" transform="rotate(45 43.5 79)"/>
+  <rect x="71.5" y="76.5" width="10" height="5" rx="2.5" fill="#8a5528" transform="rotate(-45 76.5 79)"/>
 </svg>

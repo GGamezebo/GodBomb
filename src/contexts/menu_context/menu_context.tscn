@@ -21,6 +21,8 @@
 [ext_resource type="Script" uid="uid://d2t3b5qtwod5n" path="res://src/features/menu/menu_fire_sparks.gd" id="18"]
 [ext_resource type="Script" uid="uid://ctfwqdpnffwoc" path="res://src/features/menu/start_action_button.gd" id="19"]
 
+[ext_resource type="Script" path="res://src/features/menu/bomb_top_bar_button.gd" id="20"]
+
 [node name="MenuContext" type="Control" unique_id=1379479129 node_paths=PackedStringArray("start_button", "player_selection_widget", "settings_button", "music_button", "rules_button", "settings_window", "rules_window")]
 layout_mode = 3
 anchors_preset = 15
@@ -124,6 +126,7 @@ layout_mode = 2
 texture_normal = ExtResource("12")
 ignore_texture_size = true
 stretch_mode = 5
+script = ExtResource("20")
 
 [node name="MusicButton" type="TextureButton" parent="Bomb/BackgroundBomb/ScaledContent/TopBar" unique_id=934041470]
 custom_minimum_size = Vector2(168, 168)
@@ -131,6 +134,7 @@ layout_mode = 2
 texture_normal = ExtResource("13")
 ignore_texture_size = true
 stretch_mode = 5
+script = ExtResource("20")
 
 [node name="RulesButton" type="TextureButton" parent="Bomb/BackgroundBomb/ScaledContent/TopBar" unique_id=1636588019]
 custom_minimum_size = Vector2(168, 168)
@@ -138,6 +142,7 @@ layout_mode = 2
 texture_normal = ExtResource("15")
 ignore_texture_size = true
 stretch_mode = 5
+script = ExtResource("20")
 
 [node name="PlayerSelectionWidget" parent="Bomb/BackgroundBomb/ScaledContent" unique_id=850158347 instance=ExtResource("6")]
 layout_mode = 1

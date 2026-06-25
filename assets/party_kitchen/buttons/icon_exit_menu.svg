@@ -1,9 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
-  <ellipse cx="60" cy="66" rx="48" ry="10" fill="#000000" opacity="0.12"/>
-  <circle cx="60" cy="56" r="48" fill="#FFFDF8" stroke="#E8D5C4" stroke-width="4"/>
-  <circle cx="60" cy="56" r="36" fill="#C44E32" opacity="0.12"/>
-  <rect x="52" y="36" width="16" height="40" rx="4" fill="none" stroke="#A8432A" stroke-width="5"/>
-  <path d="M44 56 L34 56 M34 56 L42 50 M34 56 L42 62" fill="none" stroke="#A8432A" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cx="60" cy="56" r="4" fill="#A8432A"/>
+  <defs>
+    <linearGradient id="bezel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#5a4838"/>
+      <stop offset="50%" stop-color="#3a2e24"/>
+      <stop offset="100%" stop-color="#221a14"/>
+    </linearGradient>
+    <linearGradient id="well" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2a221c"/>
+      <stop offset="100%" stop-color="#120e0b"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="60" cy="68" rx="50" ry="11" fill="#000000" opacity="0.32"/>
+  <ellipse cx="60" cy="58" rx="54" ry="50" fill="url(#bezel)" stroke="#6b4a2a" stroke-width="4"/>
+  <ellipse cx="60" cy="56" rx="44" ry="40" fill="url(#well)" stroke="#8a5a32" stroke-width="2"/>
+  <rect x="54" y="38" width="18" height="36" rx="3" fill="none" stroke="#c47a3a" stroke-width="3.5"/>
+  <path d="M46 56 L34 56 M34 56 L40 50 M34 56 L40 62" fill="none" stroke="#e8954f" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="63" cy="56" r="3.5" fill="#d48a48"/>
 </svg>

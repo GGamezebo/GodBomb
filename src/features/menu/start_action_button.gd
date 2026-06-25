@@ -3,9 +3,9 @@ extends TextureButton
 
 const PULSE_SCALE := Vector2(1.05, 1.05)
 const PULSE_HALF_PERIOD := 0.5
-const ENABLED_MODULATE := Color(1.05, 1.02, 0.95, 1.0)
-const DISABLED_MODULATE := Color(0.88, 0.88, 0.88, 1.0)
-# Vertical center of the painted pill in start_active.svg (viewBox height 120, pill center y=52).
+const ENABLED_MODULATE := Color(1.02, 0.98, 0.94, 1.0)
+const DISABLED_MODULATE := Color(0.78, 0.76, 0.74, 1.0)
+# Vertical center of the painted face in start_active.svg (viewBox height 120, face center y=52).
 const TEXT_PILL_CENTER_Y_RATIO := 52.0 / 120.0
 
 var _pulse_tween: Tween
@@ -53,7 +53,9 @@ func set_pulse_active(active: bool) -> void:
 	if active:
 		modulate = ENABLED_MODULATE
 		if label:
-			label.add_theme_color_override("font_color", Color(1, 1, 1, 1))
+			label.add_theme_color_override("font_color", Color(1, 0.98, 0.94, 1))
+			label.add_theme_color_override("font_outline_color", Color(0.12, 0.06, 0.02, 0.85))
+			label.add_theme_constant_override("outline_size", 3)
 		pivot_offset = size * 0.5
 		_pulse_tween = create_tween().set_loops()
 		_pulse_tween.tween_property(self, "scale", PULSE_SCALE, PULSE_HALF_PERIOD).set_trans(Tween.TRANS_SINE)
@@ -61,7 +63,9 @@ func set_pulse_active(active: bool) -> void:
 	else:
 		modulate = DISABLED_MODULATE
 		if label:
-			label.add_theme_color_override("font_color", Color(0.94, 0.92, 0.9, 1))
+			label.add_theme_color_override("font_color", Color(0.82, 0.8, 0.76, 1))
+			label.add_theme_color_override("font_outline_color", Color(0.1, 0.08, 0.06, 0.55))
+			label.add_theme_constant_override("outline_size", 2)
 	call_deferred("refresh_label_layout")
 
 
