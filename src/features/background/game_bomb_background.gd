@@ -9,6 +9,7 @@ signal layout_applied
 
 @export var game_events: GameEvents
 @export var bomb_art: TextureRect
+@export var dial_glass: CanvasItem
 @export var player_color_bg: ColorRect
 @export var fire_sparks: Control
 @export var scaled_content: Control
@@ -27,6 +28,8 @@ var _hint_marker_node: Node2D
 func _ready() -> void:
 	if bomb_art == null:
 		bomb_art = get_node_or_null("BombArt") as TextureRect
+	if dial_glass == null:
+		dial_glass = get_node_or_null("DisplayBomb") as CanvasItem
 	if player_color_bg == null:
 		player_color_bg = get_node_or_null("PlayerColorBackground") as ColorRect
 	if scaled_content == null:
@@ -154,53 +157,78 @@ func _apply_state(state: String) -> void:
 
 
 func _set_bomb_visible(visible: bool) -> void:
-	if not bomb_art:
-		return
-	bomb_art.visible = visible
-	if visible:
-		bomb_art.modulate = Color.WHITE
+	for part in _bomb_visual_parts():
+		part.visible = visible
+		if visible:
+			part.modulate = Color.WHITE
 
 
 func _set_bomb_modulate(color: Color) -> void:
+	for part in _bomb_visual_parts():
+		part.modulate = color
+
+
+func _bomb_visual_parts() -> Array[CanvasItem]:
+	var parts: Array[CanvasItem] = []
 	if bomb_art:
-		bomb_art.modulate = color
+		parts.append(bomb_art)
+	if dial_glass:
+		parts.append(dial_glass)
+	return parts
 
 
 func _play_ready_pulse() -> void:
-	if not bomb_art:
+	var parts := _bomb_visual_parts()
+	if parts.is_empty():
 		return
 	_kill_tween()
 	_tween = create_tween()
-	_tween.tween_property(bomb_art, "modulate", Color(1.04, 1.02, 0.98, 1.0), 0.35).set_trans(Tween.TRANS_SINE)
-	_tween.tween_property(bomb_art, "modulate", Color.WHITE, 0.35)
+	for part in parts:
+		var track := _tween.parallel()
+		track.tween_property(part, "modulate", Color(1.04, 1.02, 0.98, 1.0), 0.35).set_trans(Tween.TRANS_SINE)
+		track.tween_property(part, "modulate", Color.WHITE, 0.35).set_trans(Tween.TRANS_SINE)
 
 
 func _play_comes_flash() -> void:
-	if not bomb_art:
+	var parts := _bomb_visual_parts()
+	if parts.is_empty():
 		return
 	_kill_tween()
-	bomb_art.modulate = Color(1, 1, 1, 0.88)
+	for part in parts:
+		part.modulate = Color(1, 1, 1, 0.88)
 	_tween = create_tween()
-	_tween.tween_property(bomb_art, "modulate", Color.WHITE, 0.45).set_trans(Tween.TRANS_SINE)
+	for part in parts:
+		_tween.parallel().tween_property(part, "modulate", Color.WHITE, 0.45).set_trans(Tween.TRANS_SINE)
 
 
 func _play_explosion() -> void:
 	_kill_tween()
-	if bomb_art and bomb_art.visible:
-		bomb_art.modulate = Color(1.45, 0.42, 0.12, 1.0)
+	var parts := _visible_bomb_visual_parts()
+	if not parts.is_empty():
+		var flash_color := Color(1.45, 0.42, 0.12, 1.0)
 		var fade := create_tween()
-		fade.tween_property(bomb_art, "modulate:a", 0.0, 0.14).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_IN)
+		for part in parts:
+			part.modulate = flash_color
+			fade.parallel().tween_property(part, "modulate:a", 0.0, 0.14).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_IN)
 		fade.tween_callback(func() -> void:
-			if bomb_art:
-				bomb_art.visible = false
+			for part in parts:
+				part.visible = false
 		)
 	if scaled_content:
 		_tween = create_tween()
 		var base := _content_base_pos
 		for i in 6:
-			var offset := Vector2(randf_range(-10, 10), randf_range(-10, 10))
-			_tween.tween_property(scaled_content, "position", base + offset, 0.04)
+			var shake_offset := Vector2(randf_range(-10, 10), randf_range(-10, 10))
+			_tween.tween_property(scaled_content, "position", base + shake_offset, 0.04)
 		_tween.tween_property(scaled_content, "position", base, 0.06)
+
+
+func _visible_bomb_visual_parts() -> Array[CanvasItem]:
+	var parts: Array[CanvasItem] = []
+	for part in _bomb_visual_parts():
+		if part.visible:
+			parts.append(part)
+	return parts
 
 
 func _kill_tween() -> void:

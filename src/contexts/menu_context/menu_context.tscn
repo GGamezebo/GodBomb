@@ -16,6 +16,7 @@
 [ext_resource type="Texture2D" uid="uid://cbb8gsai6lwuy" path="res://assets/party_kitchen/buttons/icon_music_off.svg" id="14"]
 [ext_resource type="Texture2D" uid="uid://ci0nbi42m75wm" path="res://assets/party_kitchen/buttons/icon_rules.svg" id="15"]
 [ext_resource type="Script" uid="uid://bombs212nuf58" path="res://src/features/menu/menu_bomb_layout.gd" id="16"]
+[ext_resource type="Script" path="res://src/features/bomb/bomb_dial_glass.gd" id="16_glass"]
 [ext_resource type="Script" uid="uid://cesm4akuquebh" path="res://src/features/bomb/bomb_lamps.gd" id="17"]
 [ext_resource type="Script" uid="uid://d2t3b5qtwod5n" path="res://src/features/menu/menu_fire_sparks.gd" id="18"]
 [ext_resource type="Script" uid="uid://ctfwqdpnffwoc" path="res://src/features/menu/start_action_button.gd" id="19"]
@@ -32,11 +33,11 @@ main_events = ExtResource("2")
 game_config = ExtResource("3")
 account = ExtResource("4")
 menu_events = ExtResource("5")
-start_button = NodePath("BackgroundBomb/ScaledContent/StartButton")
-player_selection_widget = NodePath("BackgroundBomb/ScaledContent/PlayerSelectionWidget")
-settings_button = NodePath("BackgroundBomb/ScaledContent/TopBar/SettingsButton")
-music_button = NodePath("BackgroundBomb/ScaledContent/TopBar/MusicButton")
-rules_button = NodePath("BackgroundBomb/ScaledContent/TopBar/RulesButton")
+start_button = NodePath("Bomb/BackgroundBomb/ScaledContent/StartButton")
+player_selection_widget = NodePath("Bomb/BackgroundBomb/ScaledContent/PlayerSelectionWidget")
+settings_button = NodePath("Bomb/BackgroundBomb/ScaledContent/TopBar/SettingsButton")
+music_button = NodePath("Bomb/BackgroundBomb/ScaledContent/TopBar/MusicButton")
+rules_button = NodePath("Bomb/BackgroundBomb/ScaledContent/TopBar/RulesButton")
 settings_window = NodePath("ModalLayer/SettingsWindow")
 rules_window = NodePath("ModalLayer/RulesWindow")
 music_on_texture = ExtResource("13")
@@ -62,7 +63,34 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("18")
 
-[node name="BackgroundBomb" type="TextureRect" parent="." unique_id=226861383 node_paths=PackedStringArray("scaled_content")]
+[node name="Bomb" type="Control" parent="." unique_id=1073867173]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="DisplayBomb" type="ColorRect" parent="Bomb" unique_id=549593783]
+custom_maximum_size = Vector2(800, 800)
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.3148148
+anchor_top = 0.4015625
+anchor_right = 0.3148148
+anchor_bottom = 0.4015625
+offset_left = -202.0
+offset_top = -221.0
+offset_right = 598.0
+offset_bottom = 579.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 1)
+script = ExtResource("16_glass")
+metadata/_edit_use_anchors_ = true
+
+[node name="BackgroundBomb" type="TextureRect" parent="Bomb" unique_id=226861383 node_paths=PackedStringArray("scaled_content")]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -77,23 +105,23 @@ script = ExtResource("16")
 scaled_content = NodePath("ScaledContent")
 hint_marker = NodePath("ScaledContent/Marker2D")
 
-[node name="ScaledContent" type="Control" parent="BackgroundBomb" unique_id=628158409]
+[node name="ScaledContent" type="Control" parent="Bomb/BackgroundBomb" unique_id=628158409]
 anchors_preset = 0
 offset_right = 1080.0
 offset_bottom = 1920.0
 mouse_filter = 2
 
-[node name="Marker2D" type="Marker2D" parent="BackgroundBomb/ScaledContent" unique_id=1831889289]
+[node name="Marker2D" type="Marker2D" parent="Bomb/BackgroundBomb/ScaledContent" unique_id=1831889289]
 position = Vector2(528, 483)
 
-[node name="BombLamps" type="Control" parent="BackgroundBomb/ScaledContent" unique_id=197644960]
+[node name="BombLamps" type="Control" parent="Bomb/BackgroundBomb/ScaledContent" unique_id=197644960]
 anchors_preset = 0
 offset_right = 1080.0
 offset_bottom = 1920.0
 mouse_filter = 2
 script = ExtResource("17")
 
-[node name="TopBar" type="HBoxContainer" parent="BackgroundBomb/ScaledContent" unique_id=2074903033]
+[node name="TopBar" type="HBoxContainer" parent="Bomb/BackgroundBomb/ScaledContent" unique_id=2074903033]
 layout_mode = 0
 offset_left = 26.0
 offset_top = 244.0
@@ -102,31 +130,31 @@ offset_bottom = 412.0
 theme_override_constants/separation = 48
 alignment = 1
 
-[node name="SettingsButton" type="TextureButton" parent="BackgroundBomb/ScaledContent/TopBar" unique_id=2066844004]
+[node name="SettingsButton" type="TextureButton" parent="Bomb/BackgroundBomb/ScaledContent/TopBar" unique_id=2066844004]
 custom_minimum_size = Vector2(168, 168)
 layout_mode = 2
 texture_normal = ExtResource("12")
 ignore_texture_size = true
 stretch_mode = 5
 
-[node name="MusicButton" type="TextureButton" parent="BackgroundBomb/ScaledContent/TopBar" unique_id=934041470]
+[node name="MusicButton" type="TextureButton" parent="Bomb/BackgroundBomb/ScaledContent/TopBar" unique_id=934041470]
 custom_minimum_size = Vector2(168, 168)
 layout_mode = 2
 texture_normal = ExtResource("13")
 ignore_texture_size = true
 stretch_mode = 5
 
-[node name="RulesButton" type="TextureButton" parent="BackgroundBomb/ScaledContent/TopBar" unique_id=1636588019]
+[node name="RulesButton" type="TextureButton" parent="Bomb/BackgroundBomb/ScaledContent/TopBar" unique_id=1636588019]
 custom_minimum_size = Vector2(168, 168)
 layout_mode = 2
 texture_normal = ExtResource("15")
 ignore_texture_size = true
 stretch_mode = 5
 
-[node name="PlayerSelectionWidget" parent="BackgroundBomb/ScaledContent" unique_id=850158347 instance=ExtResource("6")]
+[node name="PlayerSelectionWidget" parent="Bomb/BackgroundBomb/ScaledContent" unique_id=850158347 instance=ExtResource("6")]
 layout_mode = 1
 
-[node name="StartButton" type="TextureButton" parent="BackgroundBomb/ScaledContent" unique_id=1243521563]
+[node name="StartButton" type="TextureButton" parent="Bomb/BackgroundBomb/ScaledContent" unique_id=1243521563]
 z_index = 4
 layout_mode = 0
 offset_left = 215.0
@@ -140,7 +168,7 @@ ignore_texture_size = true
 stretch_mode = 5
 script = ExtResource("19")
 
-[node name="StartLabel" type="Label" parent="BackgroundBomb/ScaledContent/StartButton" unique_id=129669063]
+[node name="StartLabel" type="Label" parent="Bomb/BackgroundBomb/ScaledContent/StartButton" unique_id=129669063]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0

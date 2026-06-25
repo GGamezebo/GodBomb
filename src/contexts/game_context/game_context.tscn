@@ -25,6 +25,7 @@
 [ext_resource type="Script" uid="uid://qjkbatpnhuo" path="res://core/systems/haptics/haptics_manager.gd" id="25"]
 [ext_resource type="Texture2D" uid="uid://de4n5e1fxki8i" path="res://assets/textures/Background/Background.png" id="26"]
 [ext_resource type="Script" uid="uid://dkplswcbvqptx" path="res://src/features/background/game_bomb_background.gd" id="27"]
+[ext_resource type="Script" path="res://src/features/bomb/bomb_dial_glass.gd" id="27_glass"]
 [ext_resource type="Texture2D" uid="uid://b27y0jjb7mmmy" path="res://assets/party_kitchen/buttons/start_active.svg" id="28"]
 [ext_resource type="Script" uid="uid://cesm4akuquebh" path="res://src/features/bomb/bomb_lamps.gd" id="29"]
 [ext_resource type="Resource" path="res://src/common/menu_events.tres" id="31"]
@@ -37,9 +38,9 @@
 [ext_resource type="Script" uid="uid://ctfwqdpnffwoc" path="res://src/features/menu/start_action_button.gd" id="38"]
 [ext_resource type="Script" uid="uid://id0rvsyrsne0" path="res://src/features/bomb/pass_bomb_spark_layer.gd" id="39"]
 [ext_resource type="Script" uid="uid://bhmt3sxmxiwlg" path="res://src/contexts/game_context/game_logic/game_manager/game_states/emergency_state.gd" id="40"]
-[ext_resource type="PackedScene" path="res://src/contexts/game_context/ui/battle_emergency_overlay.tscn" id="41"]
+[ext_resource type="PackedScene" uid="uid://c00gnh7dac78a" path="res://src/contexts/game_context/ui/battle_emergency_overlay.tscn" id="41"]
 [ext_resource type="Texture2D" uid="uid://dhcclubtdmtpd" path="res://assets/party_kitchen/buttons/icon_emergency.svg" id="42"]
-[ext_resource type="AudioStream" path="res://assets/audio/music/win.mp3" id="43"]
+[ext_resource type="AudioStream" uid="uid://x5qdrvhmg2g" path="res://assets/audio/music/win.mp3" id="43"]
 
 [node name="GameContext" type="Control" unique_id=1610270397 node_paths=PackedStringArray("game_manager", "battle_chrome")]
 layout_mode = 3
@@ -97,7 +98,7 @@ tick_streams = Array[AudioStream]([ExtResource("20"), ExtResource("21")])
 
 [node name="UI" type="CanvasLayer" parent="." unique_id=1341470968]
 
-[node name="BackgroundBomb" type="Control" parent="UI" unique_id=226861383 node_paths=PackedStringArray("bomb_art", "player_color_bg", "fire_sparks", "scaled_content")]
+[node name="BackgroundBomb" type="Control" parent="UI" unique_id=226861383 node_paths=PackedStringArray("bomb_art", "dial_glass", "player_color_bg", "fire_sparks", "scaled_content")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -108,6 +109,7 @@ mouse_filter = 2
 script = ExtResource("27")
 game_events = ExtResource("15")
 bomb_art = NodePath("BombArt")
+dial_glass = NodePath("DisplayBomb")
 player_color_bg = NodePath("PlayerColorBackground")
 fire_sparks = NodePath("FireSparks")
 scaled_content = NodePath("ScaledContent")
@@ -122,6 +124,25 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 color = Color(0.06, 0.05, 0.04, 1)
+
+[node name="DisplayBomb" type="ColorRect" parent="UI/BackgroundBomb" unique_id=722071729]
+custom_maximum_size = Vector2(800, 800)
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.3148148
+anchor_top = 0.4015625
+anchor_right = 0.3148148
+anchor_bottom = 0.4015625
+offset_left = -202.0
+offset_top = -221.0
+offset_right = 598.0
+offset_bottom = 579.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 1)
+script = ExtResource("27_glass")
+metadata/_edit_use_anchors_ = true
 
 [node name="FireSparks" type="Control" parent="UI/BackgroundBomb" unique_id=1258871190]
 visible = false
