@@ -10,9 +10,17 @@ const TABLE_HINT_MIN_WIDTH := 280.0
 const SCREEN_MARGIN := 32.0
 const PANEL_MARGIN_H := 24
 const PANEL_MARGIN_V := 9
-const PANEL_BORDER_INSET := 9.0
+const PANEL_BORDER_WIDTH := 4
+const TEXT_FIT_SAFETY := 4.0
 const MAX_FONT_SIZE := 51
 const MIN_FONT_SIZE := 30
+const ABSOLUTE_MIN_FONT_SIZE := 22
+
+const PANEL_BG := Color(0.2, 0.16, 0.13, 0.94)
+const PANEL_BORDER := Color(0.9, 0.55, 0.32, 0.98)
+const PANEL_SHADOW := Color(0.04, 0.02, 0.01, 0.42)
+const TEXT_COLOR := Color(0.99, 0.96, 0.9, 1)
+const TEXT_OUTLINE := Color(0.1, 0.06, 0.04, 0.82)
 
 var _label: Label
 var _margin: MarginContainer
@@ -40,13 +48,14 @@ func _ready() -> void:
 	add_child(_margin)
 
 	_label = Label.new()
+	_label.theme_type_variation = &"Hero"
 	_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_label.clip_contents = true
 	_label.add_theme_font_size_override("font_size", MAX_FONT_SIZE)
-	_label.add_theme_color_override("font_color", Color(0.18, 0.13, 0.1, 1))
-	_label.add_theme_color_override("font_outline_color", Color(1, 0.99, 0.97, 0.85))
+	_label.add_theme_color_override("font_color", TEXT_COLOR)
+	_label.add_theme_color_override("font_outline_color", TEXT_OUTLINE)
 	_label.add_theme_constant_override("outline_size", 4)
 	_margin.add_child(_label)
 
@@ -89,12 +98,17 @@ func _lock_banner_size() -> void:
 
 
 func _text_area_size() -> Vector2:
-	var text_width := maxf(_banner_width - PANEL_MARGIN_H * 2.0, 0.0)
+	var border_inset := PANEL_BORDER_WIDTH * 2.0
+	var text_width := maxf(_banner_width - border_inset - PANEL_MARGIN_H * 2.0, 0.0)
 	var text_height := maxf(
-		TABLE_HINT_HEIGHT - PANEL_MARGIN_V * 2.0 - PANEL_BORDER_INSET,
+		TABLE_HINT_HEIGHT - border_inset - PANEL_MARGIN_V * 2.0 - TEXT_FIT_SAFETY,
 		0.0
 	)
 	return Vector2(text_width, text_height)
+
+
+func _outline_size_for(font_size: int) -> int:
+	return maxi(2, int(round(float(font_size) / 10.0)))
 
 
 func _apply_text_fit() -> void:
@@ -103,16 +117,13 @@ func _apply_text_fit() -> void:
 	_label.custom_maximum_size = area
 	_label.size = area
 
-	var chosen_font := MIN_FONT_SIZE
-	for font_size in range(MAX_FONT_SIZE, MIN_FONT_SIZE - 1, -1):
+	var chosen_font := ABSOLUTE_MIN_FONT_SIZE
+	for font_size in range(MAX_FONT_SIZE, ABSOLUTE_MIN_FONT_SIZE - 1, -1):
 		if _measure_wrapped_text_height(_label.text, area.x, font_size) <= area.y:
 			chosen_font = font_size
 			break
 	_label.add_theme_font_size_override("font_size", chosen_font)
-	_label.add_theme_constant_override(
-		"outline_size",
-		maxi(2, int(round(float(chosen_font) / 10.0)))
-	)
+	_label.add_theme_constant_override("outline_size", _outline_size_for(chosen_font))
 
 
 func _measure_wrapped_text_height(text: String, text_width: float, font_size: int) -> float:
@@ -121,13 +132,16 @@ func _measure_wrapped_text_height(text: String, text_width: float, font_size: in
 	var font: Font = _label.get_theme_font(&"font")
 	if font == null:
 		font = ThemeDB.fallback_font
-	return font.get_multiline_string_size(
+	var outline := float(_outline_size_for(font_size))
+	var measured := font.get_multiline_string_size(
 		text,
 		HORIZONTAL_ALIGNMENT_CENTER,
 		text_width,
 		font_size,
 		TextServer.BREAK_MANDATORY | TextServer.BREAK_WORD_BOUND
-	).y
+	)
+	# Outline and line spacing are not fully included in string size — reserve slack.
+	return measured.y + outline * 2.0 + TEXT_FIT_SAFETY
 
 
 func _sync_layout_if_ready() -> void:
@@ -234,13 +248,15 @@ static func visible_design_rect(
 
 static func apply_panel_style(panel: PanelContainer) -> void:
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(1, 0.99, 0.96, 0.94)
-	style.border_color = Color(0.88, 0.62, 0.38, 0.55)
-	style.set_border_width_all(4)
+	style.bg_color = PANEL_BG
+	style.border_color = PANEL_BORDER
+	style.set_border_width_all(PANEL_BORDER_WIDTH)
 	style.set_corner_radius_all(27)
-	style.shadow_color = Color(0.14, 0.08, 0.04, 0.16)
-	style.shadow_size = 9
-	style.shadow_offset = Vector2(0, 4)
+	style.set_content_margin_all(PANEL_BORDER_WIDTH)
+	style.shadow_color = PANEL_SHADOW
+	style.shadow_size = 14
+	style.shadow_offset = Vector2(0, 6)
+	style.anti_aliasing = true
 	panel.add_theme_stylebox_override("panel", style)
 
 
