@@ -11,6 +11,8 @@
 [ext_resource type="Texture2D" uid="uid://barvyayav0plu" path="res://assets/party_kitchen/buttons/remove_player.svg" id="9"]
 [ext_resource type="Texture2D" uid="uid://cyemvf284wyqa" path="res://assets/party_kitchen/table.svg" id="10"]
 
+[ext_resource type="Script" path="res://src/features/menu/bomb_table_action_button.gd" id="11"]
+
 [node name="PlayerSelectionWidget" type="Control" unique_id=282943105 node_paths=PackedStringArray("preset_storage", "table_area", "icons_layer", "chairs_layer", "add_player_button", "edit_player_window")]
 layout_mode = 3
 anchors_preset = 15
@@ -90,6 +92,8 @@ grow_vertical = 2
 texture_normal = ExtResource("8")
 ignore_texture_size = true
 stretch_mode = 5
+clip_contents = false
+script = ExtResource("11")
 
 [node name="PresetStorage" type="Node" parent="." unique_id=1088746652]
 script = ExtResource("2")

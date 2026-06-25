@@ -49,7 +49,6 @@ var _is_start_preview_playing: bool = false
 var _turn_order_arrows: TurnOrderArrowsLayer
 var _order_badges_layer: Control
 var _order_badges: Array[SeatOrderBadge] = []
-var _remove_button_ring: ChairSwapRing
 var _remove_zone_haptic_active: bool = false
 var _table_hint_banner: TableHintBanner
 var _swap_drag_hint_active: bool = false
@@ -68,7 +67,6 @@ signal emergency_selection_changed(index: int, info: PlayerInfo)
 func _ready() -> void:
 	_setup_turn_order_arrows()
 	_setup_order_badges()
-	_setup_remove_button_ring()
 	_setup_swap_hints()
 	if add_player_button:
 		add_player_button.pressed.connect(_on_add_player_button_pressed)
@@ -103,8 +101,6 @@ func _connect_bomb_layout() -> void:
 func _on_bomb_layout_applied() -> void:
 	_schedule_position_update()
 	_update_hint_banner_layout()
-	_apply_remove_ring_radius()
-	_layout_remove_button_ring()
 
 
 func _find_layout_host() -> Node:
@@ -218,40 +214,21 @@ func _exit_tree() -> void:
 	listener.deinit()
 
 
-func _setup_remove_button_ring() -> void:
-	if not add_player_button:
+func _sync_add_button_glow(zone_boost: bool = false) -> void:
+	if not add_player_button is BombTableActionButton:
 		return
-	_remove_button_ring = ChairSwapRing.new()
-	_remove_button_ring.ring_color = ChairSwapRing.DEFAULT_RING_COLOR
-	_remove_button_ring.z_index = 1
-	_remove_button_ring.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_player_button.add_child(_remove_button_ring)
-	if not add_player_button.resized.is_connected(_layout_remove_button_ring):
-		add_player_button.resized.connect(_layout_remove_button_ring)
-	_apply_remove_ring_radius()
-	_layout_remove_button_ring()
-
-
-func _apply_remove_ring_radius() -> void:
-	if not _remove_button_ring or not add_player_button:
-		return
-	var button_half := minf(add_player_button.size.x, add_player_button.size.y) * 0.5
-	var chair_half := chair_size.x * 0.5
-	_remove_button_ring.set_ring_radius(ChairSwapRing.radius_for_half_extent(button_half, chair_half))
-
-
-func _layout_remove_button_ring() -> void:
-	if not _remove_button_ring or not add_player_button:
-		return
-	var ring_radius := _remove_button_ring.ring_radius
-	var button_center := add_player_button.size * 0.5
-	_remove_button_ring.position = button_center - Vector2(ring_radius, ring_radius)
+	var btn := add_player_button as BombTableActionButton
+	var active := add_player_button.visible and not add_player_button.disabled
+	btn.set_glow_active(active)
+	btn.set_alert_glow(_is_remove_mode)
+	btn.set_zone_boost(zone_boost)
 
 
 func _remove_ring_radius() -> float:
-	if _remove_button_ring:
-		return _remove_button_ring.ring_radius
-	return ChairSwapRing.DEFAULT_RING_RADIUS
+	if not add_player_button:
+		return ChairSwapRing.DEFAULT_RING_RADIUS
+	var button_half := minf(add_player_button.size.x, add_player_button.size.y) * 0.5
+	return ChairSwapRing.radius_for_half_extent(button_half, chair_size.x * 0.5)
 
 
 func _get_remove_button_center_global() -> Vector2:
@@ -282,12 +259,8 @@ func _update_remove_button_highlight(in_zone: bool) -> void:
 
 
 func _update_remove_button_ring(dragging: PlayerIcon) -> void:
-	if not _remove_button_ring:
-		return
-	_apply_remove_ring_radius()
-	_layout_remove_button_ring()
 	var in_zone := dragging != null and _is_icon_in_remove_ring(dragging)
-	_remove_button_ring.visible_ring = in_zone
+	_sync_add_button_glow(in_zone)
 	_update_remove_button_highlight(in_zone)
 
 
@@ -683,6 +656,7 @@ func _update_add_button() -> void:
 		add_player_button.disabled = count >= game_config.max_players
 		_update_add_button_animation(_player_icons.size() < _min_players_required())
 	_apply_add_button_texture()
+	_sync_add_button_glow()
 	_refresh_table_hint()
 
 
@@ -937,8 +911,7 @@ func _on_icon_drag_ended(icon: PlayerIcon) -> void:
 	_set_order_markers_drag_dimmed(false)
 	_refresh_turn_order()
 	_clear_chair_highlights()
-	if _remove_button_ring:
-		_remove_button_ring.visible_ring = false
+	_sync_add_button_glow(false)
 	_update_remove_button_highlight(false)
 
 	if should_remove:
@@ -1140,8 +1113,6 @@ func _notification(what: int) -> void:
 	if what == NOTIFICATION_RESIZED:
 		_schedule_position_update()
 		_update_hint_banner_layout()
-		_apply_remove_ring_radius()
-		_layout_remove_button_ring()
 
 
 func _apply_emergency_interaction_state() -> void:
