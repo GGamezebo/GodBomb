@@ -4,6 +4,8 @@ extends CanvasLayer
 const SLIME_PATH := "res://assets/party_kitchen/slimes/%d.svg"
 const TABLE_CENTER := Vector2(540.0, 960.0)
 const PREVIEW_SLIME_SIZE := Vector2(128.0, 128.0)
+const PANEL_SCREEN_MARGIN := Vector2(32.0, 64.0)
+const EXPLANATION_BANNER_HEIGHT := 256.0
 const EXPLANATION_TEXT := (
 	"Если кто-то случайно или специально нарушил правила — "
 	+ "например, назвал неверное слово или нажал на экран несколько раз, "
@@ -36,8 +38,11 @@ func _ready() -> void:
 		player_selection_widget.emergency_selection_changed.connect(_on_selection_changed)
 	if game_events:
 		listener.add(game_events.ev_game_state_changed, _on_game_state_changed)
-	if layout_host and not layout_host.layout_applied.is_connected(_layout_preview_on_table):
-		layout_host.layout_applied.connect(_layout_preview_on_table)
+	if layout_host:
+		if not layout_host.layout_applied.is_connected(_layout_explanation_banner):
+			layout_host.layout_applied.connect(_layout_explanation_banner)
+		if not layout_host.layout_applied.is_connected(_layout_preview_on_table):
+			layout_host.layout_applied.connect(_layout_preview_on_table)
 	_setup_explanation_banner()
 
 
@@ -54,9 +59,33 @@ func configure(data: Dictionary) -> void:
 func _setup_explanation_banner() -> void:
 	if not explanation_banner:
 		return
+	var title := explanation_banner.get_node_or_null("Margin/VBox/Title") as Label
+	if title:
+		title.autowrap_mode = TextServer.AUTOWRAP_OFF
+		title.text = "Экстренная\u00A0ситуация"
 	var text := explanation_banner.get_node_or_null("Margin/VBox/ExplanationText") as RichTextLabel
 	if text:
+		text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		text.text = EXPLANATION_TEXT
+	call_deferred("_layout_explanation_banner")
+
+
+func _layout_explanation_banner() -> void:
+	if not explanation_banner or not layout_host:
+		return
+	var scale := layout_host.get_cover_scale()
+	if scale <= 0.0:
+		return
+	var host_size := layout_host.size
+	var offset := (host_size - MenuBombLayout.DESIGN_SIZE * scale) * 0.5
+	var left := (PANEL_SCREEN_MARGIN.x - offset.x) / scale
+	var right := (host_size.x - PANEL_SCREEN_MARGIN.x - offset.x) / scale
+	var top := (PANEL_SCREEN_MARGIN.y - offset.y) / scale
+	explanation_banner.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	explanation_banner.offset_left = left
+	explanation_banner.offset_top = top
+	explanation_banner.offset_right = right
+	explanation_banner.offset_bottom = top + EXPLANATION_BANNER_HEIGHT
 
 
 func _on_game_state_changed(from_state: String, to_state: String) -> void:
@@ -77,6 +106,7 @@ func open() -> void:
 	_sync_preview(session.get_current_player().info)
 	if continue_button is StartActionButton:
 		(continue_button as StartActionButton).call_deferred("refresh_label_layout")
+	call_deferred("_layout_explanation_banner")
 	call_deferred("_layout_preview_on_table")
 	visible = true
 

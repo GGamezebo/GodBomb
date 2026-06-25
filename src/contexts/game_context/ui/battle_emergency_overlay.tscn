@@ -70,15 +70,9 @@ offset_bottom = 1920.0
 position = Vector2(528, 483)
 
 [node name="ExplanationBanner" type="PanelContainer" parent="Root/LayoutHost/ScaledContent" unique_id=1804694599]
-layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -400.0
-offset_right = 400.0
-offset_bottom = 256.0
-grow_horizontal = 2
-offset_transform_enabled = true
+layout_mode = 0
+offset_right = 1048.0
+offset_bottom = 320.0
 
 [node name="Margin" type="MarginContainer" parent="Root/LayoutHost/ScaledContent/ExplanationBanner" unique_id=477833408]
 layout_mode = 2
@@ -94,8 +88,9 @@ theme_override_constants/separation = 28
 [node name="Title" type="Label" parent="Root/LayoutHost/ScaledContent/ExplanationBanner/Margin/VBox" unique_id=1942092072]
 layout_mode = 2
 theme_type_variation = &"ModalTitle"
-text = "Экстренная ситуация"
+text = "Экстренная ситуация"
 horizontal_alignment = 1
+autowrap_mode = 0
 
 [node name="ExplanationText" type="RichTextLabel" parent="Root/LayoutHost/ScaledContent/ExplanationBanner/Margin/VBox" unique_id=120906736]
 layout_mode = 2
@@ -103,7 +98,7 @@ theme_type_variation = &"ModalRichText"
 bbcode_enabled = true
 fit_content = true
 scroll_active = false
-autowrap_mode = 1
+autowrap_mode = 3
 
 [node name="PreviewColumn" type="VBoxContainer" parent="Root/LayoutHost/ScaledContent" unique_id=1100767216]
 z_index = 5
