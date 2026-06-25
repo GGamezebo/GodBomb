@@ -18,6 +18,8 @@ extends Control
 @export var reset_button: Button
 @export var close_button: Button
 
+const SLIDER_GRABBER_INSET := 26.0
+
 var _awaiting_reset_confirm: bool = false
 
 
@@ -26,6 +28,7 @@ func _ready() -> void:
 	if game_time_slider:
 		game_time_slider.value_changed.connect(_on_game_time_changed)
 		UiSounds.bind_slider(game_time_slider, 1.0)
+		_configure_game_time_slider()
 	if music_check:
 		music_check.toggled.connect(_on_music_toggled)
 		UiSounds.bind_checkbox(music_check)
@@ -48,6 +51,34 @@ func _ready() -> void:
 		close_button.pressed.connect(close)
 		UiSounds.bind_button(close_button)
 	call_deferred("_update_modal_layer_visibility")
+
+
+func _configure_game_time_slider() -> void:
+	if game_time_slider == null:
+		return
+	game_time_slider.clip_contents = false
+	var row := game_time_slider.get_parent() as Control
+	if row:
+		row.clip_contents = false
+	var scroll := _find_scroll_container(game_time_slider)
+	if scroll:
+		scroll.clip_contents = false
+	for style_name in ["slider", "grabber_area", "grabber_area_highlight"]:
+		var style := game_time_slider.get_theme_stylebox(style_name, &"HSlider")
+		if style is StyleBoxFlat:
+			var tuned := style.duplicate() as StyleBoxFlat
+			tuned.content_margin_left = SLIDER_GRABBER_INSET
+			tuned.content_margin_right = SLIDER_GRABBER_INSET
+			game_time_slider.add_theme_stylebox_override(style_name, tuned)
+
+
+func _find_scroll_container(from: Node) -> ScrollContainer:
+	var node: Node = from
+	while node:
+		if node is ScrollContainer:
+			return node as ScrollContainer
+		node = node.get_parent()
+	return null
 
 
 func open() -> void:

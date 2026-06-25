@@ -10,7 +10,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1")
-game_time_slider = NodePath("Panel/Margin/VBox/Scroll/Content/GameTimeSlider")
+game_time_slider = NodePath("Panel/Margin/VBox/Scroll/Content/GameTimeRow/GameTimeSlider")
 game_time_label = NodePath("Panel/Margin/VBox/Scroll/Content/GameTimeLabel")
 music_check = NodePath("Panel/Margin/VBox/Scroll/Content/MusicCheck")
 music_slider = NodePath("Panel/Margin/VBox/Scroll/Content/MusicRow/MusicSlider")
@@ -65,6 +65,8 @@ horizontal_alignment = 1
 [node name="Scroll" type="ScrollContainer" parent="Panel/Margin/VBox"]
 layout_mode = 2
 size_flags_vertical = 3
+horizontal_scroll_mode = 0
+clip_contents = false
 
 [node name="Content" type="VBoxContainer" parent="Panel/Margin/VBox/Scroll"]
 layout_mode = 2
@@ -76,9 +78,23 @@ layout_mode = 2
 theme_type_variation = &"ModalLabel"
 text = "Длительность партии: 5 мин"
 
-[node name="GameTimeSlider" type="HSlider" parent="Panel/Margin/VBox/Scroll/Content"]
+[node name="GameTimeRow" type="Control" parent="Panel/Margin/VBox/Scroll/Content"]
 custom_minimum_size = Vector2(0, 88)
 layout_mode = 2
+size_flags_horizontal = 3
+clip_contents = false
+
+[node name="GameTimeSlider" type="HSlider" parent="Panel/Margin/VBox/Scroll/Content/GameTimeRow"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 26.0
+offset_top = 0.0
+offset_right = -26.0
+offset_bottom = 0.0
+grow_horizontal = 2
+grow_vertical = 2
 min_value = 1.0
 max_value = 30.0
 value = 5.0

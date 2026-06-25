@@ -66,9 +66,9 @@ font_weight = 600
 [sub_resource type="StyleBoxEmpty" id="Style_checkbox"]
 
 [sub_resource type="StyleBoxFlat" id="Style_slider_fill"]
-content_margin_left = 4.0
+content_margin_left = 26.0
 content_margin_top = 12.0
-content_margin_right = 4.0
+content_margin_right = 26.0
 content_margin_bottom = 12.0
 bg_color = Color(1, 0.419608, 0.290196, 0.92)
 corner_radius_top_left = 12
@@ -77,9 +77,9 @@ corner_radius_bottom_right = 12
 corner_radius_bottom_left = 12
 
 [sub_resource type="StyleBoxFlat" id="Style_slider_fill_hi"]
-content_margin_left = 4.0
+content_margin_left = 26.0
 content_margin_top = 12.0
-content_margin_right = 4.0
+content_margin_right = 26.0
 content_margin_bottom = 12.0
 bg_color = Color(1, 0.52, 0.36, 1)
 corner_radius_top_left = 12
@@ -88,9 +88,9 @@ corner_radius_bottom_right = 12
 corner_radius_bottom_left = 12
 
 [sub_resource type="StyleBoxFlat" id="Style_slider_rail"]
-content_margin_left = 4.0
+content_margin_left = 26.0
 content_margin_top = 16.0
-content_margin_right = 4.0
+content_margin_right = 26.0
 content_margin_bottom = 16.0
 bg_color = Color(0.28, 0.22, 0.18, 1)
 border_width_left = 2
