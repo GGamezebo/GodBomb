@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://exit_confirm_dialog_godbomb"]
+[gd_scene load_steps=3 format=3 uid="uid://exit_confirm_dialog_godbomb"]
 
 [ext_resource type="Script" path="res://src/features/menu/exit_confirm_dialog.gd" id="1"]
+[ext_resource type="PackedScene" path="res://src/features/menu/pill_action_button.tscn" id="2"]
 
 [node name="ExitConfirmDialog" type="Control" node_paths=PackedStringArray("message_label", "cancel_button", "confirm_button")]
 layout_mode = 3
@@ -62,16 +63,10 @@ layout_mode = 2
 theme_override_constants/separation = 20
 alignment = 1
 
-[node name="CancelButton" type="Button" parent="Panel/Margin/VBox/Buttons"]
-custom_minimum_size = Vector2(0, 180)
+[node name="CancelButton" parent="Panel/Margin/VBox/Buttons" instance=ExtResource("2")]
 layout_mode = 2
-size_flags_horizontal = 3
-theme_type_variation = &"ModalButton"
-text = "Отмена"
+action_text = "Отмена"
 
-[node name="ConfirmButton" type="Button" parent="Panel/Margin/VBox/Buttons"]
-custom_minimum_size = Vector2(0, 180)
+[node name="ConfirmButton" parent="Panel/Margin/VBox/Buttons" instance=ExtResource("2")]
 layout_mode = 2
-size_flags_horizontal = 3
-theme_type_variation = &"ModalButton"
-text = "Да"
+action_text = "Да"

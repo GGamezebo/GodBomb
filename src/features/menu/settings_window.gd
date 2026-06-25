@@ -15,8 +15,8 @@ extends Control
 @export var haptics_check: CheckBox
 @export var haptics_slider: HSlider
 @export var haptics_value_label: Label
-@export var reset_button: Button
-@export var close_button: Button
+@export var reset_button: StartActionButton
+@export var close_button: StartActionButton
 
 const SLIDER_GRABBER_INSET := 26.0
 

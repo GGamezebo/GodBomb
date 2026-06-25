@@ -21,7 +21,7 @@ const RULES_TEXT := """[font_size=52][b]Правила игры «Бомба»[/
 • Удержание 1,5 секунды — изменить имя и цвет слайма."""
 
 @export var rules_text: RichTextLabel
-@export var close_button: Button
+@export var close_button: StartActionButton
 
 
 func _ready() -> void:

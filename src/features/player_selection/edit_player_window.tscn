@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://b56w3ott01iat"]
 
 [ext_resource type="Script" uid="uid://bt3a3dds2u7xr" path="res://src/features/player_selection/edit_player_window.gd" id="1"]
+[ext_resource type="PackedScene" path="res://src/features/menu/pill_action_button.tscn" id="2"]
 
 [node name="EditPlayerWindow" type="Control" unique_id=929046007 node_paths=PackedStringArray("name_edit", "name_history_grid", "slime_preview", "ok_button", "apply_button", "cancel_button", "colors_grid")]
 layout_mode = 3
@@ -107,23 +108,17 @@ layout_mode = 2
 theme_override_constants/separation = 20
 alignment = 1
 
-[node name="CancelButton" type="Button" parent="Panel/Margin/VBox/Buttons" unique_id=422438833]
-custom_minimum_size = Vector2(0, 180)
+[node name="CancelButton" parent="Panel/Margin/VBox/Buttons" unique_id=422438833 instance=ExtResource("2")]
 layout_mode = 2
-size_flags_horizontal = 3
-theme_type_variation = &"ModalButton"
-text = "Отмена"
+action_text = "Отмена"
 
-[node name="ApplyButton" type="Button" parent="Panel/Margin/VBox/Buttons" unique_id=1125762236]
-custom_minimum_size = Vector2(0, 180)
+[node name="ApplyButton" parent="Panel/Margin/VBox/Buttons" unique_id=1125762236 instance=ExtResource("2")]
 layout_mode = 2
-size_flags_horizontal = 3
-theme_type_variation = &"ModalButton"
-text = "Применить"
+action_text = "Применить"
 
-[node name="OkButton" type="Button" parent="Panel/Margin/VBox/Buttons" unique_id=845437274]
-custom_minimum_size = Vector2(0, 180)
+[node name="ActionLabel" parent="Panel/Margin/VBox/Buttons/ApplyButton" index="0"]
+theme_override_font_sizes/font_size = 44
+
+[node name="OkButton" parent="Panel/Margin/VBox/Buttons" unique_id=845437274 instance=ExtResource("2")]
 layout_mode = 2
-size_flags_horizontal = 3
-theme_type_variation = &"ModalButton"
-text = "OK"
+action_text = "OK"

@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://settings_window_godbomb"]
+[gd_scene load_steps=3 format=3 uid="uid://settings_window_godbomb"]
 
 [ext_resource type="Script" path="res://src/features/menu/settings_window.gd" id="1"]
+[ext_resource type="PackedScene" path="res://src/features/menu/pill_action_button.tscn" id="2"]
 
 [node name="SettingsWindow" type="Control" node_paths=PackedStringArray("game_time_slider", "game_time_label", "music_check", "music_slider", "music_value_label", "sfx_slider", "sfx_value_label", "haptics_check", "haptics_slider", "haptics_value_label", "reset_button", "close_button")]
 layout_mode = 3
@@ -191,14 +192,13 @@ theme_type_variation = &"ModalMuted"
 text = "Сброс вернёт подсказки, настройки и список имён при добавлении игрока к начальным."
 autowrap_mode = 3
 
-[node name="ResetButton" type="Button" parent="Panel/Margin/VBox/Scroll/Content"]
-custom_minimum_size = Vector2(0, 180)
+[node name="ResetButton" parent="Panel/Margin/VBox/Scroll/Content" instance=ExtResource("2")]
 layout_mode = 2
-theme_type_variation = &"ModalButton"
-text = "Сбросить прогресс"
+action_text = "Сбросить прогресс"
 
-[node name="CloseButton" type="Button" parent="Panel/Margin/VBox"]
-custom_minimum_size = Vector2(0, 180)
+[node name="ActionLabel" parent="Panel/Margin/VBox/Scroll/Content/ResetButton" index="0"]
+theme_override_font_sizes/font_size = 40
+
+[node name="CloseButton" parent="Panel/Margin/VBox" instance=ExtResource("2")]
 layout_mode = 2
-theme_type_variation = &"ModalButton"
-text = "Закрыть"
+action_text = "Закрыть"

@@ -18,9 +18,9 @@ const LOCK_FONT_SIZE := 66
 @export var name_edit: LineEdit
 @export var name_history_grid: GridContainer
 @export var slime_preview: TextureRect
-@export var ok_button: Button
-@export var apply_button: Button
-@export var cancel_button: Button
+@export var ok_button: StartActionButton
+@export var apply_button: StartActionButton
+@export var cancel_button: StartActionButton
 @export var colors_grid: GridContainer
 @export var preset_storage: PlayerPresetStorage
 @export var game_config: GameConfig
@@ -315,10 +315,13 @@ func _get_name_field_text() -> String:
 func _sync_confirm_buttons() -> void:
 	var has_name := not _read_player_name().is_empty()
 	var color_taken := _is_preset_held(_selected_preset_id)
+	var can_confirm := has_name and not color_taken
 	if ok_button:
-		ok_button.disabled = not has_name or color_taken
+		ok_button.disabled = not can_confirm
+		ok_button.set_pulse_active(can_confirm)
 	if apply_button:
-		apply_button.disabled = not has_name or color_taken
+		apply_button.disabled = not can_confirm
+		apply_button.set_pulse_active(can_confirm)
 
 
 func _pick_default_history_name() -> String:

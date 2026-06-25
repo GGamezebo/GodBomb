@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://rules_window_godbomb"]
+[gd_scene load_steps=3 format=3 uid="uid://rules_window_godbomb"]
 
 [ext_resource type="Script" path="res://src/features/menu/rules_window.gd" id="1"]
+[ext_resource type="PackedScene" path="res://src/features/menu/pill_action_button.tscn" id="2"]
 
 [node name="RulesWindow" type="Control" node_paths=PackedStringArray("rules_text", "close_button")]
 layout_mode = 3
@@ -65,8 +66,6 @@ bbcode_enabled = true
 fit_content = true
 scroll_active = false
 
-[node name="CloseButton" type="Button" parent="Panel/Margin/VBox"]
-custom_minimum_size = Vector2(0, 180)
+[node name="CloseButton" parent="Panel/Margin/VBox" instance=ExtResource("2")]
 layout_mode = 2
-theme_type_variation = &"ModalButton"
-text = "Закрыть"
+action_text = "Закрыть"

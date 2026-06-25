@@ -7,8 +7,8 @@ signal cancelled
 const PANEL_SIDE_MARGIN := 32.0
 
 @export var message_label: Label
-@export var cancel_button: Button
-@export var confirm_button: Button
+@export var cancel_button: StartActionButton
+@export var confirm_button: StartActionButton
 
 var _panel: PanelContainer
 
