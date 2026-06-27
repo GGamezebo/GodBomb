@@ -112,6 +112,8 @@ const _RU: Dictionary = {
 	"WORD_COND_BEGIN": "Слог в начале слова",
 	"WORD_COND_ANYWHERE": "Слог в любом месте",
 	"WORD_COND_END": "Слог в конце слова",
+	"WORD_COND_NOT_BEGIN": "Слог не в начале слова",
+	"WORD_COND_NOT_END": "Слог не в конце слова",
 	"LOADING": "ЗАГРУЗКА",
 	"EXIT_CONFIRM_MESSAGE": "Завершить партию?",
 	"EXIT_CANCEL": "Отмена",
@@ -189,6 +191,8 @@ const _EN: Dictionary = {
 	"WORD_COND_BEGIN": "Syllable at word start",
 	"WORD_COND_ANYWHERE": "Syllable anywhere",
 	"WORD_COND_END": "Syllable at word end",
+	"WORD_COND_NOT_BEGIN": "Syllable not at word start",
+	"WORD_COND_NOT_END": "Syllable not at word end",
 	"LOADING": "LOADING",
 	"EXIT_CONFIRM_MESSAGE": "End the match?",
 	"EXIT_CANCEL": "Cancel",
@@ -243,18 +247,47 @@ const _SLIME_EN: Array[String] = [
 
 
 static func lookup(locale: String, key: String) -> String:
-	var table := _EN if locale == "en" else _RU
-	return str(table.get(key, key))
+	if key.begins_with("LANG_"):
+		return LocaleCatalog.native_name(key.substr(5).to_lower())
+	var normalized := LocaleCatalog.normalize(locale)
+	match normalized:
+		LocaleCatalog.LOCALE_EN:
+			return str(_EN.get(key, key))
+		LocaleCatalog.LOCALE_RU:
+			return str(_RU.get(key, key))
+		_:
+			var extra := LocaleStringsLocales.ui_table(normalized)
+			if extra.has(key):
+				return str(extra[key])
+			return str(_EN.get(key, key))
 
 
 static func get_rules_text(locale: String) -> String:
-	return RULES_TEXT_EN if locale == "en" else RULES_TEXT_RU
+	var normalized := LocaleCatalog.normalize(locale)
+	match normalized:
+		LocaleCatalog.LOCALE_EN:
+			return RULES_TEXT_EN
+		LocaleCatalog.LOCALE_RU:
+			return RULES_TEXT_RU
+		_:
+			var extra := LocaleStringsLocales.rules_text(normalized)
+			if not extra.is_empty():
+				return extra
+			return RULES_TEXT_EN
 
 
 static func get_slime_names(locale: String) -> Array[String]:
-	if locale == "en":
-		return _SLIME_EN.duplicate()
-	return _SLIME_RU.duplicate()
+	var normalized := LocaleCatalog.normalize(locale)
+	match normalized:
+		LocaleCatalog.LOCALE_EN:
+			return _SLIME_EN.duplicate()
+		LocaleCatalog.LOCALE_RU:
+			return _SLIME_RU.duplicate()
+		_:
+			var extra := LocaleStringsLocales.slime_names(normalized)
+			if not extra.is_empty():
+				return extra
+			return _SLIME_EN.duplicate()
 
 
 static func get_slime_name(locale: String, preset_id: int) -> String:

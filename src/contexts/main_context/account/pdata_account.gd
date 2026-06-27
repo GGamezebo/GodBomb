@@ -90,21 +90,20 @@ func ensure_recent_names_initialized() -> void:
 
 func get_language() -> String:
 	ensure_language_initialized()
-	return str(data.get("language", "ru"))
+	return LocaleCatalog.normalize(str(data.get("language", LocaleCatalog.LOCALE_RU)))
 
 
 func set_language(code: String) -> void:
-	data["language"] = "en" if code == "en" else "ru"
+	data["language"] = LocaleCatalog.normalize(code)
 	emit_changed()
 
 
 func ensure_language_initialized() -> void:
 	if data.has("language"):
 		var lang := str(data.get("language", ""))
-		if not lang.is_empty():
+		if not lang.is_empty() and LocaleCatalog.ORDER.has(lang):
 			return
-	var sys := OS.get_locale_language().to_lower()
-	data["language"] = "en" if sys == "en" else "ru"
+	data["language"] = LocaleCatalog.detect_from_system()
 	emit_changed()
 
 

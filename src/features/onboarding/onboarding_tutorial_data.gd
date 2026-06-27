@@ -61,10 +61,184 @@ const ROUNDS_EN: Array[Dictionary] = [
 	},
 ]
 
+const ROUNDS_SR: Array[Dictionary] = [
+	{
+		"syllable": "КА",
+		"condition": WordCondition.Type.BEGIN,
+		"word_hint": "кафа",
+		"examples": "кафа, како, калем",
+		"pass_hint": "Izgovori reč naglas i dodirni ekran — prebaci bombu.",
+		"explode_player_index": 0,
+	},
+	{
+		"syllable": "СТ",
+		"condition": WordCondition.Type.ANYWHERE,
+		"word_hint": "стол",
+		"examples": "стол, листа, бистро",
+		"pass_hint": "Izgovori reč i prebaci bombu kratkim dodirom.",
+		"explode_player_index": 1,
+	},
+	{
+		"syllable": "ОК",
+		"condition": WordCondition.Type.END,
+		"word_hint": "рукопис",
+		"examples": "рукопис, блог, дневник",
+		"pass_hint": "Izgovori reč i prebaci bombu susedu.",
+		"explode_player_index": 0,
+	},
+]
+
+const ROUNDS_ES: Array[Dictionary] = [
+	{
+		"syllable": "BL",
+		"condition": WordCondition.Type.BEGIN,
+		"word_hint": "blanco",
+		"examples": "blanco, bloque, blusa",
+		"pass_hint": "Di una palabra en voz alta y toca la pantalla para pasar la bomba.",
+		"explode_player_index": 0,
+	},
+	{
+		"syllable": "AND",
+		"condition": WordCondition.Type.ANYWHERE,
+		"word_hint": "sandalias",
+		"examples": "sandalias, mano, random",
+		"pass_hint": "Di una palabra y pasa la bomba con un toque rápido.",
+		"explode_player_index": 1,
+	},
+	{
+		"syllable": "AR",
+		"condition": WordCondition.Type.END,
+		"word_hint": "mar",
+		"examples": "mar, avatar, popular",
+		"pass_hint": "Di una palabra y pasa la bomba al vecino.",
+		"explode_player_index": 0,
+	},
+]
+
+const ROUNDS_HI: Array[Dictionary] = [
+	{
+		"syllable": "का",
+		"condition": WordCondition.Type.BEGIN,
+		"word_hint": "कमल",
+		"examples": "कमल, कपड़ा, कहानी",
+		"pass_hint": "शब्द ज़ोर से बोलें और बम आगे पास करने के लिए स्क्रीन टैप करें।",
+		"explode_player_index": 0,
+	},
+	{
+		"syllable": "र",
+		"condition": WordCondition.Type.ANYWHERE,
+		"word_hint": "गर्म",
+		"examples": "गर्म, परदा, बर्फ",
+		"pass_hint": "शब्द बोलें और जल्दी टैप करके बम पास करें।",
+		"explode_player_index": 1,
+	},
+	{
+		"syllable": "न",
+		"condition": WordCondition.Type.END,
+		"word_hint": "धन",
+		"examples": "धन, कन, अनमोल",
+		"pass_hint": "शब्द बोलें और बम पड़ोसी को पास करें।",
+		"explode_player_index": 0,
+	},
+]
+
+const ROUNDS_DE: Array[Dictionary] = [
+	{
+		"syllable": "TRA",
+		"condition": WordCondition.Type.BEGIN,
+		"word_hint": "Traum",
+		"examples": "Traum, Traktor, Transport",
+		"pass_hint": "Sag ein Wort laut und tippe kurz auf den Bildschirm, um die Bombe weiterzugeben.",
+		"explode_player_index": 0,
+	},
+	{
+		"syllable": "AND",
+		"condition": WordCondition.Type.ANYWHERE,
+		"word_hint": "Hand",
+		"examples": "Hand, Land, Band",
+		"pass_hint": "Sag ein Wort und gib die Bombe mit einem schnellen Tipp weiter.",
+		"explode_player_index": 1,
+	},
+	{
+		"syllable": "END",
+		"condition": WordCondition.Type.END,
+		"word_hint": "Ende",
+		"examples": "Ende, Wendung, Freund",
+		"pass_hint": "Sag ein Wort und gib die Bombe an deinen Nachbarn weiter.",
+		"explode_player_index": 0,
+	},
+]
+
+const ROUNDS_FR: Array[Dictionary] = [
+	{
+		"syllable": "CH",
+		"condition": WordCondition.Type.BEGIN,
+		"word_hint": "machine",
+		"examples": "machine, riche, échec",
+		"pass_hint": "Dis un mot à voix haute et touche l'écran pour passer la bombe.",
+		"explode_player_index": 0,
+	},
+	{
+		"syllable": "ER",
+		"condition": WordCondition.Type.ANYWHERE,
+		"word_hint": "erreur",
+		"examples": "erreur, mer, terre",
+		"pass_hint": "Dis un mot et passe la bombe d'un tap rapide.",
+		"explode_player_index": 1,
+	},
+	{
+		"syllable": "AN",
+		"condition": WordCondition.Type.END,
+		"word_hint": "banane",
+		"examples": "banane, orange, antenne",
+		"pass_hint": "Dis un mot et passe la bombe à ton voisin.",
+		"explode_player_index": 0,
+	},
+]
+
+const ROUNDS_IT: Array[Dictionary] = [
+	{
+		"syllable": "ST",
+		"condition": WordCondition.Type.BEGIN,
+		"word_hint": "festa",
+		"examples": "festa, pasta, mostra",
+		"pass_hint": "Di una parola ad alta voce e tocca lo schermo per passare la bomba.",
+		"explode_player_index": 0,
+	},
+	{
+		"syllable": "TR",
+		"condition": WordCondition.Type.ANYWHERE,
+		"word_hint": "metro",
+		"examples": "metro, patria, contro",
+		"pass_hint": "Di una parola e passa la bomba con un tocco rapido.",
+		"explode_player_index": 1,
+	},
+	{
+		"syllable": "ATO",
+		"condition": WordCondition.Type.END,
+		"word_hint": "mattoni",
+		"examples": "mattoni, pirata, formato",
+		"pass_hint": "Di una parola e passa la bomba al vicino.",
+		"explode_player_index": 0,
+	},
+]
+
+const ROUNDS_BY_LOCALE: Dictionary = {
+	LocaleCatalog.LOCALE_RU: ROUNDS_RU,
+	LocaleCatalog.LOCALE_EN: ROUNDS_EN,
+	LocaleCatalog.LOCALE_SR: ROUNDS_SR,
+	LocaleCatalog.LOCALE_ES: ROUNDS_ES,
+	LocaleCatalog.LOCALE_HI: ROUNDS_HI,
+	LocaleCatalog.LOCALE_DE: ROUNDS_DE,
+	LocaleCatalog.LOCALE_FR: ROUNDS_FR,
+	LocaleCatalog.LOCALE_IT: ROUNDS_IT,
+}
+
 
 static func rounds() -> Array[Dictionary]:
-	if LocaleService.get_locale() == LocaleService.LOCALE_EN:
-		return ROUNDS_EN
+	var locale := LocaleService.get_locale()
+	if ROUNDS_BY_LOCALE.has(locale):
+		return ROUNDS_BY_LOCALE[locale]
 	return ROUNDS_RU
 
 
@@ -112,7 +286,7 @@ static func round_index_for_card(card: GameCard) -> int:
 		return 0
 	var all := rounds()
 	for i in all.size():
-		var round := all[i]
+		var round: Dictionary = all[i]
 		if round["syllable"] == card.word and int(round["condition"]) == card.condition:
 			return i
 	return 0

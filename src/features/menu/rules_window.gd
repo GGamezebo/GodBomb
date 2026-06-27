@@ -49,7 +49,7 @@ func _ready() -> void:
 	refresh_localized()
 
 
-func refresh_localized() -> void:
+func refresh_localized(_locale: String = "") -> void:
 	if rules_text:
 		rules_text.text = LocaleService.get_rules_text()
 	var title := get_node_or_null("Panel/Margin/VBox/TitleBlock/TitleRules") as Label

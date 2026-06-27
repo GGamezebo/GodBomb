@@ -63,12 +63,15 @@ func _setup_language_option() -> void:
 	if language_option == null:
 		return
 	language_option.clear()
-	language_option.add_item(LocaleService.text("LANG_RU"), 0)
-	language_option.add_item(LocaleService.text("LANG_EN"), 1)
-	language_option.item_selected.connect(_on_language_selected)
+	for i in LocaleCatalog.ORDER.size():
+		var code := LocaleCatalog.ORDER[i]
+		language_option.add_item(LocaleCatalog.native_name(code), i)
+	if not language_option.item_selected.is_connected(_on_language_selected):
+		language_option.item_selected.connect(_on_language_selected)
 
 
 func _on_locale_changed(_locale: String) -> void:
+	_setup_language_option()
 	_refresh_static_labels()
 	_sync_language_option()
 
@@ -115,7 +118,9 @@ func _refresh_static_labels() -> void:
 func _sync_language_option() -> void:
 	if language_option == null or account == null:
 		return
-	var idx := 1 if account.get_language() == LocaleService.LOCALE_EN else 0
+	var idx := LocaleCatalog.ORDER.find(LocaleCatalog.normalize(account.get_language()))
+	if idx < 0:
+		idx = 0
 	if language_option.selected != idx:
 		language_option.set_block_signals(true)
 		language_option.select(idx)
@@ -123,7 +128,9 @@ func _sync_language_option() -> void:
 
 
 func _on_language_selected(index: int) -> void:
-	var code := LocaleService.LOCALE_EN if index == 1 else LocaleService.LOCALE_RU
+	if index < 0 or index >= LocaleCatalog.ORDER.size():
+		return
+	var code := LocaleCatalog.ORDER[index]
 	if LocaleService.get_locale() == code:
 		return
 	LocaleService.set_locale(code, true)

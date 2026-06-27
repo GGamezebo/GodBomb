@@ -2,10 +2,10 @@ extends Node
 
 signal locale_changed(locale: String)
 
-const LOCALE_RU := "ru"
-const LOCALE_EN := "en"
+const LOCALE_RU := LocaleCatalog.LOCALE_RU
+const LOCALE_EN := LocaleCatalog.LOCALE_EN
 
-var _locale: String = LOCALE_RU
+var _locale: String = LocaleCatalog.LOCALE_RU
 var _account: PDataAccount = null
 
 
@@ -16,17 +16,14 @@ func _ready() -> void:
 func init_from_account(account: PDataAccount) -> void:
 	_account = account
 	if account == null:
-		set_locale(detect_system_locale(), false)
+		set_locale(LocaleCatalog.detect_from_system(), false)
 		return
 	account.ensure_language_initialized()
 	set_locale(account.get_language(), false)
 
 
 func detect_system_locale() -> String:
-	var language := OS.get_locale_language().to_lower()
-	if language == LOCALE_EN:
-		return LOCALE_EN
-	return LOCALE_RU
+	return LocaleCatalog.detect_from_system()
 
 
 func get_locale() -> String:
@@ -34,7 +31,7 @@ func get_locale() -> String:
 
 
 func set_locale(code: String, persist: bool = true) -> void:
-	var normalized := LOCALE_EN if code == LOCALE_EN else LOCALE_RU
+	var normalized := LocaleCatalog.normalize(code)
 	var changed := normalized != _locale
 	_locale = normalized
 	TranslationServer.set_locale(_locale)

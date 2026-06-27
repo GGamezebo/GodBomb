@@ -17,4 +17,4 @@ Party hot-potato, слоги. Godot **4.7** GDScript, 1080×1920 portrait, mobil
 
 **Правила контекста:** `.cursor/rules/*.mdc` — **агент обновляет сам** при изменениях UI/механик/audio (кратко, без дублирования между файлами). Визуал концепта → `visual-style.mdc`, PNG в `assets/reference/concept/`.
 
-**Язык:** код EN · UI RU. Игнор: `.godot/`, `*.import`. F6 без crash — см. `architecture.mdc`.
+**Язык:** код EN · UI строки через `src/common/locale/` (RU/EN + locale tables). Игнор: `.godot/`, `*.import`. F6 без crash — см. `architecture.mdc`.

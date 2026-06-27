@@ -22,7 +22,21 @@ static func random() -> int:
 	return conditions[randi() % conditions.size()]
 
 
+static func uses_exclusion_rules() -> bool:
+	return LocaleCatalog.uses_exclusion_conditions(LocaleService.get_locale())
+
+
 static func get_label(condition: int) -> String:
+	if uses_exclusion_rules():
+		match condition:
+			Type.BEGIN:
+				return LocaleService.text("WORD_COND_NOT_BEGIN")
+			Type.ANYWHERE:
+				return LocaleService.text("WORD_COND_ANYWHERE")
+			Type.END:
+				return LocaleService.text("WORD_COND_NOT_END")
+			_:
+				return ""
 	match condition:
 		Type.BEGIN:
 			return LocaleService.text("WORD_COND_BEGIN")
@@ -35,6 +49,16 @@ static func get_label(condition: int) -> String:
 
 
 static func get_pattern_hint(syllable: String, condition: int) -> String:
+	if uses_exclusion_rules():
+		match condition:
+			Type.BEGIN:
+				return "___[%s]" % syllable
+			Type.END:
+				return "[%s]___" % syllable
+			Type.ANYWHERE:
+				return "_%s_" % syllable
+			_:
+				return syllable
 	match condition:
 		Type.BEGIN:
 			return "[%s]___" % syllable
@@ -72,6 +96,16 @@ static func _build_pattern_bbcode(syllable: String, condition: int, hi_size: int
 	var hi := "[font_size=%d][color=#FFFFFF]%s[/color][/font_size]" % [hi_size, syllable]
 	var dash := _dash_bbcode(dim_size)
 	var side := _side_dash_bbcode(dim_size)
+	if uses_exclusion_rules():
+		match condition:
+			Type.BEGIN:
+				return dash + hi
+			Type.END:
+				return hi + dash
+			Type.ANYWHERE:
+				return side + hi + side
+			_:
+				return hi
 	match condition:
 		Type.BEGIN:
 			return hi + dash
@@ -106,6 +140,20 @@ static func _measure_text_width(text: String, font_size: int) -> float:
 
 
 static func _measure_pattern_width(syllable: String, condition: int, hi_size: int, dim_size: int) -> float:
+	if uses_exclusion_rules():
+		match condition:
+			Type.BEGIN:
+				return _measure_dash_width(dim_size, PATTERN_DASH_NBSP_COUNT) + _measure_text_width(syllable, hi_size)
+			Type.END:
+				return _measure_text_width(syllable, hi_size) + _measure_dash_width(dim_size, PATTERN_DASH_NBSP_COUNT)
+			Type.ANYWHERE:
+				return (
+					_measure_dash_width(dim_size, PATTERN_SIDE_NBSP_COUNT)
+					+ _measure_text_width(syllable, hi_size)
+					+ _measure_dash_width(dim_size, PATTERN_SIDE_NBSP_COUNT)
+				)
+			_:
+				return _measure_text_width(syllable, hi_size)
 	match condition:
 		Type.BEGIN:
 			return _measure_text_width(syllable, hi_size) + _measure_dash_width(dim_size, PATTERN_DASH_NBSP_COUNT)
