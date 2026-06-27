@@ -1,19 +1,20 @@
-[gd_scene load_steps=4 format=3 uid="uid://pill_action_button_godbomb"]
+[gd_scene format=3 uid="uid://bff3xhmdudpjx"]
 
 [ext_resource type="Texture2D" uid="uid://b27y0jjb7mmmy" path="res://assets/party_kitchen/buttons/start_active.svg" id="1"]
 [ext_resource type="Texture2D" uid="uid://cjgo8et40dwnd" path="res://assets/party_kitchen/buttons/start_inactive.svg" id="2"]
 [ext_resource type="Script" uid="uid://ctfwqdpnffwoc" path="res://src/features/menu/start_action_button.gd" id="3"]
 
-[node name="PillActionButton" type="TextureButton"]
+[node name="PillActionButton" type="TextureButton" unique_id=2017787884]
 custom_minimum_size = Vector2(0, 180)
 size_flags_horizontal = 3
+size_flags_vertical = 0
 texture_normal = ExtResource("1")
 texture_disabled = ExtResource("2")
 ignore_texture_size = true
 stretch_mode = 5
 script = ExtResource("3")
 
-[node name="ActionLabel" type="Label" parent="."]
+[node name="ActionLabel" type="Label" parent="." unique_id=2145930985]
 layout_mode = 0
 theme_type_variation = &"Hero"
 theme_override_font_sizes/font_size = 52

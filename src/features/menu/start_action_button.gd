@@ -7,6 +7,8 @@ const ENABLED_MODULATE := Color(1.02, 0.98, 0.94, 1.0)
 const DISABLED_MODULATE := Color(0.78, 0.76, 0.74, 1.0)
 # Vertical center of the painted face in start_active.svg (viewBox height 120, face center y=52).
 const TEXT_PILL_CENTER_Y_RATIO := 52.0 / 120.0
+const DESIGN_ACTION_SIZE := Vector2(660.0, 180.0)
+const DESIGN_FONT_SIZE := 72
 const MODAL_FONT_SIZE := 52
 
 var _action_text: String = ""
@@ -129,3 +131,20 @@ func _kill_pulse() -> void:
 	if _pulse_tween:
 		_pulse_tween.kill()
 		_pulse_tween = null
+
+
+static func viewport_cover_scale(viewport_size: Vector2) -> float:
+	return maxf(
+		viewport_size.x / MenuBombLayout.DESIGN_SIZE.x,
+		viewport_size.y / MenuBombLayout.DESIGN_SIZE.y
+	)
+
+
+func apply_scaled_action_size(viewport_size: Vector2, use_design_font: bool = false) -> void:
+	var scale := viewport_cover_scale(viewport_size)
+	custom_minimum_size = Vector2(0.0, DESIGN_ACTION_SIZE.y * scale)
+	var label := _find_action_label()
+	if label:
+		var font_size := DESIGN_FONT_SIZE if use_design_font else MODAL_FONT_SIZE
+		label.add_theme_font_size_override("font_size", maxi(32, int(round(font_size * scale))))
+	call_deferred("refresh_label_layout")

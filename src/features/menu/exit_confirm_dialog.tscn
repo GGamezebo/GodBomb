@@ -1,9 +1,9 @@
-[gd_scene load_steps=3 format=3 uid="uid://exit_confirm_dialog_godbomb"]
+[gd_scene format=3 uid="uid://bqrfxyfm6dt5w"]
 
-[ext_resource type="Script" path="res://src/features/menu/exit_confirm_dialog.gd" id="1"]
-[ext_resource type="PackedScene" path="res://src/features/menu/pill_action_button.tscn" id="2"]
+[ext_resource type="Script" uid="uid://ctnurtw5jsle" path="res://src/features/menu/exit_confirm_dialog.gd" id="1"]
+[ext_resource type="Script" uid="uid://be2tyoy2l5iun" path="res://src/features/menu/pill_stretch_button.gd" id="2"]
 
-[node name="ExitConfirmDialog" type="Control" node_paths=PackedStringArray("message_label", "cancel_button", "confirm_button")]
+[node name="ExitConfirmDialog" type="Control" unique_id=1754093447 node_paths=PackedStringArray("message_label", "cancel_button", "confirm_button")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -15,58 +15,72 @@ message_label = NodePath("Panel/Margin/VBox/Message")
 cancel_button = NodePath("Panel/Margin/VBox/Buttons/CancelButton")
 confirm_button = NodePath("Panel/Margin/VBox/Buttons/ConfirmButton")
 
-[node name="Dimmer" type="ColorRect" parent="."]
+[node name="Dimmer" type="ColorRect" parent="." unique_id=1524321795]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 0
 color = Color(0.04, 0.03, 0.025, 0.82)
 
-[node name="Panel" type="PanelContainer" parent="."]
+[node name="Panel" type="PanelContainer" parent="." unique_id=1841227019]
+custom_minimum_size = Vector2(900, 0)
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
+offset_left = -302.0
+offset_top = -307.0
+offset_right = 302.0
+offset_bottom = 307.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Margin" type="MarginContainer" parent="Panel"]
+[node name="Margin" type="MarginContainer" parent="Panel" unique_id=877682213]
 layout_mode = 2
 theme_override_constants/margin_left = 48
 theme_override_constants/margin_top = 48
 theme_override_constants/margin_right = 48
 theme_override_constants/margin_bottom = 48
 
-[node name="VBox" type="VBoxContainer" parent="Panel/Margin"]
+[node name="VBox" type="VBoxContainer" parent="Panel/Margin" unique_id=433350532]
 layout_mode = 2
-size_flags_vertical = 3
 theme_override_constants/separation = 28
 
-[node name="Message" type="Label" parent="Panel/Margin/VBox"]
+[node name="Message" type="Label" parent="Panel/Margin/VBox" unique_id=2009739750]
 layout_mode = 2
 theme_type_variation = &"ModalTitle"
 text = "Вы действительно хотите закончить игру?"
 horizontal_alignment = 1
 autowrap_mode = 3
 
-[node name="Spacer" type="Control" parent="Panel/Margin/VBox"]
+[node name="Buttons" type="HBoxContainer" parent="Panel/Margin/VBox" unique_id=1241493719]
 layout_mode = 2
-size_flags_vertical = 3
-
-[node name="Buttons" type="HBoxContainer" parent="Panel/Margin/VBox"]
-layout_mode = 2
+size_flags_vertical = 6
 theme_override_constants/separation = 20
 alignment = 1
 
-[node name="CancelButton" parent="Panel/Margin/VBox/Buttons" instance=ExtResource("2")]
+[node name="CancelButton" type="Button" parent="Panel/Margin/VBox/Buttons" unique_id=803161184]
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_type_variation = &"Hero"
+theme_override_font_sizes/font_size = 54
+text = "Отмена"
+script = ExtResource("2")
+height_scale = 0.900
 action_text = "Отмена"
 
-[node name="ConfirmButton" parent="Panel/Margin/VBox/Buttons" instance=ExtResource("2")]
+[node name="ConfirmButton" type="Button" parent="Panel/Margin/VBox/Buttons" unique_id=1112819445]
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_type_variation = &"Hero"
+theme_override_font_sizes/font_size = 54
+text = "Да"
+script = ExtResource("2")
+height_scale = 0.900
 action_text = "Да"

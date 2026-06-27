@@ -14,8 +14,8 @@ script = ExtResource("1")
 name_edit = NodePath("Panel/Margin/VBox/Content/NameEdit")
 name_history_grid = NodePath("Panel/Margin/VBox/Content/NameHistoryRow/NameHistoryGrid")
 slime_preview = NodePath("Panel/Margin/VBox/Content/PreviewRow/SlimePreview")
-ok_button = NodePath("Panel/Margin/VBox/Buttons/OkButton")
-apply_button = NodePath("Panel/Margin/VBox/Buttons/ApplyButton")
+ok_button = NodePath("Panel/Margin/VBox/Buttons/ConfirmRow/OkButton")
+apply_button = NodePath("Panel/Margin/VBox/Buttons/ConfirmRow/ApplyButton")
 cancel_button = NodePath("Panel/Margin/VBox/Buttons/CancelButton")
 colors_grid = NodePath("Panel/Margin/VBox/Content/ColorsRow/ColorsGrid")
 
@@ -103,22 +103,28 @@ columns = 6
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Buttons" type="HBoxContainer" parent="Panel/Margin/VBox" unique_id=2047278286]
+[node name="Buttons" type="VBoxContainer" parent="Panel/Margin/VBox" unique_id=2047278286]
 layout_mode = 2
 theme_override_constants/separation = 20
-alignment = 1
 
 [node name="CancelButton" parent="Panel/Margin/VBox/Buttons" unique_id=422438833 instance=ExtResource("2")]
 layout_mode = 2
+size_flags_horizontal = 3
 action_text = "Отмена"
 
-[node name="ApplyButton" parent="Panel/Margin/VBox/Buttons" unique_id=1125762236 instance=ExtResource("2")]
+[node name="ConfirmRow" type="HBoxContainer" parent="Panel/Margin/VBox/Buttons"]
 layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="ApplyButton" parent="Panel/Margin/VBox/Buttons/ConfirmRow" unique_id=1125762236 instance=ExtResource("2")]
+layout_mode = 2
+size_flags_horizontal = 3
 action_text = "Применить"
 
-[node name="ActionLabel" parent="Panel/Margin/VBox/Buttons/ApplyButton" index="0"]
+[node name="ActionLabel" parent="Panel/Margin/VBox/Buttons/ConfirmRow/ApplyButton" index="0"]
 theme_override_font_sizes/font_size = 44
 
-[node name="OkButton" parent="Panel/Margin/VBox/Buttons" unique_id=845437274 instance=ExtResource("2")]
+[node name="OkButton" parent="Panel/Margin/VBox/Buttons/ConfirmRow" unique_id=845437274 instance=ExtResource("2")]
 layout_mode = 2
+size_flags_horizontal = 3
 action_text = "OK"

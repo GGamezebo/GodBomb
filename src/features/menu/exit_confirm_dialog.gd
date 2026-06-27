@@ -4,31 +4,34 @@ extends Control
 signal confirmed
 signal cancelled
 
-const PANEL_SIDE_MARGIN := 32.0
-
 @export var message_label: Label
-@export var cancel_button: StartActionButton
-@export var confirm_button: StartActionButton
-
-var _panel: PanelContainer
+@export var cancel_button: PillStretchButton
+@export var confirm_button: PillStretchButton
 
 
 func _ready() -> void:
 	visible = false
-	_panel = get_node_or_null("Panel") as PanelContainer
 	if cancel_button:
 		cancel_button.pressed.connect(_on_cancel_pressed)
 		UiSounds.bind_button(cancel_button)
 	if confirm_button:
 		confirm_button.pressed.connect(_on_confirm_pressed)
 		UiSounds.bind_button(confirm_button, &"confirm")
-	resized.connect(_apply_panel_layout)
-	call_deferred("_apply_panel_layout")
+	resized.connect(_sync_action_button_sizes)
+	call_deferred("_sync_action_button_sizes")
 	call_deferred("_update_modal_layer_visibility")
 
 
+func _sync_action_button_sizes() -> void:
+	var viewport_size := get_viewport_rect().size
+	if cancel_button:
+		cancel_button.apply_scaled_action_size(viewport_size, true)
+	if confirm_button:
+		confirm_button.apply_scaled_action_size(viewport_size, true)
+
+
 func open() -> void:
-	_apply_panel_layout()
+	_sync_action_button_sizes()
 	visible = true
 	_show_modal_layer()
 	UiSounds.play_modal_open()
@@ -71,18 +74,3 @@ func _update_modal_layer_visibility() -> void:
 			layer.visible = true
 			return
 	layer.visible = false
-
-
-func _apply_panel_layout() -> void:
-	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	if not _panel:
-		return
-	var viewport_size := get_viewport_rect().size
-	var panel_size := maxf(320.0, viewport_size.x - PANEL_SIDE_MARGIN * 2.0)
-	_panel.set_anchors_preset(Control.PRESET_CENTER)
-	_panel.offset_left = -panel_size * 0.5
-	_panel.offset_top = -panel_size * 0.5
-	_panel.offset_right = panel_size * 0.5
-	_panel.offset_bottom = panel_size * 0.5
-	_panel.grow_horizontal = Control.GROW_DIRECTION_BOTH
-	_panel.grow_vertical = Control.GROW_DIRECTION_BOTH
