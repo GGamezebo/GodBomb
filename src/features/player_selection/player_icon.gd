@@ -70,6 +70,7 @@ func _ready() -> void:
 	_setup_edit_hint()
 	_setup_hold_overlays()
 	call_deferred("_cache_seat_offset")
+	call_deferred("_setup_fuse_effect")
 
 
 func _setup_slime_pivot() -> void:
@@ -90,6 +91,11 @@ func _setup_edit_hint() -> void:
 	_edit_hint.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
 	_edit_hint.offset_top = -16.0
 	add_child(_edit_hint)
+
+
+func _setup_fuse_effect() -> void:
+	if slime_rect:
+		BombFuseEffect.attach_to(slime_rect)
 
 
 func _setup_hold_overlays() -> void:
@@ -260,6 +266,7 @@ func apply_fixed_layout() -> void:
 		slime_rect.set_anchors_preset(Control.PRESET_TOP_LEFT)
 		slime_rect.position = SLIME_POSITION
 		slime_rect.size = SLIME_SIZE
+		BombFuseEffect.attach_to(slime_rect)
 	_cache_seat_offset()
 	layout_name_plate(_table_center_global)
 	_layout_hold_overlays()

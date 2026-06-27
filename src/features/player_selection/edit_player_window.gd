@@ -48,6 +48,7 @@ func _ready() -> void:
 		name_edit.text_submitted.connect(_on_name_submitted)
 	resized.connect(_sync_action_button_sizes)
 	call_deferred("_sync_action_button_sizes")
+	call_deferred("_setup_slime_preview_fuse")
 	_build_color_buttons()
 
 
@@ -59,6 +60,11 @@ func _sync_action_button_sizes() -> void:
 		ok_button.apply_scaled_action_size(viewport_size, true)
 	if apply_button:
 		apply_button.apply_scaled_action_size(viewport_size, true)
+
+
+func _setup_slime_preview_fuse() -> void:
+	if slime_preview:
+		BombFuseEffect.attach_to(slime_preview)
 
 
 func open_add_window() -> void:
@@ -293,6 +299,7 @@ func _select_preset(preset_id: int) -> void:
 	_refresh_all_swatches()
 	if slime_preview:
 		slime_preview.texture = load(SLIME_PATH % preset_id)
+		BombFuseEffect.attach_to(slime_preview)
 
 
 func _on_color_pressed(preset_id: int) -> void:

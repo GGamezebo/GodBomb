@@ -156,6 +156,7 @@ func _build_content() -> void:
 	_slime.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_slime.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	avatar_pad.add_child(_slime)
+	BombFuseEffect.attach_to(_slime)
 
 	_name_label = Label.new()
 	_name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT

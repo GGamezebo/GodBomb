@@ -50,9 +50,8 @@ def slime_svg(main: str, dark: str) -> str:
         gloss_main = "0.34"
         gloss_hot = "0.50"
 
-    bump_dark = "#8F5E2C"
-    bump = "#C68642"
     pupil = "#12100E"
+    fuse = _fuse_svg(outline)
 
     return f"""<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
@@ -63,17 +62,23 @@ def slime_svg(main: str, dark: str) -> str:
   <ellipse cx="64" cy="86" rx="34" ry="20" fill="{dark}" opacity="0.40"/>
   <ellipse cx="50" cy="50" rx="20" ry="14" fill="#FFFFFF" opacity="{gloss_main}"/>
   <ellipse cx="44" cy="44" rx="9" ry="6" fill="#FFFFFF" opacity="{gloss_hot}"/>
-  <ellipse cx="52" cy="32" rx="8" ry="10" fill="{bump_dark}" stroke="{outline}" stroke-width="1.5"/>
-  <ellipse cx="52" cy="31" rx="6" ry="7" fill="{bump}"/>
-  <ellipse cx="76" cy="32" rx="8" ry="10" fill="{bump_dark}" stroke="{outline}" stroke-width="1.5"/>
-  <ellipse cx="76" cy="31" rx="6" ry="7" fill="{bump}"/>
-  <ellipse cx="50" cy="68" rx="13" ry="15" fill="#FFFFFF" stroke="{outline}" stroke-width="2"/>
+{fuse}  <ellipse cx="50" cy="68" rx="13" ry="15" fill="#FFFFFF" stroke="{outline}" stroke-width="2"/>
   <ellipse cx="78" cy="68" rx="13" ry="15" fill="#FFFFFF" stroke="{outline}" stroke-width="2"/>
   <circle cx="53" cy="70" r="5" fill="{pupil}"/>
   <circle cx="81" cy="70" r="5" fill="{pupil}"/>
   <circle cx="51" cy="66" r="2.2" fill="#FFFFFF" opacity="0.95"/>
   <circle cx="79" cy="66" r="2.2" fill="#FFFFFF" opacity="0.95"/>
 </svg>
+"""
+
+
+def _fuse_svg(outline: str) -> str:
+    return f"""  <ellipse cx="64" cy="30" rx="12" ry="5" fill="#4A3018" stroke="{outline}" stroke-width="1.5"/>
+  <ellipse cx="64" cy="29" rx="8.5" ry="3.2" fill="#8B5A2E"/>
+  <ellipse cx="62" cy="28.5" rx="3" ry="1.2" fill="#B88952" opacity="0.75"/>
+  <path d="M64 27 C64 24.5 65.5 22 68 20" fill="none" stroke="#5A3F24" stroke-width="6.5" stroke-linecap="round"/>
+  <path d="M64 27 C64 24.5 65.5 22 68 20" fill="none" stroke="#C9A66B" stroke-width="3.6" stroke-linecap="round"/>
+  <path d="M64 27 C65 24.5 66.5 22.5 68 20" fill="none" stroke="#E8D2A4" stroke-width="1.4" stroke-linecap="round" opacity="0.55"/>
 """
 
 

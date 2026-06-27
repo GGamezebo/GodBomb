@@ -112,6 +112,7 @@ func _layout_preview_on_table() -> void:
 		return
 	preview_slime.custom_minimum_size = PREVIEW_SLIME_SIZE
 	preview_slime.size = PREVIEW_SLIME_SIZE
+	BombFuseEffect.attach_to(preview_slime)
 	preview_column.reset_size()
 	var column_size := preview_column.get_combined_minimum_size()
 	if column_size.x <= 0.0 or column_size.y <= 0.0:

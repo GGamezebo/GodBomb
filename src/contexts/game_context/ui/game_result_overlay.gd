@@ -336,6 +336,7 @@ func _build_rank_row(rank: int, player: GamePlayer, is_winner: bool) -> PanelCon
 	avatar.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	avatar.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	row.add_child(avatar)
+	BombFuseEffect.attach_to(avatar)
 
 	var name_label := Label.new()
 	name_label.text = player.info.name.to_upper()
