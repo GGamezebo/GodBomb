@@ -33,26 +33,46 @@ def write(path: str, content: str) -> None:
 
 
 def slime_svg(main: str, dark: str) -> str:
-    outline = "#2A2118" if main.upper() not in ("#3F474E", "#132ED1", "#6B2FBC") else "#111111"
-    eye_fill = "#FFFFFF"
-    pupil = "#1A1410"
-    if main.upper() in ("#D6E0F0", "#F5F557", "#38FEDC", "#50EF39"):
-        pupil = "#1A1410"
+    outline = "#1A1410"
+    main_u = main.upper()
+    rim = dark
+    gloss_main = "0.30"
+    gloss_hot = "0.46"
+    if main_u == "#3F474E":
+        rim = "#252B30"
+        gloss_main = "0.16"
+        gloss_hot = "0.24"
+    elif main_u == "#D6E0F0":
+        rim = "#A8B4C8"
+        gloss_main = "0.38"
+        gloss_hot = "0.55"
+    elif main_u in ("#F5F557", "#50EF39", "#38FEDC"):
+        gloss_main = "0.34"
+        gloss_hot = "0.50"
+
+    bump_dark = "#8F5E2C"
+    bump = "#C68642"
+    pupil = "#12100E"
+
     return f"""<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
-  <ellipse cx="64" cy="118" rx="38" ry="8" fill="#000000" opacity="0.18"/>
-  <path d="M24 78 C24 48 40 28 64 28 C88 28 104 48 104 78 C104 98 88 112 64 112 C40 112 24 98 24 78 Z"
-        fill="{dark}" stroke="{outline}" stroke-width="3" stroke-linejoin="round"/>
-  <path d="M30 74 C30 50 44 34 64 34 C84 34 98 50 98 74 C98 92 84 104 64 104 C44 104 30 92 30 74 Z"
-        fill="{main}"/>
-  <ellipse cx="48" cy="62" rx="16" ry="18" fill="{eye_fill}" stroke="{outline}" stroke-width="2"/>
-  <ellipse cx="80" cy="62" rx="16" ry="18" fill="{eye_fill}" stroke="{outline}" stroke-width="2"/>
-  <circle cx="52" cy="64" r="6" fill="{pupil}"/>
-  <circle cx="84" cy="64" r="6" fill="{pupil}"/>
-  <circle cx="50" cy="60" r="3" fill="#FFFFFF" opacity="0.85"/>
-  <circle cx="82" cy="60" r="3" fill="#FFFFFF" opacity="0.85"/>
-  <path d="M54 86 Q64 92 74 86" fill="none" stroke="{outline}" stroke-width="2.5" stroke-linecap="round" opacity="0.55"/>
-  <ellipse cx="44" cy="48" rx="10" ry="6" fill="#FFFFFF" opacity="0.22"/>
+  <ellipse cx="64" cy="116" rx="36" ry="8" fill="#000000" opacity="0.24"/>
+  <circle cx="64" cy="72" r="46" fill="{rim}"/>
+  <circle cx="64" cy="70" r="42" fill="{main}" stroke="{outline}" stroke-width="2"/>
+  <ellipse cx="64" cy="92" rx="30" ry="16" fill="#FF7A2A" opacity="0.07"/>
+  <ellipse cx="64" cy="86" rx="34" ry="20" fill="{dark}" opacity="0.40"/>
+  <ellipse cx="50" cy="50" rx="20" ry="14" fill="#FFFFFF" opacity="{gloss_main}"/>
+  <ellipse cx="44" cy="44" rx="9" ry="6" fill="#FFFFFF" opacity="{gloss_hot}"/>
+  <ellipse cx="52" cy="32" rx="8" ry="10" fill="{bump_dark}" stroke="{outline}" stroke-width="1.5"/>
+  <ellipse cx="52" cy="31" rx="6" ry="7" fill="{bump}"/>
+  <ellipse cx="76" cy="32" rx="8" ry="10" fill="{bump_dark}" stroke="{outline}" stroke-width="1.5"/>
+  <ellipse cx="76" cy="31" rx="6" ry="7" fill="{bump}"/>
+  <ellipse cx="50" cy="68" rx="13" ry="15" fill="#FFFFFF" stroke="{outline}" stroke-width="2"/>
+  <ellipse cx="78" cy="68" rx="13" ry="15" fill="#FFFFFF" stroke="{outline}" stroke-width="2"/>
+  <circle cx="53" cy="70" r="5" fill="{pupil}"/>
+  <circle cx="81" cy="70" r="5" fill="{pupil}"/>
+  <circle cx="51" cy="66" r="2.2" fill="#FFFFFF" opacity="0.95"/>
+  <circle cx="79" cy="66" r="2.2" fill="#FFFFFF" opacity="0.95"/>
 </svg>
 """
 
