@@ -6,6 +6,8 @@ signal closed
 const NEUTRAL_BG := Color(0, 0, 0, 1.0)
 const LOBBY_BLUR_SHADER := preload("res://assets/shaders/bomb_background_blur.gdshader")
 const LOBBY_BLUR_RADIUS := 5.0
+const EXPLANATION_TEXT := "Здесь можно редактировать состав игры, не заканчивая партию."
+const EXPLANATION_BANNER_HEIGHT := 192.0
 
 @export var game_manager: GameManager
 @export var game_config: GameConfig
@@ -15,6 +17,7 @@ const LOBBY_BLUR_RADIUS := 5.0
 @export var background_color: ColorRect
 @export var layout_host: MenuBombLayout
 @export var bomb_art: TextureRect
+@export var explanation_banner: PanelContainer
 @export var player_selection_widget: PlayerSelectionWidget
 @export var done_button: TextureButton
 
@@ -28,6 +31,7 @@ func _ready() -> void:
 	visible = false
 	_setup_blur_material()
 	_connect_layout()
+	_setup_explanation_banner()
 	if bomb_art:
 		bomb_art.visible = false
 	if done_button:
@@ -64,6 +68,7 @@ func open() -> void:
 	if player_selection_widget:
 		player_selection_widget.reload_from_account()
 	_sync_bomb_art_layout()
+	_layout_explanation_banner()
 	_set_bomb_blur(false)
 	visible = true
 
@@ -85,9 +90,26 @@ func _ensure_runtime_refs() -> void:
 
 
 func _connect_layout() -> void:
-	if layout_host and not layout_host.layout_applied.is_connected(_sync_bomb_art_layout):
-		layout_host.layout_applied.connect(_sync_bomb_art_layout)
+	if layout_host:
+		if not layout_host.layout_applied.is_connected(_sync_bomb_art_layout):
+			layout_host.layout_applied.connect(_sync_bomb_art_layout)
+		if not layout_host.layout_applied.is_connected(_layout_explanation_banner):
+			layout_host.layout_applied.connect(_layout_explanation_banner)
 	call_deferred("_sync_bomb_art_layout")
+	call_deferred("_layout_explanation_banner")
+
+
+func _setup_explanation_banner() -> void:
+	if not explanation_banner:
+		return
+	var text := explanation_banner.get_node_or_null("Margin/ExplanationText") as RichTextLabel
+	if text:
+		text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		text.text = EXPLANATION_TEXT
+
+
+func _layout_explanation_banner() -> void:
+	BattleExplanationBannerLayout.apply(explanation_banner, layout_host, EXPLANATION_BANNER_HEIGHT)
 
 
 func _sync_bomb_art_layout() -> void:

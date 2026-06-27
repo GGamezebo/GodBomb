@@ -4,7 +4,6 @@ extends CanvasLayer
 const SLIME_PATH := "res://assets/party_kitchen/slimes/%d.svg"
 const TABLE_CENTER := Vector2(540.0, 960.0)
 const PREVIEW_SLIME_SIZE := Vector2(128.0, 128.0)
-const PANEL_SCREEN_MARGIN := Vector2(32.0, 64.0)
 const EXPLANATION_BANNER_HEIGHT := 256.0
 const EXPLANATION_TEXT := (
 	"Если кто-то случайно или специально нарушил правила — "
@@ -71,21 +70,7 @@ func _setup_explanation_banner() -> void:
 
 
 func _layout_explanation_banner() -> void:
-	if not explanation_banner or not layout_host:
-		return
-	var scale := layout_host.get_cover_scale()
-	if scale <= 0.0:
-		return
-	var host_size := layout_host.size
-	var offset := (host_size - MenuBombLayout.DESIGN_SIZE * scale) * 0.5
-	var left := (PANEL_SCREEN_MARGIN.x - offset.x) / scale
-	var right := (host_size.x - PANEL_SCREEN_MARGIN.x - offset.x) / scale
-	var top := (PANEL_SCREEN_MARGIN.y - offset.y) / scale
-	explanation_banner.set_anchors_preset(Control.PRESET_TOP_LEFT)
-	explanation_banner.offset_left = left
-	explanation_banner.offset_top = top
-	explanation_banner.offset_right = right
-	explanation_banner.offset_bottom = top + EXPLANATION_BANNER_HEIGHT
+	BattleExplanationBannerLayout.apply(explanation_banner, layout_host, EXPLANATION_BANNER_HEIGHT)
 
 
 func _on_game_state_changed(from_state: String, to_state: String) -> void:

@@ -7,12 +7,13 @@
 [ext_resource type="Script" path="res://src/features/menu/menu_fire_sparks.gd" id="6"]
 [ext_resource type="Script" path="res://src/features/menu/start_action_button.gd" id="7"]
 
-[node name="BattlePlayerLobbyOverlay" type="CanvasLayer" node_paths=PackedStringArray("background_color", "layout_host", "bomb_art", "player_selection_widget", "done_button")]
+[node name="BattlePlayerLobbyOverlay" type="CanvasLayer" node_paths=PackedStringArray("background_color", "layout_host", "bomb_art", "explanation_banner", "player_selection_widget", "done_button")]
 layer = 12
 script = ExtResource("1")
 background_color = NodePath("Root/BackgroundColor")
 layout_host = NodePath("Root/LayoutHost")
 bomb_art = NodePath("Root/LayoutHost/BombArt")
+explanation_banner = NodePath("Root/LayoutHost/ScaledContent/ExplanationBanner")
 player_selection_widget = NodePath("Root/LayoutHost/ScaledContent/PlayerSelectionWidget")
 done_button = NodePath("Root/LayoutHost/ScaledContent/DoneButton")
 
@@ -76,6 +77,27 @@ mouse_filter = 0
 
 [node name="Marker2D" type="Marker2D" parent="Root/LayoutHost/ScaledContent"]
 position = Vector2(528, 483)
+
+[node name="ExplanationBanner" type="PanelContainer" parent="Root/LayoutHost/ScaledContent"]
+layout_mode = 0
+offset_right = 1048.0
+offset_bottom = 192.0
+
+[node name="Margin" type="MarginContainer" parent="Root/LayoutHost/ScaledContent/ExplanationBanner"]
+layout_mode = 2
+theme_override_constants/margin_left = 48
+theme_override_constants/margin_top = 40
+theme_override_constants/margin_right = 48
+theme_override_constants/margin_bottom = 40
+
+[node name="ExplanationText" type="RichTextLabel" parent="Root/LayoutHost/ScaledContent/ExplanationBanner/Margin"]
+layout_mode = 2
+theme_type_variation = &"ModalRichText"
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
+autowrap_mode = 3
+horizontal_alignment = 1
 
 [node name="PlayerSelectionWidget" parent="Root/LayoutHost/ScaledContent" instance=ExtResource("4")]
 layout_mode = 1
