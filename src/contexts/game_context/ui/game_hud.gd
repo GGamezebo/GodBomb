@@ -102,6 +102,9 @@ func _reposition_battle_ui() -> void:
 	if _action_hints:
 		_action_hints.position = PASS_HINT_RECT.position
 		_action_hints.size = PASS_HINT_RECT.size
+	if _explosion_overlay and _explosion_overlay.visible:
+		_explosion_overlay.size = design_root.size
+		_explosion_overlay.relayout()
 
 
 func _build_ui() -> void:
