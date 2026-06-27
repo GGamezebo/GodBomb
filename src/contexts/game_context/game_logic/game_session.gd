@@ -18,6 +18,7 @@ var bomb_is_exploded: bool = false
 
 var explosion_duration: float = 0.0
 var explosion_is_countdown: bool = false
+var match_cards_total: int = 0
 
 
 func setup(p_config: GameConfig, p_events: GameEvents, account: PDataAccount) -> void:
@@ -115,6 +116,7 @@ func _build_card_deck(game_time_minutes: int) -> void:
 
 	for i in length:
 		cards.append(GameCard.new(deck[i], WordCondition.random()))
+	match_cards_total = cards.size()
 
 
 func reset_round() -> void:
@@ -193,6 +195,7 @@ func next_card() -> bool:
 		if result.size() > 1 and result[0].score == result[1].score:
 			var random_index := randi() % game_config.cards.size()
 			cards.append(GameCard.new(game_config.cards[random_index], WordCondition.random()))
+			match_cards_total += 1
 		else:
 			return false
 
@@ -200,6 +203,19 @@ func next_card() -> bool:
 	if game_events:
 		game_events.ev_card_changed.emit(current_card)
 	return true
+
+
+func get_rounds_remaining() -> int:
+	var remaining := cards.size()
+	if current_card != null:
+		remaining += 1
+	return remaining
+
+
+func get_match_remaining_ratio() -> float:
+	if match_cards_total <= 0:
+		return 1.0
+	return float(get_rounds_remaining()) / float(match_cards_total)
 
 
 func get_sorted_results() -> Array[GamePlayer]:

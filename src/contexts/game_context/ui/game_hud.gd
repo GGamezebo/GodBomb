@@ -16,6 +16,7 @@ var listener: EventListener = EventListener.new()
 var _player_strip: GamePlayerStrip
 var _syllable_card: GameSyllableCard
 var _hint_banner: TableHintBanner
+var _time_progress_banner: GameTimeProgressBanner
 var _action_hints: GameActionHints
 var _battle_layer: Control
 var _countdown_label: Label
@@ -23,6 +24,7 @@ var _explosion_overlay: GameExplosionOverlay
 var _result_overlay: GameResultOverlay
 var _current_state: String = ""
 var _last_choice_player_index: int = -1
+var _time_progress_token: int = 0
 
 
 func _ready() -> void:
@@ -96,9 +98,13 @@ func _reposition_battle_ui() -> void:
 		BombMarkerLayout.place_control_at_marker(
 			_countdown_label, design_root, ROUND_WORD_MARKER, FALLBACK_ROUND_WORD
 		)
+	var hint_bounds := _get_hint_bounds()
 	if _hint_banner:
-		var bounds := _get_hint_bounds()
-		TableHintBanner.place_centered_at(_hint_banner, _get_hint_marker_position(), bounds)
+		TableHintBanner.place_centered_at(_hint_banner, _get_hint_marker_position(), hint_bounds)
+	if _time_progress_banner:
+		_time_progress_banner.fit_layout(
+			_get_hint_marker_position(), TableHintBanner.TABLE_HINT_WIDTH, hint_bounds
+		)
 	if _action_hints:
 		_action_hints.position = PASS_HINT_RECT.position
 		_action_hints.size = PASS_HINT_RECT.size
@@ -127,6 +133,10 @@ func _build_ui() -> void:
 	_hint_banner = TableHintBanner.new()
 	_hint_banner.z_index = 5
 	_battle_layer.add_child(_hint_banner)
+
+	_time_progress_banner = GameTimeProgressBanner.new()
+	_time_progress_banner.z_index = 6
+	_battle_layer.add_child(_time_progress_banner)
 
 	_action_hints = GameActionHints.new()
 	_action_hints.game_events = game_events
@@ -179,6 +189,9 @@ func _hide_all() -> void:
 		_battle_layer.visible = false
 	if _hint_banner:
 		_hint_banner.hide_message(false)
+	if _time_progress_banner:
+		_time_progress_banner.hide_progress(false)
+	_cancel_time_progress_timer()
 	if _action_hints:
 		_action_hints.visible = false
 	if _countdown_label:
@@ -198,14 +211,14 @@ func _sync_to_current_state() -> void:
 	_on_game_state_changed("", game_manager.fsm.get_current_state_name())
 
 
-func _on_game_state_changed(_from_state: String, to_state: String) -> void:
+func _on_game_state_changed(from_state: String, to_state: String) -> void:
 	_current_state = to_state
 	_hide_all()
 	match to_state:
 		FSMGameStates.PLAYER_CHOICE:
 			_show_player_choice()
 		FSMGameStates.READY_TO_START:
-			_show_ready_to_start()
+			_show_ready_to_start(from_state)
 		FSMGameStates.COUNTDOWN:
 			_show_countdown()
 		FSMGameStates.PLAY:
@@ -280,15 +293,53 @@ func _show_player_choice() -> void:
 	call_deferred("_reposition_battle_ui")
 
 
-func _show_ready_to_start() -> void:
+func _show_ready_to_start(from_state: String = "") -> void:
 	_battle_layer.visible = true
 	_player_strip.visible = true
 	if _syllable_card:
 		_syllable_card.visible = true
 		_syllable_card.set_message("Готовы?")
-	_show_hint("Нажми «Начать раунд»")
 	_sync_current_player()
 	call_deferred("_reposition_battle_ui")
+	if from_state == FSMGameStates.EXPLOSION and _should_show_time_progress():
+		_show_between_rounds_progress()
+	else:
+		_show_hint("Нажми «Начать раунд»")
+
+
+func _should_show_time_progress() -> bool:
+	if game_manager == null or game_manager.session == null:
+		return false
+	return game_manager.session.match_cards_total > 1
+
+
+func _show_between_rounds_progress() -> void:
+	if _hint_banner:
+		_hint_banner.hide_message(false)
+	if _time_progress_banner == null:
+		_show_hint("Нажми «Начать раунд»")
+		return
+	var ratio := game_manager.session.get_match_remaining_ratio()
+	_time_progress_banner.show_progress(ratio)
+	_time_progress_token += 1
+	var token := _time_progress_token
+	get_tree().create_timer(GameTimeProgressBanner.SHOW_DURATION).timeout.connect(
+		func() -> void:
+			if token == _time_progress_token:
+				_on_time_progress_finished(),
+		CONNECT_ONE_SHOT
+	)
+
+
+func _on_time_progress_finished() -> void:
+	if _time_progress_banner:
+		_time_progress_banner.hide_progress()
+	if _current_state == FSMGameStates.READY_TO_START:
+		_show_hint("Нажми «Начать раунд»")
+
+
+func _cancel_time_progress_timer() -> void:
+	_time_progress_token += 1
 
 
 func _show_countdown() -> void:
