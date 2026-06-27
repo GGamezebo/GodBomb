@@ -34,7 +34,7 @@ func _process(delta: float) -> void:
 		pulse = 0.14 * sin(Time.get_ticks_msec() * 0.012)
 	_target_alpha = 0.12 + _pulse_boost + pulse
 	if _explosion_active:
-		_target_alpha = 0.55 + 0.1 * sin(Time.get_ticks_msec() * 0.02)
+		_target_alpha = 0.82 + 0.12 * sin(Time.get_ticks_msec() * 0.024)
 	_edge_alpha = move_toward(_edge_alpha, _target_alpha, delta * 8.0)
 	queue_redraw()
 
@@ -71,7 +71,7 @@ func _on_game_state_changed(_from_state: String, to_state: String) -> void:
 		FSMGameStates.EXPLOSION:
 			_explosion_active = true
 			_alert_active = false
-			_pulse_boost = 0.35
+			_pulse_boost = 0.62
 		FSMGameStates.READY_TO_START, FSMGameStates.COUNTDOWN, FSMGameStates.PLAYER_CHOICE:
 			_alert_active = false
 			_explosion_active = false

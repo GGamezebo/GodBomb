@@ -205,13 +205,20 @@ func _play_comes_flash() -> void:
 
 func _play_explosion() -> void:
 	_kill_tween()
+	_kill_tint_tween()
+	var rebound_tint := _base_tint
+	if player_color_bg:
+		player_color_bg.color = Color(1.72, 0.92, 0.22, 1.0)
+		var bg_flash := create_tween()
+		bg_flash.tween_property(player_color_bg, "color", rebound_tint.lightened(0.42), 0.16).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
+		bg_flash.tween_property(player_color_bg, "color", rebound_tint, 0.52).set_trans(Tween.TRANS_SINE)
 	var parts := _visible_bomb_visual_parts()
 	if not parts.is_empty():
-		var flash_color := Color(1.45, 0.42, 0.12, 1.0)
 		var fade := create_tween()
 		for part in parts:
-			part.modulate = flash_color
-			fade.parallel().tween_property(part, "modulate:a", 0.0, 0.14).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_IN)
+			part.modulate = Color(2.0, 1.72, 1.15, 1.0)
+			fade.parallel().tween_property(part, "modulate", Color(1.95, 0.58, 0.08, 1.0), 0.07)
+			fade.parallel().tween_property(part, "modulate:a", 0.0, 0.24).set_delay(0.07).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_IN)
 		fade.tween_callback(func() -> void:
 			for part in parts:
 				part.visible = false
@@ -219,10 +226,16 @@ func _play_explosion() -> void:
 	if scaled_content:
 		_tween = create_tween()
 		var base := _content_base_pos
-		for i in 6:
-			var shake_offset := Vector2(randf_range(-10, 10), randf_range(-10, 10))
-			_tween.tween_property(scaled_content, "position", base + shake_offset, 0.04)
-		_tween.tween_property(scaled_content, "position", base, 0.06)
+		var cover_scale := get_cover_scale()
+		var punch_scale := Vector2.ONE * cover_scale * 1.055
+		var normal_scale := Vector2.ONE * cover_scale
+		_tween.tween_property(scaled_content, "scale", punch_scale, 0.05).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		for i in 16:
+			var intensity := lerpf(38.0, 6.0, float(i) / 15.0)
+			var shake_offset := Vector2(randf_range(-intensity, intensity), randf_range(-intensity, intensity))
+			_tween.tween_property(scaled_content, "position", base + shake_offset, 0.032)
+		_tween.tween_property(scaled_content, "position", base, 0.1).set_trans(Tween.TRANS_SINE)
+		_tween.parallel().tween_property(scaled_content, "scale", normal_scale, 0.16).set_trans(Tween.TRANS_SINE)
 
 
 func _visible_bomb_visual_parts() -> Array[CanvasItem]:

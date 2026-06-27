@@ -236,17 +236,17 @@ particles = NodePath("Particles")
 
 [node name="Particles" type="CPUParticles2D" parent="UI/BackgroundBomb/ScaledContent/ExplosionEffect" unique_id=1757993458]
 emitting = false
-amount = 180
-lifetime = 0.9
+amount = 320
+lifetime = 1.05
 one_shot = true
 explosiveness = 1.0
 spread = 180.0
 gravity = Vector2(0, 0)
-initial_velocity_min = 420.0
-initial_velocity_max = 980.0
-scale_amount_min = 3.0
-scale_amount_max = 9.0
-color = Color(1.2, 0.85, 0.35, 1)
+initial_velocity_min = 680.0
+initial_velocity_max = 1520.0
+scale_amount_min = 5.0
+scale_amount_max = 16.0
+color = Color(1.55, 1.12, 0.62, 1)
 
 [node name="PassBombSparkLayer" type="Node2D" parent="UI/BackgroundBomb/ScaledContent" unique_id=536773508]
 script = ExtResource("39")

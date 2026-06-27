@@ -2,6 +2,7 @@ class_name GameExplosionOverlay
 extends PanelContainer
 
 const DESIGN_SIZE := Vector2(1080.0, 1920.0)
+const CONTENT_WIDTH_MARGIN := 200.0
 const CONTENT_ANCHOR := Vector2(540.0, 930.0)
 const EXPLOSION_PILL_SCALE := 1.65
 
@@ -22,7 +23,7 @@ func _ready() -> void:
 
 func _build_ui() -> void:
 	var backdrop := StyleBoxFlat.new()
-	backdrop.bg_color = Color(0.04, 0.02, 0.01, 0.72)
+	backdrop.bg_color = Color(0.08, 0.03, 0.01, 0.82)
 	add_theme_stylebox_override("panel", backdrop)
 
 	var stack := Control.new()
@@ -38,6 +39,7 @@ func _build_ui() -> void:
 	_headline = Label.new()
 	_headline.text = "ВАС ПОДОРВАЛО!"
 	_headline.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_headline.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_headline.add_theme_font_size_override("font_size", 92)
 	_headline.add_theme_color_override("font_color", Color.WHITE)
 	_headline.add_theme_color_override("font_outline_color", Color(0.04, 0.03, 0.02, 0.88))
@@ -52,11 +54,25 @@ func _build_ui() -> void:
 	pill_host.add_child(_player_strip)
 
 
+func _get_content_width() -> float:
+	return DESIGN_SIZE.x - CONTENT_WIDTH_MARGIN
+
+
+func _fit_headline_width() -> void:
+	if not _headline:
+		return
+	var content_width := _get_content_width()
+	_headline.custom_minimum_size.x = content_width
+	_headline.size.x = content_width
+
+
 func _layout_content() -> void:
 	if not _content_col:
 		return
+	_fit_headline_width()
 	_content_col.reset_size()
 	var col_size := _content_col.get_combined_minimum_size()
+	col_size.x = maxf(col_size.x, _get_content_width())
 	_content_col.size = col_size
 	_content_col.position = CONTENT_ANCHOR - Vector2(col_size.x * 0.5, col_size.y * 0.48)
 
@@ -68,9 +84,9 @@ func show_for_player(player: GamePlayer) -> void:
 	visible = true
 	modulate.a = 0.0
 	_headline.modulate = Color(1.0, 1.0, 1.0, 0.0)
-	_headline.scale = Vector2(0.92, 0.92)
+	_headline.scale = Vector2(0.78, 0.78)
 	_player_strip.modulate = Color(1.0, 1.0, 1.0, 0.0)
-	_player_strip.scale = Vector2(0.84, 0.84)
+	_player_strip.scale = Vector2(0.72, 0.72)
 	call_deferred("_start_reveal_animation")
 
 
@@ -79,11 +95,13 @@ func _start_reveal_animation() -> void:
 	_headline.pivot_offset = _headline.size * 0.5
 
 	var tween := create_tween()
-	tween.tween_property(self, "modulate:a", 1.0, 0.18).set_trans(Tween.TRANS_SINE)
-	tween.parallel().tween_property(_headline, "modulate:a", 1.0, 0.24).set_delay(0.04)
-	tween.parallel().tween_property(_headline, "scale", Vector2.ONE, 0.28).set_delay(0.04).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	tween.parallel().tween_property(_player_strip, "modulate:a", 1.0, 0.26).set_delay(0.1)
-	tween.parallel().tween_property(_player_strip, "scale", Vector2.ONE, 0.34).set_delay(0.1).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_property(self, "modulate:a", 1.0, 0.12).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
+	tween.parallel().tween_property(_headline, "modulate:a", 1.0, 0.2).set_delay(0.05)
+	tween.parallel().tween_property(_headline, "scale", Vector2(1.08, 1.08), 0.22).set_delay(0.05).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.parallel().tween_property(_headline, "scale", Vector2.ONE, 0.16).set_delay(0.27).set_trans(Tween.TRANS_SINE)
+	tween.parallel().tween_property(_player_strip, "modulate:a", 1.0, 0.24).set_delay(0.12)
+	tween.parallel().tween_property(_player_strip, "scale", Vector2(1.06, 1.06), 0.28).set_delay(0.12).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.parallel().tween_property(_player_strip, "scale", Vector2.ONE, 0.18).set_delay(0.4).set_trans(Tween.TRANS_SINE)
 
 
 func hide_overlay() -> void:
