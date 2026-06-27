@@ -288,7 +288,7 @@ func _show_player_choice() -> void:
 	if _syllable_card:
 		_syllable_card.visible = true
 		_syllable_card.set_message("?")
-	_show_hint("Кто ходит первым?")
+	_show_hint("Жребий — кто ходит первым?")
 	_sync_current_player()
 	call_deferred("_reposition_battle_ui")
 

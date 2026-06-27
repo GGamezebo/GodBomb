@@ -88,7 +88,7 @@ theme_override_constants/separation = 28
 [node name="Title" type="Label" parent="Root/LayoutHost/ScaledContent/ExplanationBanner/Margin/VBox" unique_id=1942092072]
 layout_mode = 2
 theme_type_variation = &"ModalTitle"
-text = "Экстренная ситуация"
+text = "Аварийная пауза"
 horizontal_alignment = 1
 autowrap_mode = 0
 
@@ -145,6 +145,6 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_type_variation = &"Hero"
 theme_override_font_sizes/font_size = 56
-text = "Продолжить игру"
+text = "Продолжить"
 horizontal_alignment = 1
 vertical_alignment = 1

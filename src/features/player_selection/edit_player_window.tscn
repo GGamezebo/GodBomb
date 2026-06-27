@@ -75,7 +75,7 @@ stretch_mode = 5
 custom_minimum_size = Vector2(0, 96)
 layout_mode = 2
 theme_type_variation = &"ModalLineEdit"
-placeholder_text = "Имя игрока (до 12 символов)"
+placeholder_text = "Имя (до 12 символов)"
 max_length = 12
 
 [node name="NameHistoryRow" type="HBoxContainer" parent="Panel/Margin/VBox/Content"]

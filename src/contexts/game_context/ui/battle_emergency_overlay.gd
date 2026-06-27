@@ -5,11 +5,7 @@ const SLIME_PATH := "res://assets/party_kitchen/slimes/%d.svg"
 const TABLE_CENTER := Vector2(540.0, 960.0)
 const PREVIEW_SLIME_SIZE := Vector2(128.0, 128.0)
 const EXPLANATION_BANNER_HEIGHT := 256.0
-const EXPLANATION_TEXT := (
-	"Если кто-то случайно или специально нарушил правила — "
-	+ "например, назвал неверное слово или нажал на экран несколько раз, "
-	+ "— здесь можно перевыбрать текущего персонажа, который должен переиграть свой ход."
-)
+const EXPLANATION_TEXT := "Ошибка в слове или случайное нажатие? Выберите, кто переигрывает ход."
 
 @export var game_manager: GameManager
 @export var game_events: GameEvents
@@ -61,7 +57,7 @@ func _setup_explanation_banner() -> void:
 	var title := explanation_banner.get_node_or_null("Margin/VBox/Title") as Label
 	if title:
 		title.autowrap_mode = TextServer.AUTOWRAP_OFF
-		title.text = "Экстренная\u00A0ситуация"
+		title.text = "Аварийная пауза"
 	var text := explanation_banner.get_node_or_null("Margin/VBox/ExplanationText") as RichTextLabel
 	if text:
 		text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART

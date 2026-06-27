@@ -48,7 +48,7 @@ func _build_content() -> void:
 	margin.add_child(row)
 
 	_label = Label.new()
-	_label.text = "ВРЕМЯ ДО КОНЦА ИГРЫ"
+	_label.text = "До конца партии"
 	_label.theme_type_variation = &"Hero"
 	_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER

@@ -53,7 +53,7 @@ theme_override_constants/separation = 28
 [node name="Message" type="Label" parent="Panel/Margin/VBox" unique_id=2009739750]
 layout_mode = 2
 theme_type_variation = &"ModalTitle"
-text = "Вы действительно хотите закончить игру?"
+text = "Завершить партию?"
 horizontal_alignment = 1
 autowrap_mode = 3
 
@@ -80,7 +80,7 @@ size_flags_horizontal = 3
 size_flags_vertical = 4
 theme_type_variation = &"Hero"
 theme_override_font_sizes/font_size = 54
-text = "Да"
+text = "Выйти"
 script = ExtResource("2")
 height_scale = 0.900
-action_text = "Да"
+action_text = "Выйти"

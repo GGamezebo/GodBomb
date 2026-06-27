@@ -6,7 +6,7 @@ signal closed
 const NEUTRAL_BG := Color(0, 0, 0, 1.0)
 const LOBBY_BLUR_SHADER := preload("res://assets/shaders/bomb_background_blur.gdshader")
 const LOBBY_BLUR_RADIUS := 5.0
-const EXPLANATION_TEXT := "Здесь можно редактировать состав игры, не заканчивая партию."
+const EXPLANATION_TEXT := "Смените состав за столом — партия не прервётся."
 const EXPLANATION_BANNER_HEIGHT := 192.0
 
 @export var game_manager: GameManager

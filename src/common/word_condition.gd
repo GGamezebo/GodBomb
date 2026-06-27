@@ -8,9 +8,9 @@ enum Type {
 }
 
 const LABELS: Dictionary = {
-	Type.BEGIN: "В начале слова",
-	Type.ANYWHERE: "Где угодно",
-	Type.END: "В конце слова",
+	Type.BEGIN: "Слог в начале слова",
+	Type.ANYWHERE: "Слог в любом месте",
+	Type.END: "Слог в конце слова",
 }
 
 const MESSAGE_FONT_MAX := 112

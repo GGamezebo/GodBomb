@@ -189,7 +189,7 @@ horizontal_alignment = 2
 [node name="ResetHint" type="Label" parent="Panel/Margin/VBox/Scroll/Content"]
 layout_mode = 2
 theme_type_variation = &"ModalMuted"
-text = "Сброс вернёт подсказки, настройки и список имён при добавлении игрока к начальным."
+text = "Сбросит настройки, подсказки и имена игроков по умолчанию."
 autowrap_mode = 3
 
 [node name="ResetButton" parent="Panel/Margin/VBox/Scroll/Content" instance=ExtResource("2")]

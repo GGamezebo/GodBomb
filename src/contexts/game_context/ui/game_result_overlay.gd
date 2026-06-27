@@ -201,7 +201,7 @@ func _build_winner_frame() -> PanelContainer:
 	_winner_strip_host.add_child(_winner_strip)
 
 	_winner_subtitle = Label.new()
-	_winner_subtitle.text = "ЛУЧШИЙ!"
+	_winner_subtitle.text = "МЕНЬШЕ ШТРАФОВ"
 	_winner_subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_winner_subtitle.add_theme_font_size_override("font_size", 72)
 	_winner_subtitle.add_theme_color_override("font_color", Color.WHITE)
