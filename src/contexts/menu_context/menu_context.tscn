@@ -7,7 +7,7 @@
 [ext_resource type="Resource" path="res://src/common/menu_events.tres" id="5"]
 [ext_resource type="PackedScene" uid="uid://duug5w0r0cqrv" path="res://src/features/player_selection/player_selection_widget.tscn" id="6"]
 [ext_resource type="Texture2D" uid="uid://b27y0jjb7mmmy" path="res://assets/party_kitchen/buttons/start_active.svg" id="8"]
-[ext_resource type="Texture2D" uid="uid://1ihkwl0g3cg3" path="res://assets/textures/Background/Background1.png" id="8_ksiyf"]
+[ext_resource type="Texture2D" uid="uid://vgrig0lw4nx4" path="res://assets/textures/Background/Background1.png" id="8_ksiyf"]
 [ext_resource type="Texture2D" uid="uid://cjgo8et40dwnd" path="res://assets/party_kitchen/buttons/start_inactive.svg" id="9"]
 [ext_resource type="PackedScene" path="res://src/features/menu/settings_window.tscn" id="10"]
 [ext_resource type="PackedScene" path="res://src/features/menu/rules_window.tscn" id="11"]
@@ -20,8 +20,7 @@
 [ext_resource type="Script" uid="uid://cesm4akuquebh" path="res://src/features/bomb/bomb_lamps.gd" id="17"]
 [ext_resource type="Script" uid="uid://d2t3b5qtwod5n" path="res://src/features/menu/menu_fire_sparks.gd" id="18"]
 [ext_resource type="Script" uid="uid://ctfwqdpnffwoc" path="res://src/features/menu/start_action_button.gd" id="19"]
-
-[ext_resource type="Script" path="res://src/features/menu/bomb_top_bar_button.gd" id="20"]
+[ext_resource type="Script" uid="uid://4aa3vactq0xy" path="res://src/features/menu/bomb_top_bar_button.gd" id="20"]
 
 [node name="MenuContext" type="Control" unique_id=1379479129 node_paths=PackedStringArray("start_button", "player_selection_widget", "settings_button", "music_button", "rules_button", "settings_window", "rules_window")]
 layout_mode = 3

@@ -10,15 +10,11 @@ const TABLE_HINT_MIN_WIDTH := 280.0
 const SCREEN_MARGIN := 32.0
 const PANEL_MARGIN_H := 24
 const PANEL_MARGIN_V := 9
-const PANEL_BORDER_WIDTH := 4
 const TEXT_FIT_SAFETY := 4.0
 const MAX_FONT_SIZE := 51
 const MIN_FONT_SIZE := 30
 const ABSOLUTE_MIN_FONT_SIZE := 22
 
-const PANEL_BG := Color(0.2, 0.16, 0.13, 0.94)
-const PANEL_BORDER := Color(0.9, 0.55, 0.32, 0.98)
-const PANEL_SHADOW := Color(0.04, 0.02, 0.01, 0.42)
 const TEXT_COLOR := Color(0.99, 0.96, 0.9, 1)
 const TEXT_OUTLINE := Color(0.1, 0.06, 0.04, 0.82)
 
@@ -36,9 +32,9 @@ var _banner_width := TABLE_HINT_WIDTH
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	visible = false
-	modulate.a = 0.0
+	modulate.a = 1.0
 	clip_contents = true
-	_apply_panel_style()
+	apply_panel_style(self)
 
 	_margin = MarginContainer.new()
 	_margin.add_theme_constant_override("margin_left", PANEL_MARGIN_H)
@@ -58,6 +54,7 @@ func _ready() -> void:
 	_label.add_theme_color_override("font_outline_color", TEXT_OUTLINE)
 	_label.add_theme_constant_override("outline_size", 4)
 	_margin.add_child(_label)
+	_set_fade_alpha(0.0)
 
 
 func fit_layout(anchor: Vector2, max_width: float = TABLE_HINT_WIDTH, bounds: Rect2 = Rect2()) -> void:
@@ -98,12 +95,8 @@ func _lock_banner_size() -> void:
 
 
 func _text_area_size() -> Vector2:
-	var border_inset := PANEL_BORDER_WIDTH * 2.0
-	var text_width := maxf(_banner_width - border_inset - PANEL_MARGIN_H * 2.0, 0.0)
-	var text_height := maxf(
-		TABLE_HINT_HEIGHT - border_inset - PANEL_MARGIN_V * 2.0 - TEXT_FIT_SAFETY,
-		0.0
-	)
+	var text_width := maxf(_banner_width - PANEL_MARGIN_H * 2.0, 0.0)
+	var text_height := maxf(TABLE_HINT_HEIGHT - PANEL_MARGIN_V * 2.0 - TEXT_FIT_SAFETY, 0.0)
 	return Vector2(text_width, text_height)
 
 
@@ -140,7 +133,6 @@ func _measure_wrapped_text_height(text: String, text_width: float, font_size: in
 		font_size,
 		TextServer.BREAK_MANDATORY | TextServer.BREAK_WORD_BOUND
 	)
-	# Outline and line spacing are not fully included in string size — reserve slack.
 	return measured.y + outline * 2.0 + TEXT_FIT_SAFETY
 
 
@@ -167,20 +159,20 @@ func show_message(text: String, animate: bool = true, emphasis: bool = false) ->
 
 	if emphasis:
 		visible = true
-		modulate.a = 1.0
+		_set_fade_alpha(1.0)
 		return
 
-	if visible and modulate.a > 0.95 and same_text:
+	if visible and _fade_alpha() > 0.95 and same_text:
 		return
 
-	if not visible or modulate.a < 0.05:
+	if not visible or _fade_alpha() < 0.05:
 		visible = true
-		modulate.a = 0.0
+		_set_fade_alpha(0.0)
 		if animate:
 			_fade_tween = create_tween()
-			_fade_tween.tween_property(self, "modulate:a", 1.0, FADE_IN).set_trans(Tween.TRANS_SINE)
+			_fade_tween.tween_method(_set_fade_alpha, 0.0, 1.0, FADE_IN).set_trans(Tween.TRANS_SINE)
 		else:
-			modulate.a = 1.0
+			_set_fade_alpha(1.0)
 		return
 
 	if same_text:
@@ -188,20 +180,20 @@ func show_message(text: String, animate: bool = true, emphasis: bool = false) ->
 
 	if animate:
 		_fade_tween = create_tween()
-		_fade_tween.tween_property(self, "modulate:a", 0.0, FADE_OUT * 0.55).set_trans(Tween.TRANS_SINE)
+		_fade_tween.tween_method(_set_fade_alpha, _fade_alpha(), 0.0, FADE_OUT * 0.55).set_trans(Tween.TRANS_SINE)
 		_fade_tween.tween_callback(func() -> void:
 			_label.text = text
 			if _layout_ready:
 				_lock_banner_size()
 				_apply_text_fit()
 		)
-		_fade_tween.tween_property(self, "modulate:a", 1.0, FADE_IN).set_trans(Tween.TRANS_SINE)
+		_fade_tween.tween_method(_set_fade_alpha, 0.0, 1.0, FADE_IN).set_trans(Tween.TRANS_SINE)
 	else:
 		_label.text = text
 		if _layout_ready:
 			_lock_banner_size()
 			_apply_text_fit()
-		modulate.a = 1.0
+		_set_fade_alpha(1.0)
 
 
 func hide_message(animate: bool = true) -> void:
@@ -213,7 +205,7 @@ func hide_message(animate: bool = true) -> void:
 
 	if animate:
 		_fade_tween = create_tween()
-		_fade_tween.tween_property(self, "modulate:a", 0.0, FADE_OUT).set_trans(Tween.TRANS_SINE)
+		_fade_tween.tween_method(_set_fade_alpha, _fade_alpha(), 0.0, FADE_OUT).set_trans(Tween.TRANS_SINE)
 		_fade_tween.tween_callback(_finish_hide)
 	else:
 		_finish_hide()
@@ -221,18 +213,26 @@ func hide_message(animate: bool = true) -> void:
 
 func _finish_hide() -> void:
 	visible = false
-	modulate.a = 0.0
+	_set_fade_alpha(0.0)
 	_label.text = ""
+
+
+func _fade_alpha() -> float:
+	if _label:
+		return _label.modulate.a
+	return 0.0
+
+
+func _set_fade_alpha(alpha: float) -> void:
+	modulate.a = 1.0
+	if _label:
+		_label.modulate.a = alpha
 
 
 func _kill_fade_tween() -> void:
 	if _fade_tween:
 		_fade_tween.kill()
 		_fade_tween = null
-
-
-func _apply_panel_style() -> void:
-	apply_panel_style(self)
 
 
 static func visible_design_rect(
@@ -247,16 +247,7 @@ static func visible_design_rect(
 
 
 static func apply_panel_style(panel: PanelContainer) -> void:
-	var style := StyleBoxFlat.new()
-	style.bg_color = PANEL_BG
-	style.border_color = PANEL_BORDER
-	style.set_border_width_all(PANEL_BORDER_WIDTH)
-	style.set_corner_radius_all(27)
-	style.set_content_margin_all(PANEL_BORDER_WIDTH)
-	style.shadow_color = PANEL_SHADOW
-	style.shadow_size = 14
-	style.shadow_offset = Vector2(0, 6)
-	style.anti_aliasing = true
+	var style := StyleBoxEmpty.new()
 	panel.add_theme_stylebox_override("panel", style)
 
 

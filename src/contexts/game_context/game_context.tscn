@@ -23,7 +23,7 @@
 [ext_resource type="AudioStream" uid="uid://7yrpfgssj2v0" path="res://assets/audio/sfx/FastTick.mp3" id="21"]
 [ext_resource type="Script" uid="uid://d26o15jgt3s4y" path="res://src/features/explosion/explosion_effect.gd" id="24"]
 [ext_resource type="Script" uid="uid://qjkbatpnhuo" path="res://core/systems/haptics/haptics_manager.gd" id="25"]
-[ext_resource type="Texture2D" uid="uid://1ihkwl0g3cg3" path="res://assets/textures/Background/Background1.png" id="26_ro4vc"]
+[ext_resource type="Texture2D" uid="uid://vgrig0lw4nx4" path="res://assets/textures/Background/Background1.png" id="26_ro4vc"]
 [ext_resource type="Script" uid="uid://dkplswcbvqptx" path="res://src/features/background/game_bomb_background.gd" id="27"]
 [ext_resource type="Script" uid="uid://b4n1w2jmpoutu" path="res://src/features/bomb/bomb_dial_glass.gd" id="27_glass"]
 [ext_resource type="Texture2D" uid="uid://b27y0jjb7mmmy" path="res://assets/party_kitchen/buttons/start_active.svg" id="28"]
@@ -32,7 +32,7 @@
 [ext_resource type="Texture2D" uid="uid://dtg7vc67xhlwk" path="res://assets/party_kitchen/buttons/icon_exit_menu.svg" id="32"]
 [ext_resource type="Texture2D" uid="uid://46dhblt0l34f" path="res://assets/party_kitchen/buttons/icon_players.svg" id="33"]
 [ext_resource type="Script" uid="uid://drq6tfem3yi12" path="res://src/contexts/game_context/ui/game_battle_chrome.gd" id="34"]
-[ext_resource type="PackedScene" path="res://src/features/menu/exit_confirm_dialog.tscn" id="35"]
+[ext_resource type="PackedScene" uid="uid://bqrfxyfm6dt5w" path="res://src/features/menu/exit_confirm_dialog.tscn" id="35"]
 [ext_resource type="PackedScene" path="res://src/contexts/game_context/ui/battle_player_lobby_overlay.tscn" id="36"]
 [ext_resource type="Script" uid="uid://d2t3b5qtwod5n" path="res://src/features/menu/menu_fire_sparks.gd" id="37"]
 [ext_resource type="Script" uid="uid://ctfwqdpnffwoc" path="res://src/features/menu/start_action_button.gd" id="38"]
@@ -41,7 +41,7 @@
 [ext_resource type="PackedScene" uid="uid://c00gnh7dac78a" path="res://src/contexts/game_context/ui/battle_emergency_overlay.tscn" id="41"]
 [ext_resource type="Texture2D" uid="uid://dhcclubtdmtpd" path="res://assets/party_kitchen/buttons/icon_emergency.svg" id="42"]
 [ext_resource type="AudioStream" uid="uid://x5qdrvhmg2g" path="res://assets/audio/music/win.mp3" id="43"]
-[ext_resource type="Script" path="res://src/features/menu/bomb_top_bar_button.gd" id="44"]
+[ext_resource type="Script" uid="uid://4aa3vactq0xy" path="res://src/features/menu/bomb_top_bar_button.gd" id="44"]
 
 [node name="GameContext" type="Control" unique_id=1610270397 node_paths=PackedStringArray("game_manager", "battle_chrome")]
 layout_mode = 3

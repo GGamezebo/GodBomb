@@ -5,7 +5,7 @@ const ROUND_WORD_MARKER := &"RoundWord"
 const FALLBACK_ROUND_WORD := Vector2(540, 928)
 const TABLE_CENTER := GamePlayerStrip.TABLE_CENTER
 const FALLBACK_HINT_MARKER := Vector2(528, 483)
-const PASS_HINT_RECT := Rect2(48.0, 1410.0, 984.0, 96.0)
+const PASS_HINT_RECT := Rect2(48.0, 1415.0, 984.0, 96.0)
 
 @export var game_manager: GameManager
 @export var game_events: GameEvents
