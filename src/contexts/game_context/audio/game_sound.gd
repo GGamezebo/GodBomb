@@ -48,8 +48,15 @@ func _setup_win_music_player() -> void:
 	_win_music_player.name = "WinMusicPlayer"
 	add_child(_win_music_player)
 	if win_music_stream:
-		_enable_stream_loop(win_music_stream)
+		_disable_stream_loop(win_music_stream)
 		_win_music_player.stream = win_music_stream
+
+
+func _disable_stream_loop(stream: AudioStream) -> void:
+	if stream is AudioStreamMP3:
+		(stream as AudioStreamMP3).loop = false
+	elif stream is AudioStreamOggVorbis:
+		(stream as AudioStreamOggVorbis).loop = false
 
 
 func _enable_stream_loop(stream: AudioStream) -> void:
@@ -131,7 +138,7 @@ func _start_win_music() -> void:
 	if win_music_stream == null:
 		return
 	if _win_music_player.stream != win_music_stream:
-		_enable_stream_loop(win_music_stream)
+		_disable_stream_loop(win_music_stream)
 		_win_music_player.stream = win_music_stream
 	_win_music_player.play()
 

@@ -19,6 +19,7 @@ var bomb_is_exploded: bool = false
 var explosion_duration: float = 0.0
 var explosion_is_countdown: bool = false
 var match_cards_total: int = 0
+var is_tutorial: bool = false
 
 
 func setup(p_config: GameConfig, p_events: GameEvents, account: PDataAccount) -> void:
@@ -119,15 +120,40 @@ func _build_card_deck(game_time_minutes: int) -> void:
 	match_cards_total = cards.size()
 
 
+func apply_tutorial_deck(entries: Array) -> void:
+	cards.clear()
+	current_card = null
+	is_tutorial = true
+	for player in players:
+		player.score = 0
+	for entry in entries:
+		cards.append(GameCard.new(str(entry["syllable"]), int(entry["condition"])))
+	match_cards_total = cards.size()
+
+
+func apply_tutorial_final_scores() -> void:
+	if not is_tutorial:
+		return
+	for player in players:
+		player.score = 0
+	for round_idx in OnboardingTutorialData.ROUND_COUNT:
+		var explode_idx := OnboardingTutorialData.explode_player_index(round_idx)
+		if explode_idx >= 0 and explode_idx < players.size():
+			players[explode_idx].score += 1
+
+
 func reset_round() -> void:
 	state_time = 0.0
 	last_second = -1
 
 
 func reset_bomb() -> void:
-	bomb_alive_time = game_config.min_bomb_alive_time + randf() * (
-		game_config.max_bomb_alive_time - game_config.min_bomb_alive_time
-	)
+	if is_tutorial:
+		bomb_alive_time = OnboardingTutorialData.BOMB_ALIVE_TIME
+	else:
+		bomb_alive_time = game_config.min_bomb_alive_time + randf() * (
+			game_config.max_bomb_alive_time - game_config.min_bomb_alive_time
+		)
 	bomb_duration = 0.0
 	bomb_is_alerted = false
 	bomb_is_exploded = false
@@ -164,6 +190,14 @@ func update_bomb(delta: float) -> bool:
 	if bomb_is_exploded:
 		return false
 
+	if is_tutorial:
+		if not bomb_is_alerted and (bomb_alive_time - bomb_duration) < game_config.alert_bomb_time:
+			bomb_is_alerted = true
+			if game_events:
+				game_events.ev_alert.emit()
+		bomb_duration += delta
+		return false
+
 	if not bomb_is_alerted and (bomb_alive_time - bomb_duration) < game_config.alert_bomb_time:
 		bomb_is_alerted = true
 		if game_events:
@@ -191,6 +225,8 @@ func update_explosion(delta: float) -> bool:
 
 func next_card() -> bool:
 	if cards.is_empty():
+		if is_tutorial:
+			return false
 		var result := get_sorted_results()
 		if result.size() > 1 and result[0].score == result[1].score:
 			var random_index := randi() % game_config.cards.size()

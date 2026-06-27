@@ -242,7 +242,7 @@ func _refresh_menu_button_layout() -> void:
 		_menu_button.refresh_label_layout()
 
 
-func show_results(sorted_players: Array[GamePlayer]) -> void:
+func show_results(sorted_players: Array[GamePlayer], tutorial_mode: bool = false) -> void:
 	if sorted_players.is_empty():
 		return
 	if not is_node_ready():
@@ -274,7 +274,10 @@ func show_results(sorted_players: Array[GamePlayer]) -> void:
 	_ranking_title.modulate.a = 0.0
 	_winner_strip.scale = Vector2(0.86, 0.86)
 	call_deferred("_play_reveal")
-	call_deferred("_start_menu_button_reveal")
+	if tutorial_mode:
+		call_deferred("_enable_menu_button")
+	else:
+		call_deferred("_start_menu_button_reveal")
 
 
 func _reset_menu_button_reveal() -> void:

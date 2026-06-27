@@ -72,6 +72,9 @@ func _ready() -> void:
 	if edit_player_window:
 		edit_player_window.player_added.connect(_on_player_added_from_window)
 		edit_player_window.player_applied.connect(_on_player_applied_from_window)
+		edit_player_window.edit_cancelled.connect(_on_player_edit_cancelled)
+		if not edit_player_window.visibility_changed.is_connected(_on_edit_window_visibility_changed):
+			edit_player_window.visibility_changed.connect(_on_edit_window_visibility_changed)
 	_sync_edit_window_refs()
 	reload_from_account()
 	_apply_add_button_texture()
@@ -176,6 +179,44 @@ func get_emergency_selected_index() -> int:
 
 func get_roster_size() -> int:
 	return _player_icons.size()
+
+
+func get_first_player_icon() -> PlayerIcon:
+	if _player_icons.is_empty():
+		return null
+	return _player_icons[0]
+
+
+func get_player_icon_at(index: int) -> PlayerIcon:
+	if index < 0 or index >= _player_icons.size():
+		return null
+	return _player_icons[index]
+
+
+func add_player_direct(info: PlayerInfo) -> void:
+	if not account or info == null:
+		return
+	if _is_onboarding_add_blocked():
+		return
+	var players := account.get_players()
+	players.append(account.dict_from_player_info(info))
+	account.set_players(players)
+	_create_player_icon(info)
+	_schedule_position_update()
+	if preset_storage:
+		preset_storage.rebuild_locks(players)
+	if menu_events:
+		menu_events.ev_player_added.emit(info)
+	_update_add_button()
+	_update_start_button()
+
+
+func swap_players_at_indices(index_a: int, index_b: int) -> void:
+	if index_a < 0 or index_b < 0 or index_a >= _player_icons.size() or index_b >= _player_icons.size():
+		return
+	if index_a == index_b:
+		return
+	_swap_players(_player_icons[index_a], _player_icons[index_b])
 
 
 func commit_roster_to_account() -> void:
@@ -515,6 +556,19 @@ func _min_players_required() -> int:
 	return game_config.min_players if game_config else 2
 
 
+func _is_onboarding_active() -> bool:
+	if not is_inside_tree():
+		return false
+	return OnboardingController.is_onboarding_active(get_tree())
+
+
+func _is_onboarding_add_blocked() -> bool:
+	return (
+		_is_onboarding_active()
+		and _player_icons.size() >= OnboardingTutorialData.ROUND_COUNT
+	)
+
+
 func _needs_min_players_hint() -> bool:
 	if _battle_mode:
 		return false
@@ -522,6 +576,10 @@ func _needs_min_players_hint() -> bool:
 
 
 func _refresh_table_hint() -> void:
+	if _is_onboarding_active():
+		if _table_hint_banner:
+			_table_hint_banner.hide_message(false)
+		return
 	if not _table_hint_banner:
 		return
 	if _remove_hint_active:
@@ -542,6 +600,8 @@ func _refresh_table_hint() -> void:
 
 
 func _play_swap_hint_intro_if_needed() -> void:
+	if _is_onboarding_active():
+		return
 	if _battle_mode:
 		return
 	if _swap_idle_intro_played:
@@ -570,6 +630,9 @@ func _dismiss_swap_idle_hint(animate: bool = true) -> void:
 
 
 func _play_hold_edit_hint_if_needed() -> void:
+	if _is_onboarding_active():
+		_sync_hold_idle_hints()
+		return
 	if _battle_mode:
 		_sync_hold_idle_hints()
 		return
@@ -630,7 +693,7 @@ func _update_add_button() -> void:
 		add_player_button.visible = false
 		return
 	var count := _player_icons.size()
-	var at_max := count >= game_config.max_players
+	var at_max := count >= game_config.max_players or _is_onboarding_add_blocked()
 	add_player_button.visible = _is_remove_mode or not at_max
 	if _is_remove_mode:
 		add_player_button.disabled = count <= min_players_for_remove
@@ -639,8 +702,10 @@ func _update_add_button() -> void:
 			add_player_button.scale = Vector2.ONE
 			add_player_button.modulate = Color.WHITE
 	else:
-		add_player_button.disabled = count >= game_config.max_players
-		_update_add_button_animation(_player_icons.size() < _min_players_required())
+		add_player_button.disabled = count >= game_config.max_players or _is_onboarding_add_blocked()
+		_update_add_button_animation(
+			_player_icons.size() < _min_players_required() and not _is_onboarding_add_blocked()
+		)
 	_apply_add_button_texture()
 	_sync_add_button_glow()
 	_refresh_table_hint()
@@ -733,6 +798,8 @@ func _kill_add_pulse_tween() -> void:
 
 
 func _set_remove_mode(enabled: bool) -> void:
+	if enabled and _is_onboarding_active():
+		return
 	_is_remove_mode = enabled
 	if enabled:
 		_kill_add_pulse_tween()
@@ -749,6 +816,8 @@ func _set_remove_mode(enabled: bool) -> void:
 
 func _on_add_player_button_pressed() -> void:
 	if _is_remove_mode:
+		return
+	if _is_onboarding_add_blocked():
 		return
 	UiSounds.play_click()
 	if preset_storage and account:
@@ -886,7 +955,8 @@ func _update_swap_preview(dragging: PlayerIcon) -> void:
 
 func _on_icon_drag_ended(icon: PlayerIcon) -> void:
 	var should_remove := (
-		icon == _dragging_icon
+		not _is_onboarding_active()
+		and icon == _dragging_icon
 		and _is_grab_over_remove_ring(icon.get_release_slime_center(), icon.get_grab_radius_global())
 	)
 
@@ -944,6 +1014,8 @@ func _on_icon_hold_edit(index: int) -> void:
 
 
 func _on_player_added_from_window(player_name: String, preset_id: int) -> void:
+	if _is_onboarding_add_blocked():
+		return
 	var info := PlayerInfo.new(player_name, preset_id)
 	var players := account.get_players()
 	players.append(account.dict_from_player_info(info))
@@ -974,7 +1046,26 @@ func _on_player_applied_from_window(index: int, player_name: String, preset_id: 
 	_save_account()
 
 
+func _on_player_edit_cancelled(_index: int) -> void:
+	var controller := OnboardingController.get_controller(get_tree() if is_inside_tree() else null)
+	if controller == null or not controller.is_active():
+		return
+	controller.notify_lobby_name_step_completed()
+
+
+func _on_edit_window_visibility_changed() -> void:
+	var controller := OnboardingController.get_controller(get_tree() if is_inside_tree() else null)
+	if controller == null or not controller.is_active() or edit_player_window == null:
+		return
+	if edit_player_window.visible:
+		controller.pause_overlay()
+	else:
+		controller.resume_overlay()
+
+
 func _remove_player(icon: PlayerIcon) -> void:
+	if _is_onboarding_active():
+		return
 	var index := _player_icons.find(icon)
 	if index < 0:
 		return
@@ -1076,6 +1167,8 @@ func _rect_overlaps(icon: PlayerIcon, button: Control) -> bool:
 
 
 func _save_account() -> void:
+	if _is_onboarding_active():
+		return
 	if not account:
 		return
 	var controller := _resolve_pdata_controller()

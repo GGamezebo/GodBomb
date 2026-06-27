@@ -1,7 +1,10 @@
 class_name RulesWindow
 extends Control
 
-const RULES_TEXT := """[font_size=36]Весёлая словесная игра на одном экране: садитесь кругом, бомба ходит по очереди, вы на лету придумываете слова. Не успели — бум и штраф. Для двоих и для большой компании.
+signal onboarding_continue_pressed
+signal tutorial_requested
+
+const RULES_TEXT := """[font_size=36]Весёлая словесная игра для вечеринок на одном экране: садитесь с друзьями кругом, бомба-телефон передаётся друг другу по очереди, вы на лету придумываете слова. Не успели — бум и штраф. Для двоих и для большой компании.
 
 [font_size=40][b]Как играть?[/b][/font_size]
 На циферблате — слог, например «ЛО», и подсказка: слог в начале, в конце или в любом месте слова.
@@ -42,12 +45,15 @@ const RULES_TEXT := """[font_size=36]Весёлая словесная игра 
 const SCROLL_TRACK := Color(0.08, 0.06, 0.05, 0.42)
 const SCROLL_GRABBER := Color(0.78, 0.48, 0.28, 0.9)
 const SCROLL_GRABBER_HI := Color(0.94, 0.6, 0.34, 0.98)
-
 @export var rules_scroll: ScrollContainer
 @export var rules_text: RichTextLabel
 @export var close_button: StartActionButton
+@export var tutorial_button: StartActionButton
+@export var onboarding_skip_button: Button
 
 var _layout_pending := false
+var _onboarding_mode := false
+var _layout_width := -1
 
 
 func _ready() -> void:
@@ -56,6 +62,8 @@ func _ready() -> void:
 		rules_text.text = RULES_TEXT
 		rules_text.scroll_active = false
 		rules_text.fit_content = true
+		rules_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		rules_text.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 		rules_text.bbcode_enabled = true
 		rules_text.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if rules_scroll:
@@ -63,15 +71,35 @@ func _ready() -> void:
 		if not rules_scroll.resized.is_connected(_queue_rules_layout):
 			rules_scroll.resized.connect(_queue_rules_layout)
 	if close_button:
-		close_button.pressed.connect(close)
+		close_button.pressed.connect(_on_close_pressed)
 		UiSounds.bind_button(close_button)
+	if tutorial_button:
+		tutorial_button.pressed.connect(_on_tutorial_pressed)
+		UiSounds.bind_button(tutorial_button, &"confirm")
+	if onboarding_skip_button:
+		onboarding_skip_button.pressed.connect(_on_onboarding_skip_pressed)
+		UiSounds.bind_button(onboarding_skip_button)
+	_apply_mode_ui()
 	call_deferred("_update_modal_layer_visibility")
 	call_deferred("_queue_rules_layout")
 
 
 func open() -> void:
+	_onboarding_mode = false
+	_apply_mode_ui()
+	_open_common()
+
+
+func open_for_onboarding() -> void:
+	_onboarding_mode = true
+	_apply_mode_ui()
+	_open_common()
+
+
+func _open_common() -> void:
 	visible = true
 	_show_modal_layer()
+	_layout_width = -1
 	if rules_scroll:
 		rules_scroll.scroll_vertical = 0
 	_queue_rules_layout()
@@ -79,13 +107,45 @@ func open() -> void:
 
 
 func close() -> void:
+	_onboarding_mode = false
+	_apply_mode_ui()
 	visible = false
 	_update_modal_layer_visibility()
 	UiSounds.play_modal_close()
 
 
+func _on_close_pressed() -> void:
+	if _onboarding_mode:
+		onboarding_continue_pressed.emit()
+	close()
+
+
+func _on_tutorial_pressed() -> void:
+	close()
+	tutorial_requested.emit()
+
+
+func _on_onboarding_skip_pressed() -> void:
+	close()
+	var controller := OnboardingController.get_controller(get_tree())
+	if controller:
+		controller.skip_current_step()
+
+
+func _apply_mode_ui() -> void:
+	if close_button:
+		close_button.action_text = "Дальше" if _onboarding_mode else "Закрыть"
+		close_button.disabled = false
+	if tutorial_button:
+		tutorial_button.visible = not _onboarding_mode
+	if onboarding_skip_button:
+		onboarding_skip_button.visible = _onboarding_mode
+
+
 func _input(event: InputEvent) -> void:
 	if not visible:
+		return
+	if _onboarding_mode:
 		return
 	if event.is_action_pressed("ui_cancel"):
 		close()
@@ -112,13 +172,16 @@ func _sync_rules_text_layout() -> void:
 	if width <= 1:
 		return
 	var text_width := maxi(width - 18, 1)
-	rules_text.custom_minimum_size = Vector2(text_width, 0.0)
-	rules_text.size.x = text_width
+	if text_width == _layout_width:
+		return
+	_layout_width = text_width
+
 	rules_text.fit_content = true
+	rules_text.custom_minimum_size.x = text_width
+	rules_text.custom_maximum_size.x = text_width
 	await get_tree().process_frame
-	var content_h := maxf(rules_text.get_content_height(), rules_text.size.y)
-	rules_text.custom_minimum_size = Vector2(text_width, content_h)
-	rules_text.size = rules_text.custom_minimum_size
+	if rules_scroll:
+		rules_scroll.scroll_vertical = 0
 
 
 static func _configure_scroll(scroll: ScrollContainer) -> void:

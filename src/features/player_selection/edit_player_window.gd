@@ -3,6 +3,7 @@ extends Control
 
 signal player_added(player_name: String, preset_id: int)
 signal player_applied(index: int, player_name: String, preset_id: int)
+signal edit_cancelled(index: int)
 
 const SLIME_PATH := "res://assets/party_kitchen/slimes/%d.svg"
 const SWATCH_SIZE := 120
@@ -396,6 +397,9 @@ func _read_player_name() -> String:
 
 
 func _on_cancel_pressed() -> void:
+	var index := _player_index
+	if index >= 0:
+		edit_cancelled.emit(index)
 	_close_window(true)
 
 

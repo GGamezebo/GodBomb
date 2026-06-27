@@ -39,6 +39,9 @@ func initialize(data: Dictionary) -> void:
 		battle_chrome.game_manager = game_manager
 		battle_chrome.game_events = game_events
 		battle_chrome.configure(data)
+	var onboarding: OnboardingController = data.get("onboarding_controller")
+	if onboarding:
+		onboarding.bind_game(self)
 
 
 func deinit() -> void:

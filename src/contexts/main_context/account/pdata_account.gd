@@ -202,6 +202,24 @@ func reset_progress() -> void:
 	emit_changed()
 
 
+func is_onboarding_completed() -> bool:
+	return bool(data.get("onboarding_completed", false))
+
+
+func set_onboarding_completed(value: bool) -> void:
+	data["onboarding_completed"] = value
+	emit_changed()
+
+
+func was_onboarding_auto_started() -> bool:
+	return bool(data.get("onboarding_auto_started", false))
+
+
+func set_onboarding_auto_started(value: bool = true) -> void:
+	data["onboarding_auto_started"] = value
+	emit_changed()
+
+
 func player_info_from_dict(entry: Dictionary) -> PlayerInfo:
 	return PlayerInfo.new(
 		PlayerInfo.sanitize_name(str(entry.get("name", ""))),

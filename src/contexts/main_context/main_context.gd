@@ -15,9 +15,9 @@ var is_loading: bool = false
 var target_path: String = ""
 var listener: EventListener = EventListener.new()
 
-
 @onready var _pdata_controller: Node = $Account/PersistentDataController
 @onready var _game_audio: GameAudioController = $GameAudio
+@onready var _onboarding: OnboardingController = $OnboardingController
 
 
 func _ready() -> void:
@@ -29,12 +29,25 @@ func _ready() -> void:
 		menu_context.initialize(_session_data())
 
 	call_deferred("_apply_context_music", true)
+	call_deferred("_boot_onboarding")
+
+
+func _boot_onboarding() -> void:
+	if _onboarding == null:
+		return
+	_onboarding.account = account
+	_onboarding.pdata_controller = _pdata_controller
+	_onboarding.main_events = main_events
+	if current_context:
+		_onboarding.bind_menu(current_context)
+	_onboarding.try_start_first_launch()
 
 
 func _session_data() -> Dictionary:
 	return {
 		"account": account,
 		"pdata_controller": _pdata_controller,
+		"onboarding_controller": _onboarding,
 	}
 
 
@@ -136,6 +149,8 @@ func _on_loading_complete(scene: PackedScene, data: Dictionary) -> void:
 	add_child(current_context)
 	await get_tree().process_frame
 	_apply_context_music(target_path == menu_context_path)
+	if _onboarding:
+		_onboarding.on_context_loaded(current_context, target_path, menu_context_path)
 
 	if current_loading_screen:
 		current_loading_screen.fade_out()

@@ -1,9 +1,9 @@
-[gd_scene load_steps=3 format=3 uid="uid://rules_window_godbomb"]
+[gd_scene format=3 uid="uid://dulm6j2b8mwrm"]
 
-[ext_resource type="Script" path="res://src/features/menu/rules_window.gd" id="1"]
-[ext_resource type="PackedScene" path="res://src/features/menu/pill_action_button.tscn" id="2"]
+[ext_resource type="Script" uid="uid://epurqnopxktw" path="res://src/features/menu/rules_window.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://bff3xhmdudpjx" path="res://src/features/menu/pill_action_button.tscn" id="2"]
 
-[node name="RulesWindow" type="Control" node_paths=PackedStringArray("rules_scroll", "rules_text", "close_button")]
+[node name="RulesWindow" type="Control" unique_id=41091836 node_paths=PackedStringArray("rules_scroll", "rules_text", "close_button", "tutorial_button", "onboarding_skip_button")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -12,20 +12,21 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1")
 rules_scroll = NodePath("Panel/Margin/VBox/Scroll")
-rules_text = NodePath("Panel/Margin/VBox/Scroll/RulesText")
-close_button = NodePath("Panel/Margin/VBox/CloseButton")
+rules_text = NodePath("Panel/Margin/VBox/Scroll/ScrollContent/RulesText")
+close_button = NodePath("Panel/Margin/VBox/ButtonRow/CloseButton")
+tutorial_button = NodePath("Panel/Margin/VBox/ButtonRow/TutorialButton")
+onboarding_skip_button = NodePath("Panel/Margin/VBox/OnboardingSkipButton")
 
-[node name="Dimmer" type="ColorRect" parent="."]
+[node name="Dimmer" type="ColorRect" parent="." unique_id=1175574398]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 0
 color = Color(0.04, 0.03, 0.025, 0.82)
 
-[node name="Panel" type="PanelContainer" parent="."]
+[node name="Panel" type="PanelContainer" parent="." unique_id=1489270321]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -37,51 +38,71 @@ offset_bottom = -64.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Margin" type="MarginContainer" parent="Panel"]
+[node name="Margin" type="MarginContainer" parent="Panel" unique_id=1900486957]
 layout_mode = 2
 theme_override_constants/margin_left = 48
 theme_override_constants/margin_top = 48
 theme_override_constants/margin_right = 48
 theme_override_constants/margin_bottom = 48
 
-[node name="VBox" type="VBoxContainer" parent="Panel/Margin"]
+[node name="VBox" type="VBoxContainer" parent="Panel/Margin" unique_id=904628420]
 layout_mode = 2
 theme_override_constants/separation = 28
 
-[node name="TitleBlock" type="VBoxContainer" parent="Panel/Margin/VBox"]
+[node name="TitleBlock" type="VBoxContainer" parent="Panel/Margin/VBox" unique_id=1989648726]
 layout_mode = 2
 theme_override_constants/separation = 0
 alignment = 1
 
-[node name="TitleRules" type="Label" parent="Panel/Margin/VBox/TitleBlock"]
+[node name="TitleRules" type="Label" parent="Panel/Margin/VBox/TitleBlock" unique_id=1858898077]
 layout_mode = 2
 theme_type_variation = &"ModalTitle"
 text = "Правила игры"
 horizontal_alignment = 1
 
-[node name="TitleGame" type="Label" parent="Panel/Margin/VBox/TitleBlock"]
+[node name="TitleGame" type="Label" parent="Panel/Margin/VBox/TitleBlock" unique_id=464560625]
 layout_mode = 2
 theme_type_variation = &"ModalTitle"
 text = "Тик-Так-Бадабум"
 horizontal_alignment = 1
 
-[node name="Scroll" type="ScrollContainer" parent="Panel/Margin/VBox"]
+[node name="Scroll" type="ScrollContainer" parent="Panel/Margin/VBox" unique_id=586567589]
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
 vertical_scroll_mode = 2
 scroll_deadzone = 16
-clip_contents = true
 
-[node name="RulesText" type="RichTextLabel" parent="Panel/Margin/VBox/Scroll"]
+[node name="ScrollContent" type="VBoxContainer" parent="Panel/Margin/VBox/Scroll" unique_id=1352361051]
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_vertical = 0
+
+[node name="RulesText" type="RichTextLabel" parent="Panel/Margin/VBox/Scroll/ScrollContent" unique_id=1403433987]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 0
+mouse_filter = 2
 theme_type_variation = &"ModalRichText"
 bbcode_enabled = true
 fit_content = true
 scroll_active = false
-mouse_filter = 2
 
-[node name="CloseButton" parent="Panel/Margin/VBox" instance=ExtResource("2")]
+[node name="OnboardingSkipButton" type="Button" parent="Panel/Margin/VBox" unique_id=103385364]
+layout_mode = 2
+size_flags_horizontal = 8
+theme_type_variation = &"Hero"
+theme_override_font_sizes/font_size = 34
+text = "Пропустить"
+
+[node name="ButtonRow" type="VBoxContainer" parent="Panel/Margin/VBox" unique_id=1552179712]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="TutorialButton" parent="Panel/Margin/VBox/ButtonRow" unique_id=409864747 instance=ExtResource("2")]
+layout_mode = 2
+action_text = "Пройти обучение"
+
+[node name="CloseButton" parent="Panel/Margin/VBox/ButtonRow" unique_id=38049169 instance=ExtResource("2")]
 layout_mode = 2
 action_text = "Закрыть"

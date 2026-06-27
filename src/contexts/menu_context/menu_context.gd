@@ -64,6 +64,10 @@ func initialize(data: Dictionary) -> void:
 			player_selection_widget.pdata_controller = passed_controller
 		player_selection_widget.reload_from_account()
 
+	var onboarding: OnboardingController = data.get("onboarding_controller")
+	if onboarding:
+		onboarding.bind_menu(self)
+
 	_update_music_button_icon()
 	_update_start_button()
 	if account and not account.changed.is_connected(_update_music_button_icon):
@@ -79,11 +83,15 @@ func deinit() -> void:
 
 
 func _on_settings_pressed() -> void:
+	if OnboardingController.is_onboarding_active(get_tree()):
+		return
 	if settings_window:
 		settings_window.open()
 
 
 func _on_rules_pressed() -> void:
+	if OnboardingController.is_onboarding_active(get_tree()):
+		return
 	if rules_window:
 		rules_window.open()
 

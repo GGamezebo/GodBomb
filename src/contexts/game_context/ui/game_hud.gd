@@ -379,4 +379,4 @@ func _show_result() -> void:
 	if not _result_overlay or not game_manager:
 		return
 	var sorted := game_manager.session.get_sorted_results()
-	_result_overlay.show_results(sorted)
+	_result_overlay.show_results(sorted, game_manager.session.is_tutorial)

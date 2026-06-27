@@ -127,6 +127,68 @@ func _process(delta: float) -> void:
 			_process_explosion(delta)
 
 
+func apply_tutorial_deck(entries: Array) -> void:
+	if not _session_ready:
+		return
+	session.apply_tutorial_deck(entries)
+	session.set_current_player_index(OnboardingTutorialData.FIRST_PLAYER_INDEX)
+
+
+func force_finish_player_choice() -> void:
+	if fsm == null or fsm.get_current_state_name() != FSMGameStates.PLAYER_CHOICE:
+		return
+	session.set_current_player_index(OnboardingTutorialData.FIRST_PLAYER_INDEX)
+	session.state_time = session.game_config.player_choice_time + 1.0
+
+
+func force_enter_play_from_countdown() -> void:
+	if fsm == null or fsm.get_current_state_name() != FSMGameStates.COUNTDOWN:
+		return
+	session.state_time = session.game_config.countdown_time + 1.0
+
+
+func force_finish_explosion() -> void:
+	if fsm == null or fsm.get_current_state_name() != FSMGameStates.EXPLOSION:
+		return
+	session.explosion_is_countdown = true
+	_on_explosion_finished()
+
+
+func force_tutorial_explosion_at(player_index: int) -> void:
+	if fsm == null:
+		return
+	var state_name := fsm.get_current_state_name()
+	if state_name == FSMGameStates.COUNTDOWN:
+		force_enter_play_from_countdown()
+		call_deferred("_deferred_tutorial_explosion_at", player_index)
+		return
+	if state_name != FSMGameStates.PLAY:
+		return
+	_apply_tutorial_explosion_at(player_index)
+
+
+func force_tutorial_explosion() -> void:
+	if session == null:
+		return
+	force_tutorial_explosion_at(session.current_player_index)
+
+
+func _deferred_tutorial_explosion_at(player_index: int) -> void:
+	if fsm == null or fsm.get_current_state_name() != FSMGameStates.PLAY:
+		return
+	_apply_tutorial_explosion_at(player_index)
+
+
+func _apply_tutorial_explosion_at(player_index: int) -> void:
+	if session.bomb_is_exploded:
+		return
+	session.set_current_player_index(player_index)
+	session.bomb_is_exploded = true
+	if not session.is_tutorial:
+		session.get_current_player().on_explosion()
+	fsm.add_event(FSMGameEvents.EXPLODE)
+
+
 func start_round() -> void:
 	session.reset_round()
 	fsm.add_event(FSMGameEvents.START_ROUND)
@@ -134,6 +196,8 @@ func start_round() -> void:
 
 func next_player() -> void:
 	session.next_player()
+	if session.is_tutorial:
+		_try_tutorial_landing_explosion()
 
 
 func enter_emergency() -> void:
@@ -146,10 +210,13 @@ func enter_emergency() -> void:
 func continue_emergency(player_index: int) -> void:
 	if fsm == null or fsm.get_current_state_name() != FSMGameStates.EMERGENCY:
 		return
-	session.set_current_player_index(player_index)
-	session.try_add_bonus_bomb_time()
 	fsm.add_event(FSMGameEvents.EMERGENCY_CONTINUE)
 	set_paused(false)
+	if session.is_tutorial:
+		call_deferred("_deferred_tutorial_scripted_explosion")
+		return
+	session.set_current_player_index(player_index)
+	session.try_add_bonus_bomb_time()
 	if session.bomb_is_alerted and game_events:
 		game_events.ev_alert.emit()
 
@@ -192,7 +259,33 @@ func _on_explosion_finished() -> void:
 		session.reset_round()
 		fsm.add_event(FSMGameEvents.EXPLOSION_DONE)
 	else:
+		if session.is_tutorial:
+			session.apply_tutorial_final_scores()
 		fsm.add_event(FSMGameEvents.MATCH_END)
+
+
+func _get_tutorial_round_index() -> int:
+	if session.current_card != null:
+		return OnboardingTutorialData.round_index_for_card(session.current_card)
+	var played := session.match_cards_total - session.cards.size()
+	return clampi(played - 1, 0, OnboardingTutorialData.ROUND_COUNT - 1)
+
+
+func _try_tutorial_landing_explosion() -> void:
+	if fsm == null or fsm.get_current_state_name() != FSMGameStates.PLAY:
+		return
+	if session.bomb_is_exploded:
+		return
+	var explode_idx := OnboardingTutorialData.explode_player_index(_get_tutorial_round_index())
+	if session.current_player_index == explode_idx:
+		_apply_tutorial_explosion_at(explode_idx)
+
+
+func _deferred_tutorial_scripted_explosion() -> void:
+	if fsm == null or fsm.get_current_state_name() != FSMGameStates.PLAY:
+		return
+	var explode_idx := OnboardingTutorialData.explode_player_index(_get_tutorial_round_index())
+	_apply_tutorial_explosion_at(explode_idx)
 
 
 func _on_state_changed(from_state_name: String, to_state_name: String) -> void:
