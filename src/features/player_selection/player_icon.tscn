@@ -2,22 +2,6 @@
 
 [ext_resource type="Script" uid="uid://by0043iak2qax" path="res://src/features/player_selection/player_icon.gd" id="1"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_name"]
-bg_color = Color(1, 0.98, 0.94, 0.92)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.55, 0.4, 0.28, 0.55)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
-content_margin_left = 14.0
-content_margin_top = 4.0
-content_margin_right = 14.0
-content_margin_bottom = 4.0
-
 [node name="PlayerIcon" type="Control" unique_id=1632185681 node_paths=PackedStringArray("slime_rect", "name_label")]
 custom_minimum_size = Vector2(110, 200)
 layout_mode = 3
@@ -41,12 +25,12 @@ offset_left = 5.0
 offset_top = 52.0
 offset_right = 105.0
 offset_bottom = 86.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_name")
 
 [node name="PlayerName" type="Label" parent="NamePlate" unique_id=1061097853]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.16, 0.12, 0.1, 1)
-theme_override_colors/font_outline_color = Color(1, 0.99, 0.97, 0.9)
+theme_type_variation = &"Hero"
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.02, 0.02, 0.02, 0.92)
 theme_override_constants/outline_size = 2
 theme_override_font_sizes/font_size = 26
 text = "Игрок"

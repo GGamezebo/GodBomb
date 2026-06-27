@@ -18,6 +18,9 @@ const NAME_FONT_MAX := 54
 const NAME_FONT_MIN := 30
 const MAX_PILL_WIDTH := 580.0
 
+const NAME_TEXT_COLOR := Color(1.0, 1.0, 1.0, 1.0)
+const NAME_OUTLINE_COLOR := Color(0.04, 0.03, 0.02, 0.5)
+
 var _frame: PanelContainer
 var _avatar_ring: PanelContainer
 var _slime: TextureRect
@@ -54,6 +57,50 @@ func _vi(value: float) -> int:
 	return int(roundf(value * _visual_scale))
 
 
+static func create_name_pill_style(
+	plate_height: float,
+	pad_h: float = 0.0,
+	pad_v: float = 0.0,
+	border_width: int = 2,
+	shadow_size: int = 10,
+	lobby: bool = false
+) -> StyleBoxFlat:
+	var pill := StyleBoxFlat.new()
+	if lobby:
+		pill.bg_color = Color(1.0, 1.0, 1.0, 0.1)
+		pill.border_color = Color(1.0, 1.0, 1.0, 0.26)
+		pill.set_border_width_all(maxi(border_width, 1))
+		pill.set_corner_radius_all(maxi(4, int(plate_height * 0.5)))
+		pill.shadow_size = 0
+	else:
+		pill.bg_color = Color(1.0, 0.99, 0.97, 0.44)
+		pill.border_color = Color(1.0, 1.0, 1.0, 0.34)
+		pill.set_border_width_all(maxi(border_width, 2))
+		pill.set_corner_radius_all(maxi(4, int(plate_height * 0.5)))
+		pill.shadow_color = Color(0.05, 0.03, 0.02, 0.28)
+		pill.shadow_size = shadow_size
+		pill.shadow_offset = Vector2(0.0, maxf(2.0, plate_height * 0.033))
+	pill.content_margin_left = pad_h
+	pill.content_margin_top = pad_v
+	pill.content_margin_right = pad_h
+	pill.content_margin_bottom = pad_v
+	pill.anti_aliasing = false
+	return pill
+
+
+static func apply_name_label_style(label: Label, font_size: int, outline_size: int = -1, crisp: bool = false) -> void:
+	var outline := outline_size
+	if outline < 0:
+		outline = 2 if crisp else maxi(2, int(round(float(font_size) / 10.0)))
+	label.add_theme_color_override("font_color", NAME_TEXT_COLOR)
+	label.add_theme_color_override(
+		"font_outline_color",
+		Color(0.02, 0.02, 0.02, 0.92) if crisp else NAME_OUTLINE_COLOR
+	)
+	label.add_theme_constant_override("outline_size", outline)
+	label.modulate = Color.WHITE
+
+
 func _build_content() -> void:
 	if _built:
 		return
@@ -65,15 +112,10 @@ func _build_content() -> void:
 
 	_frame = PanelContainer.new()
 	_frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var pill := StyleBoxFlat.new()
-	pill.bg_color = Color(1.0, 0.99, 0.97, 0.44)
-	pill.border_color = Color(1.0, 1.0, 1.0, 0.34)
-	pill.set_border_width_all(max(_vi(2.0), 2))
-	pill.set_corner_radius_all(int(frame_height * 0.5))
-	pill.shadow_color = Color(0.05, 0.03, 0.02, 0.28)
-	pill.shadow_size = _vi(10.0)
-	pill.shadow_offset = Vector2(0.0, _vx(4.0))
-	_frame.add_theme_stylebox_override("panel", pill)
+	_frame.add_theme_stylebox_override(
+		"panel",
+		create_name_pill_style(frame_height, 0.0, 0.0, max(_vi(2.0), 2), _vi(10.0))
+	)
 	add_child(_frame)
 
 	var margin := MarginContainer.new()
@@ -121,9 +163,7 @@ func _build_content() -> void:
 	_name_label.autowrap_mode = TextServer.AUTOWRAP_OFF
 	_name_label.clip_text = false
 	_name_label.add_theme_font_size_override("font_size", _vi(NAME_FONT_MAX))
-	_name_label.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0, 1.0))
-	_name_label.add_theme_color_override("font_outline_color", Color(0.04, 0.03, 0.02, 0.5))
-	_name_label.add_theme_constant_override("outline_size", max(_vi(2.0), 2))
+	apply_name_label_style(_name_label, _vi(NAME_FONT_MAX), max(_vi(2.0), 2))
 	row.add_child(_name_label)
 
 
@@ -155,6 +195,7 @@ func _fit_name_layout() -> void:
 			chosen_width = name_width
 			break
 	_name_label.add_theme_font_size_override("font_size", chosen_size)
+	apply_name_label_style(_name_label, chosen_size, max(_vi(2.0), 2))
 	_name_label.custom_minimum_size = Vector2(chosen_width, avatar_size)
 	var pill_width := _pill_width_for_name(chosen_width)
 	custom_minimum_size = Vector2(pill_width, frame_height)

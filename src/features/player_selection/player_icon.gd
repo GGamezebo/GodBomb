@@ -180,17 +180,25 @@ func layout_name_plate(table_center_global: Vector2 = Vector2.ZERO) -> void:
 	var max_plate_width := _compute_max_plate_width()
 	var font_size := _fit_name_font_size(max_plate_width)
 	name_label.add_theme_font_size_override("font_size", font_size)
+	GamePlayerStrip.apply_name_label_style(name_label, font_size, 2, true)
 
 	var text_width := _measure_name_width(font_size)
 	var plate_width := clampf(text_width + NAME_PLATE_PAD_X * 2.0, NAME_PLATE_MIN_WIDTH, max_plate_width)
 
 	name_plate.z_index = 2
+	name_plate.modulate = Color.WHITE
+	name_plate.clip_contents = true
 	name_plate.custom_minimum_size = Vector2(plate_width, 0)
 	name_plate.reset_size()
 	var plate_size := name_plate.get_combined_minimum_size()
 	if plate_size.y <= 0.0:
 		plate_size.y = float(font_size) + 12.0
 	name_plate.size = plate_size
+	if name_plate is PanelContainer:
+		(name_plate as PanelContainer).add_theme_stylebox_override(
+			"panel",
+			GamePlayerStrip.create_name_pill_style(plate_size.y, NAME_PLATE_PAD_X, 4.0, 1, 0, true)
+		)
 
 	var seat_anchor := _compute_seat_offset()
 	var slime_bottom := slime_rect.position.y + slime_rect.size.y
