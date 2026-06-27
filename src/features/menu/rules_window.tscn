@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://src/features/menu/rules_window.gd" id="1"]
 [ext_resource type="PackedScene" path="res://src/features/menu/pill_action_button.tscn" id="2"]
 
-[node name="RulesWindow" type="Control" node_paths=PackedStringArray("rules_text", "close_button")]
+[node name="RulesWindow" type="Control" node_paths=PackedStringArray("rules_scroll", "rules_text", "close_button")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -11,6 +11,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1")
+rules_scroll = NodePath("Panel/Margin/VBox/Scroll")
 rules_text = NodePath("Panel/Margin/VBox/Scroll/RulesText")
 close_button = NodePath("Panel/Margin/VBox/CloseButton")
 
@@ -47,24 +48,39 @@ theme_override_constants/margin_bottom = 48
 layout_mode = 2
 theme_override_constants/separation = 28
 
-[node name="Title" type="Label" parent="Panel/Margin/VBox"]
+[node name="TitleBlock" type="VBoxContainer" parent="Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="TitleRules" type="Label" parent="Panel/Margin/VBox/TitleBlock"]
 layout_mode = 2
 theme_type_variation = &"ModalTitle"
-text = "Правила"
+text = "Правила игры"
+horizontal_alignment = 1
+
+[node name="TitleGame" type="Label" parent="Panel/Margin/VBox/TitleBlock"]
+layout_mode = 2
+theme_type_variation = &"ModalTitle"
+text = "Тик-Так-Бадабум"
 horizontal_alignment = 1
 
 [node name="Scroll" type="ScrollContainer" parent="Panel/Margin/VBox"]
 layout_mode = 2
 size_flags_vertical = 3
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 2
+scroll_deadzone = 16
+clip_contents = true
 
 [node name="RulesText" type="RichTextLabel" parent="Panel/Margin/VBox/Scroll"]
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_vertical = 3
 theme_type_variation = &"ModalRichText"
 bbcode_enabled = true
 fit_content = true
 scroll_active = false
+mouse_filter = 2
 
 [node name="CloseButton" parent="Panel/Margin/VBox" instance=ExtResource("2")]
 layout_mode = 2
