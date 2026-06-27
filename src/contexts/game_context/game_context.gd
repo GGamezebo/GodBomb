@@ -34,6 +34,7 @@ func initialize(data: Dictionary) -> void:
 	if game_manager and game_config and session_account:
 		if not game_manager.game_events and game_events:
 			game_manager.game_events = game_events
+		LocaleService.apply_cards_to(game_config)
 		game_manager.setup_session(game_config, session_account)
 	if battle_chrome:
 		battle_chrome.game_manager = game_manager

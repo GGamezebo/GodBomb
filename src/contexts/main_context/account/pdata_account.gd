@@ -15,11 +15,8 @@ const DEFAULT_HAPTICS_ENABLED := true
 const DEFAULT_HAPTICS_STRENGTH := 1.0
 
 
-static func default_recent_names() -> Array[String]:
-	var names: Array[String] = []
-	for color_name in SlimeColors.NAMES:
-		names.append(color_name)
-	return names
+static func default_recent_names(locale: String = "ru") -> Array[String]:
+	return LocaleStrings.get_slime_names(locale)
 
 @export var data: Dictionary = {
 	"version": CURRENT_VERSION,
@@ -87,8 +84,28 @@ func remember_removed_player(player_name: String) -> void:
 func ensure_recent_names_initialized() -> void:
 	var stored = data.get("recent_player_names", null)
 	if stored == null or (stored is Array and stored.is_empty()):
-		data["recent_player_names"] = default_recent_names()
+		data["recent_player_names"] = default_recent_names(get_language())
 		emit_changed()
+
+
+func get_language() -> String:
+	ensure_language_initialized()
+	return str(data.get("language", "ru"))
+
+
+func set_language(code: String) -> void:
+	data["language"] = "en" if code == "en" else "ru"
+	emit_changed()
+
+
+func ensure_language_initialized() -> void:
+	if data.has("language"):
+		var lang := str(data.get("language", ""))
+		if not lang.is_empty():
+			return
+	var sys := OS.get_locale_language().to_lower()
+	data["language"] = "en" if sys == "en" else "ru"
+	emit_changed()
 
 
 func get_games_played() -> int:
@@ -190,7 +207,7 @@ func set_haptics_strength(linear: float) -> void:
 func reset_progress() -> void:
 	data["players"] = []
 	data["games_played"] = 0
-	data["recent_player_names"] = default_recent_names()
+	data["recent_player_names"] = default_recent_names(get_language())
 	data.erase("has_edited_player")
 	data["hints_seen"] = {}
 	data["game_time_minutes"] = DEFAULT_GAME_TIME_MINUTES

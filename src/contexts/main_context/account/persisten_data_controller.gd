@@ -34,13 +34,20 @@ func _load_account() -> void:
 		var saved_res: PDataAccount = ResourceLoader.load(PDataAccount.SAVE_PATH)
 		if saved_res:
 			ResourceUtils.update_resource(account, saved_res)
-			if account:
-				account.ensure_recent_names_initialized()
+			_init_account_locale()
 			return
 
 	if account_default:
 		ResourceUtils.update_resource(account, account_default)
 
 	if account:
-		account.ensure_recent_names_initialized()
+		_init_account_locale()
 	save_account()
+
+
+func _init_account_locale() -> void:
+	if not account:
+		return
+	account.ensure_language_initialized()
+	LocaleService.init_from_account(account)
+	account.ensure_recent_names_initialized()

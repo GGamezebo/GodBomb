@@ -25,6 +25,8 @@ func _ready() -> void:
 	if root:
 		root.modulate.a = 1.0
 	_apply_styles()
+	if status_label:
+		status_label.text = LocaleService.text("LOADING")
 	call_deferred("_sync_layout")
 
 

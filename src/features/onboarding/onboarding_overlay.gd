@@ -21,7 +21,6 @@ const START_ACTIVE_TEXTURE := preload("res://assets/party_kitchen/buttons/start_
 const START_INACTIVE_TEXTURE := preload("res://assets/party_kitchen/buttons/start_inactive.svg")
 const SPOTLIGHT_SHADER := preload("res://assets/shaders/onboarding_spotlight.gdshader")
 
-const DEFAULT_SKIP_LABEL := "Пропустить"
 const SKIP_BUTTON_SIZE_SCALE := 0.9
 
 var _root: Control
@@ -176,11 +175,11 @@ func _build_ui() -> void:
 	_body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_body_scroll.add_child(_body)
 
-	_skip_button = _create_start_style_button(DEFAULT_SKIP_LABEL)
+	_skip_button = _create_start_style_button(LocaleService.text("ONBOARDING_SKIP"))
 	_skip_button.pressed.connect(_on_skip_pressed)
 	_bottom_dock.add_child(_skip_button)
 
-	_continue_button = _create_start_style_button("Понятно")
+	_continue_button = _create_start_style_button(LocaleService.text("ONBOARDING_GOT_IT"))
 	_continue_button.visible = false
 	_continue_button.pressed.connect(_on_continue_pressed)
 	_bottom_dock.add_child(_continue_button)
@@ -246,7 +245,7 @@ func show_step_with_notice(title: String, body: String, notice: String, show_ski
 	_title.text = title
 	_body.text = body
 	_set_notice(notice)
-	_skip_button.action_text = DEFAULT_SKIP_LABEL
+	_skip_button.action_text = LocaleService.text("ONBOARDING_SKIP")
 	_skip_button.visible = show_skip
 	_continue_button.visible = false
 	visible = true
@@ -349,13 +348,13 @@ func clear_spotlight() -> void:
 	_layout_dim()
 
 
-func set_continue_visible(show: bool, label: String = "Понятно") -> void:
-	_continue_button.action_text = label
+func set_continue_visible(show: bool, label: String = "") -> void:
+	_continue_button.action_text = label if not label.is_empty() else LocaleService.text("ONBOARDING_GOT_IT")
 	_continue_button.visible = show
 	if show:
 		_skip_button.visible = false
 	else:
-		_skip_button.action_text = DEFAULT_SKIP_LABEL
+		_skip_button.action_text = LocaleService.text("ONBOARDING_SKIP")
 	call_deferred("_layout_bottom_panel")
 
 

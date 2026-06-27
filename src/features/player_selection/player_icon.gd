@@ -242,7 +242,7 @@ func _fit_name_font_size(max_plate_width: float) -> int:
 func _measure_name_width(font_size: int) -> float:
 	if not name_label:
 		return 0.0
-	var text := name_label.text if not name_label.text.is_empty() else "Игрок"
+	var text := name_label.text if not name_label.text.is_empty() else LocaleService.text("PLAYER_DEFAULT")
 	var font := name_label.get_theme_font("font")
 	if font == null:
 		return float(text.length()) * float(font_size) * 0.55

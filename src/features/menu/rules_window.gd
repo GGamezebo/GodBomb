@@ -4,44 +4,6 @@ extends Control
 signal onboarding_continue_pressed
 signal tutorial_requested
 
-const RULES_TEXT := """[font_size=36]Весёлая словесная игра для вечеринок на одном экране: садитесь с друзьями кругом, бомба-телефон передаётся друг другу по очереди, вы на лету придумываете слова. Не успели — бум и штраф. Для двоих и для большой компании.
-
-[font_size=40][b]Как играть?[/b][/font_size]
-На циферблате — слог, например «ЛО», и подсказка: слог в начале, в конце или в любом месте слова.
-
-Назовите слово вслух и передайте бомбу соседу — коротким нажатием на экран.
-
-Лодка — полотно — весло — алоэ — ло… бум! У кого бомба взорвалась — +1 штраф.
-
-Сначала жребий выбирает первого. Потом «Готовы?», отсчёт — и раунд пошёл.
-
-[font_size=40][b]Когда бум?[/b][/font_size]
-Каждый раз по-своему: таймер случайный. Может рвануть сразу, а может дать много кругов. Перед взрывом бомба предупреждает.
-
-Между раундами мелькает полоска — сколько партии ещё осталось.
-
-[font_size=40][b]Кто победил?[/b][/font_size]
-В конце — таблица результатов. Меньше штрафов — выше место.
-
-[font_size=40][b]Сбор игроков[/b][/font_size]
-От 2 до 12 человек. [b]+[/b] — добавить, перетащите слайм на соседа — сменить место, удержите 1,5 с — имя и цвет.
-
-В настройках — длительность партии, от неё зависит число раундов.
-
-[font_size=40][b]Если накосячили[/b][/font_size]
-Неверное слово или ложное нажатие? Аварийная кнопка в бою — выберите, кто переигрывает ход. Состав можно поправить через кнопку со списком игроков.
-
-
-[font_size=24][color=#ffffff18]————————————————[/color][/font_size]
-
-
-[font_size=36][b]Разработчики[/b][/font_size]
-Екатерина Кровш — продакт-менеджер
-Герман Гульдеров — sound-дизайнер
-Игорь Белов — вайб-кодер
-
-[center][font_size=40][b]Приятной игры![/b][/font_size][/center]"""
-
 const SCROLL_TRACK := Color(0.08, 0.06, 0.05, 0.42)
 const SCROLL_GRABBER := Color(0.78, 0.48, 0.28, 0.9)
 const SCROLL_GRABBER_HI := Color(0.94, 0.6, 0.34, 0.98)
@@ -58,8 +20,10 @@ var _layout_width := -1
 
 func _ready() -> void:
 	visible = false
+	if not LocaleService.locale_changed.is_connected(refresh_localized):
+		LocaleService.locale_changed.connect(refresh_localized)
 	if rules_text:
-		rules_text.text = RULES_TEXT
+		rules_text.text = LocaleService.get_rules_text()
 		rules_text.scroll_active = false
 		rules_text.fit_content = true
 		rules_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -82,6 +46,23 @@ func _ready() -> void:
 	_apply_mode_ui()
 	call_deferred("_update_modal_layer_visibility")
 	call_deferred("_queue_rules_layout")
+	refresh_localized()
+
+
+func refresh_localized() -> void:
+	if rules_text:
+		rules_text.text = LocaleService.get_rules_text()
+	var title := get_node_or_null("Panel/Margin/VBox/TitleBlock/TitleRules") as Label
+	if title:
+		title.text = LocaleService.text("RULES_TITLE")
+	var subtitle := get_node_or_null("Panel/Margin/VBox/TitleBlock/TitleGame") as Label
+	if subtitle:
+		subtitle.text = LocaleService.text("RULES_GAME_NAME")
+	if onboarding_skip_button:
+		onboarding_skip_button.text = LocaleService.text("RULES_SKIP")
+	if tutorial_button:
+		tutorial_button.action_text = LocaleService.text("RULES_TUTORIAL")
+	_apply_mode_ui()
 
 
 func open() -> void:
@@ -134,7 +115,9 @@ func _on_onboarding_skip_pressed() -> void:
 
 func _apply_mode_ui() -> void:
 	if close_button:
-		close_button.action_text = "Дальше" if _onboarding_mode else "Закрыть"
+		close_button.action_text = (
+			LocaleService.text("RULES_NEXT") if _onboarding_mode else LocaleService.text("RULES_CLOSE")
+		)
 		close_button.disabled = false
 	if tutorial_button:
 		tutorial_button.visible = not _onboarding_mode

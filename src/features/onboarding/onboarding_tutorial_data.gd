@@ -7,7 +7,7 @@ const SWAP_INDEX_B := 1
 const BOMB_ALIVE_TIME := 10.0
 const FIRST_PLAYER_INDEX := 0
 
-const ROUNDS: Array[Dictionary] = [
+const ROUNDS_RU: Array[Dictionary] = [
 	{
 		"syllable": "ло",
 		"condition": WordCondition.Type.BEGIN,
@@ -34,10 +34,43 @@ const ROUNDS: Array[Dictionary] = [
 	},
 ]
 
+const ROUNDS_EN: Array[Dictionary] = [
+	{
+		"syllable": "BL",
+		"condition": WordCondition.Type.BEGIN,
+		"word_hint": "black",
+		"examples": "black, blink, blow",
+		"pass_hint": "Say a word out loud and tap the screen to pass the bomb.",
+		"explode_player_index": 0,
+	},
+	{
+		"syllable": "AND",
+		"condition": WordCondition.Type.ANYWHERE,
+		"word_hint": "sand",
+		"examples": "sand, hand, random",
+		"pass_hint": "Say a word and pass the bomb with a quick tap.",
+		"explode_player_index": 1,
+	},
+	{
+		"syllable": "OCK",
+		"condition": WordCondition.Type.END,
+		"word_hint": "clock",
+		"examples": "clock, block, rock",
+		"pass_hint": "Say a word and pass the bomb to your neighbor.",
+		"explode_player_index": 0,
+	},
+]
+
+
+static func rounds() -> Array[Dictionary]:
+	if LocaleService.get_locale() == LocaleService.LOCALE_EN:
+		return ROUNDS_EN
+	return ROUNDS_RU
+
 
 static func deck_entries() -> Array:
 	var entries: Array = []
-	for round in ROUNDS:
+	for round in rounds():
 		entries.append({
 			"syllable": round["syllable"],
 			"condition": round["condition"],
@@ -49,7 +82,7 @@ static func player_infos(account: PDataAccount) -> Array[PlayerInfo]:
 	var infos: Array[PlayerInfo] = []
 	var recent := account.get_recent_names_for_display() if account else []
 	for i in ROUND_COUNT:
-		var player_name := SlimeColors.NAMES[i]
+		var player_name := LocaleService.get_slime_name(i)
 		if i < recent.size() and not str(recent[i]).is_empty():
 			player_name = str(recent[i])
 		infos.append(PlayerInfo.new(player_name, i))
@@ -57,7 +90,8 @@ static func player_infos(account: PDataAccount) -> Array[PlayerInfo]:
 
 
 static func round_at(index: int) -> Dictionary:
-	return ROUNDS[clampi(index, 0, ROUNDS.size() - 1)]
+	var all := rounds()
+	return all[clampi(index, 0, all.size() - 1)]
 
 
 static func explode_player_index(round_index: int) -> int:
@@ -66,18 +100,19 @@ static func explode_player_index(round_index: int) -> int:
 
 static func round_for_card(card: GameCard) -> Dictionary:
 	if card == null:
-		return ROUNDS[0]
-	for round in ROUNDS:
+		return rounds()[0]
+	for round in rounds():
 		if round["syllable"] == card.word and int(round["condition"]) == card.condition:
 			return round
-	return ROUNDS[0]
+	return rounds()[0]
 
 
 static func round_index_for_card(card: GameCard) -> int:
 	if card == null:
 		return 0
-	for i in ROUNDS.size():
-		var round := ROUNDS[i]
+	var all := rounds()
+	for i in all.size():
+		var round := all[i]
 		if round["syllable"] == card.word and int(round["condition"]) == card.condition:
 			return i
 	return 0
@@ -91,18 +126,16 @@ static func play_step_body_for_index(round_index: int) -> String:
 static func play_step_body(card: GameCard) -> String:
 	var round := round_for_card(card)
 	var condition := WordCondition.get_label(int(round["condition"]))
-	return (
-		"Слог «%s» — %s.\nПодойдут слова: %s.\nНапример: «%s».\n%s"
-		% [
-			round["syllable"],
-			condition,
-			round["examples"],
-			round["word_hint"],
-			round["pass_hint"],
-		]
-	)
+	return LocaleService.text("TUTORIAL_PLAY_BODY") % [
+		round["syllable"],
+		condition,
+		round["examples"],
+		round["word_hint"],
+		round["pass_hint"],
+	]
 
 
 static func explosion_explanation(player_name: String) -> String:
-	var safe_name := player_name if not player_name.is_empty() else "Игрок"
-	return "%s не успел(а) придумать слово — бомба взорвалась." % safe_name
+	var fallback := LocaleService.text("PLAYER_DEFAULT")
+	var safe_name := player_name if not player_name.is_empty() else fallback
+	return LocaleService.text("TUTORIAL_EXPLOSION") % safe_name

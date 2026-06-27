@@ -24,11 +24,6 @@ extends Control
 
 const TABLE_SIZE := Vector2(640, 640)
 const SWAP_HINT_MIN_PLAYERS := 3
-const HINT_SWAP_IDLE := "Перетащи слайм на соседа — смените места"
-const HINT_SWAP_DRAG := "Отпусти — поменяетесь местами"
-const HINT_REMOVE := "Отпусти на «+» — убрать игрока"
-const HINT_MIN_PLAYERS := "Нужно минимум 2 игрока"
-const HINT_HOLD_EDIT := "Удержи 1,5 с — имя и цвет"
 const HOLD_EDIT_HINT_DURATION := 5.0
 const SWAP_IDLE_HINT_DURATION := 5.0
 const BADGE_GAP_AFTER_ARROWS := 10.0
@@ -79,6 +74,12 @@ func _ready() -> void:
 	reload_from_account()
 	_apply_add_button_texture()
 	_connect_bomb_layout()
+
+
+func refresh_localized() -> void:
+	if edit_player_window and edit_player_window.has_method("refresh_localized"):
+		edit_player_window.refresh_localized()
+	_update_start_button()
 
 
 func set_battle_mode(enabled: bool) -> void:
@@ -583,10 +584,10 @@ func _refresh_table_hint() -> void:
 	if not _table_hint_banner:
 		return
 	if _remove_hint_active:
-		_table_hint_banner.show_message(HINT_REMOVE, false, true)
+		_table_hint_banner.show_message(LocaleService.text("HINT_REMOVE"), false, true)
 		return
 	if _swap_drag_hint_active:
-		_table_hint_banner.show_message(HINT_SWAP_DRAG, false, true)
+		_table_hint_banner.show_message(LocaleService.text("HINT_SWAP_DRAG"), false, true)
 		return
 	if _swap_idle_hint_showing:
 		return
@@ -594,7 +595,7 @@ func _refresh_table_hint() -> void:
 		return
 	if _needs_min_players_hint():
 		_update_hint_banner_layout()
-		_table_hint_banner.show_message(HINT_MIN_PLAYERS, true, false)
+		_table_hint_banner.show_message(LocaleService.text("HINT_MIN_PLAYERS"), true, false)
 		return
 	_table_hint_banner.hide_message()
 
@@ -611,7 +612,7 @@ func _play_swap_hint_intro_if_needed() -> void:
 	_swap_idle_intro_played = true
 	_swap_idle_hint_showing = true
 	_update_hint_banner_layout()
-	_table_hint_banner.show_message(HINT_SWAP_IDLE, true, false)
+	_table_hint_banner.show_message(LocaleService.text("HINT_SWAP_IDLE"), true, false)
 	get_tree().create_timer(SWAP_IDLE_HINT_DURATION).timeout.connect(_on_swap_idle_hint_timeout, CONNECT_ONE_SHOT)
 
 
@@ -644,7 +645,7 @@ func _play_hold_edit_hint_if_needed() -> void:
 	if not _swap_idle_hint_showing:
 		_hold_edit_hint_showing = true
 		_update_hint_banner_layout()
-		_table_hint_banner.show_message(HINT_HOLD_EDIT, true, false)
+		_table_hint_banner.show_message(LocaleService.text("HINT_HOLD_EDIT"), true, false)
 		get_tree().create_timer(HOLD_EDIT_HINT_DURATION).timeout.connect(_on_hold_edit_hint_timeout, CONNECT_ONE_SHOT)
 	_sync_hold_idle_hints()
 
@@ -723,7 +724,7 @@ func _update_start_button() -> void:
 			if not label:
 				label = start_button.get_node_or_null("DoneLabel") as Label
 			if label:
-				label.text = "ГОТОВО"
+				label.text = LocaleService.text("LOBBY_READY")
 			if start_button is StartActionButton:
 				var action_button := start_button as StartActionButton
 				action_button.set_pulse_active(can_done)

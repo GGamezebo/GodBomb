@@ -7,11 +7,6 @@ enum Type {
 	END,
 }
 
-const LABELS: Dictionary = {
-	Type.BEGIN: "Слог в начале слова",
-	Type.ANYWHERE: "Слог в любом месте",
-	Type.END: "Слог в конце слова",
-}
 
 const MESSAGE_FONT_MAX := 112
 const MESSAGE_FONT_MIN := 56
@@ -28,7 +23,15 @@ static func random() -> int:
 
 
 static func get_label(condition: int) -> String:
-	return LABELS.get(condition, "")
+	match condition:
+		Type.BEGIN:
+			return LocaleService.text("WORD_COND_BEGIN")
+		Type.ANYWHERE:
+			return LocaleService.text("WORD_COND_ANYWHERE")
+		Type.END:
+			return LocaleService.text("WORD_COND_END")
+		_:
+			return ""
 
 
 static func get_pattern_hint(syllable: String, condition: int) -> String:

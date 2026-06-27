@@ -55,6 +55,12 @@ func initialize(data: Dictionary) -> void:
 		settings_window.pdata_controller = pdata_controller
 		settings_window.menu_events = menu_events
 		settings_window.player_selection_widget = player_selection_widget
+		settings_window.game_config = game_config
+
+	if game_config:
+		LocaleService.apply_cards_to(game_config)
+	if not LocaleService.locale_changed.is_connected(_on_locale_changed):
+		LocaleService.locale_changed.connect(_on_locale_changed)
 
 	if player_selection_widget:
 		player_selection_widget.account = account
@@ -70,6 +76,7 @@ func initialize(data: Dictionary) -> void:
 
 	_update_music_button_icon()
 	_update_start_button()
+	_refresh_localized()
 	if account and not account.changed.is_connected(_update_music_button_icon):
 		account.changed.connect(_update_music_button_icon)
 
@@ -144,6 +151,23 @@ func _on_start_pressed() -> void:
 		player_selection_widget.play_start_preview(_begin_game)
 	else:
 		_begin_game()
+
+
+func _on_locale_changed(_locale: String) -> void:
+	if game_config:
+		LocaleService.apply_cards_to(game_config)
+	_refresh_localized()
+
+
+func _refresh_localized() -> void:
+	if start_button:
+		start_button.text = LocaleService.text("MENU_START")
+	if settings_window and settings_window.has_method("_refresh_static_labels"):
+		settings_window._refresh_static_labels()
+	if rules_window and rules_window.has_method("refresh_localized"):
+		rules_window.refresh_localized()
+	if player_selection_widget and player_selection_widget.has_method("refresh_localized"):
+		player_selection_widget.refresh_localized()
 
 
 func _begin_game() -> void:

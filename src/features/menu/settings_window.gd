@@ -5,6 +5,7 @@ extends Control
 @export var pdata_controller: Node
 @export var menu_events: MenuEvents
 @export var player_selection_widget: PlayerSelectionWidget
+@export var language_option: OptionButton
 @export var game_time_slider: HSlider
 @export var game_time_label: Label
 @export var music_check: CheckBox
@@ -17,6 +18,7 @@ extends Control
 @export var haptics_value_label: Label
 @export var reset_button: StartActionButton
 @export var close_button: StartActionButton
+@export var game_config: GameConfig
 
 const SLIDER_GRABBER_INSET := 26.0
 
@@ -25,6 +27,9 @@ var _awaiting_reset_confirm: bool = false
 
 func _ready() -> void:
 	visible = false
+	_setup_language_option()
+	if not LocaleService.locale_changed.is_connected(_on_locale_changed):
+		LocaleService.locale_changed.connect(_on_locale_changed)
 	if game_time_slider:
 		game_time_slider.value_changed.connect(_on_game_time_changed)
 		UiSounds.bind_slider(game_time_slider, 1.0)
@@ -51,6 +56,82 @@ func _ready() -> void:
 		close_button.pressed.connect(close)
 		UiSounds.bind_button(close_button)
 	call_deferred("_update_modal_layer_visibility")
+	_refresh_static_labels()
+
+
+func _setup_language_option() -> void:
+	if language_option == null:
+		return
+	language_option.clear()
+	language_option.add_item(LocaleService.text("LANG_RU"), 0)
+	language_option.add_item(LocaleService.text("LANG_EN"), 1)
+	language_option.item_selected.connect(_on_language_selected)
+
+
+func _on_locale_changed(_locale: String) -> void:
+	_refresh_static_labels()
+	_sync_language_option()
+
+
+func _refresh_static_labels() -> void:
+	var title := get_node_or_null("Panel/Margin/VBox/Title") as Label
+	if title:
+		title.text = LocaleService.text("SETTINGS_TITLE")
+	var language_caption := get_node_or_null(
+		"Panel/Margin/VBox/Scroll/Content/LanguageRow/LanguageCaption"
+	) as Label
+	if language_caption:
+		language_caption.text = LocaleService.text("SETTINGS_LANGUAGE")
+	if music_check:
+		music_check.text = LocaleService.text("SETTINGS_MUSIC_MENU")
+	var music_caption := get_node_or_null(
+		"Panel/Margin/VBox/Scroll/Content/MusicRow/MusicCaption"
+	) as Label
+	if music_caption:
+		music_caption.text = LocaleService.text("SETTINGS_MUSIC_VOLUME")
+	var sfx_caption := get_node_or_null(
+		"Panel/Margin/VBox/Scroll/Content/SfxRow/SfxCaption"
+	) as Label
+	if sfx_caption:
+		sfx_caption.text = LocaleService.text("SETTINGS_SFX_VOLUME")
+	if haptics_check:
+		haptics_check.text = LocaleService.text("SETTINGS_HAPTICS")
+	var haptics_caption := get_node_or_null(
+		"Panel/Margin/VBox/Scroll/Content/HapticsRow/HapticsCaption"
+	) as Label
+	if haptics_caption:
+		haptics_caption.text = LocaleService.text("SETTINGS_HAPTICS_STRENGTH")
+	var reset_hint := get_node_or_null("Panel/Margin/VBox/Scroll/Content/ResetHint") as Label
+	if reset_hint:
+		reset_hint.text = LocaleService.text("SETTINGS_RESET_HINT")
+	if close_button:
+		close_button.action_text = LocaleService.text("SETTINGS_CLOSE")
+	if reset_button and not _awaiting_reset_confirm:
+		reset_button.text = LocaleService.text("SETTINGS_RESET")
+	if game_time_slider:
+		_update_game_time_label(int(game_time_slider.value))
+
+
+func _sync_language_option() -> void:
+	if language_option == null or account == null:
+		return
+	var idx := 1 if account.get_language() == LocaleService.LOCALE_EN else 0
+	if language_option.selected != idx:
+		language_option.set_block_signals(true)
+		language_option.select(idx)
+		language_option.set_block_signals(false)
+
+
+func _on_language_selected(index: int) -> void:
+	var code := LocaleService.LOCALE_EN if index == 1 else LocaleService.LOCALE_RU
+	if LocaleService.get_locale() == code:
+		return
+	LocaleService.set_locale(code, true)
+	if game_config:
+		LocaleService.apply_cards_to(game_config)
+	_save_account()
+	if player_selection_widget:
+		player_selection_widget.reload_from_account()
 
 
 func _configure_game_time_slider() -> void:
@@ -84,7 +165,9 @@ func _find_scroll_container(from: Node) -> ScrollContainer:
 func open() -> void:
 	_awaiting_reset_confirm = false
 	if reset_button:
-		reset_button.text = "Сбросить прогресс"
+		reset_button.text = LocaleService.text("SETTINGS_RESET")
+	_sync_language_option()
+	_refresh_static_labels()
 	_sync_from_account()
 	if account and not account.changed.is_connected(_sync_from_account):
 		account.changed.connect(_sync_from_account)
@@ -191,11 +274,11 @@ func _on_reset_pressed() -> void:
 	if not _awaiting_reset_confirm:
 		_awaiting_reset_confirm = true
 		if reset_button:
-			reset_button.text = "Точно сбросить?"
+			reset_button.text = LocaleService.text("SETTINGS_RESET_CONFIRM")
 		return
 	_awaiting_reset_confirm = false
 	if reset_button:
-		reset_button.text = "Сбросить прогресс"
+		reset_button.text = LocaleService.text("SETTINGS_RESET")
 	account.reset_progress()
 	UiSounds.play_confirm()
 	_sync_from_account()
@@ -213,7 +296,7 @@ func _on_reset_pressed() -> void:
 
 func _update_game_time_label(minutes: int) -> void:
 	if game_time_label:
-		game_time_label.text = "Длительность партии: %d мин" % minutes
+		game_time_label.text = LocaleService.text("SETTINGS_GAME_TIME") % minutes
 
 
 func _update_music_label(linear: float) -> void:

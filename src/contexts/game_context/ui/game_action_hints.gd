@@ -24,7 +24,7 @@ func _ready() -> void:
 
 	_tap_label = Label.new()
 	_tap_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_tap_label.text = "Нажми экран — передай бомбу"
+	_tap_label.text = LocaleService.text("ACTION_HINT_TAP")
 	_tap_label.add_theme_font_size_override("font_size", 37)
 	_tap_label.add_theme_color_override("font_color", Color(0.96, 0.9, 0.82, 0.92))
 	_tap_label.add_theme_color_override("font_outline_color", Color(0.05, 0.03, 0.02, 0.75))

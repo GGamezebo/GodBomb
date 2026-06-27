@@ -57,7 +57,7 @@ func _build_ui() -> void:
 	_content_col.add_child(headline_wrap)
 
 	_headline = Label.new()
-	_headline.text = "БУМ!"
+	_headline.text = LocaleService.text("EXPLOSION_BOOM")
 	_headline.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_headline.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_headline.size_flags_horizontal = Control.SIZE_EXPAND_FILL

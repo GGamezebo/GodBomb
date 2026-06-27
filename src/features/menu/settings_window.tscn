@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://src/features/menu/settings_window.gd" id="1"]
 [ext_resource type="PackedScene" path="res://src/features/menu/pill_action_button.tscn" id="2"]
 
-[node name="SettingsWindow" type="Control" node_paths=PackedStringArray("game_time_slider", "game_time_label", "music_check", "music_slider", "music_value_label", "sfx_slider", "sfx_value_label", "haptics_check", "haptics_slider", "haptics_value_label", "reset_button", "close_button")]
+[node name="SettingsWindow" type="Control" node_paths=PackedStringArray("language_option", "game_time_slider", "game_time_label", "music_check", "music_slider", "music_value_label", "sfx_slider", "sfx_value_label", "haptics_check", "haptics_slider", "haptics_value_label", "reset_button", "close_button")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -11,6 +11,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1")
+language_option = NodePath("Panel/Margin/VBox/Scroll/Content/LanguageRow/LanguageOption")
 game_time_slider = NodePath("Panel/Margin/VBox/Scroll/Content/GameTimeRow/GameTimeSlider")
 game_time_label = NodePath("Panel/Margin/VBox/Scroll/Content/GameTimeLabel")
 music_check = NodePath("Panel/Margin/VBox/Scroll/Content/MusicCheck")
@@ -73,6 +74,21 @@ clip_contents = false
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 28
+
+[node name="LanguageRow" type="HBoxContainer" parent="Panel/Margin/VBox/Scroll/Content"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="LanguageCaption" type="Label" parent="Panel/Margin/VBox/Scroll/Content/LanguageRow"]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+theme_type_variation = &"ModalLabel"
+text = "Язык"
+
+[node name="LanguageOption" type="OptionButton" parent="Panel/Margin/VBox/Scroll/Content/LanguageRow"]
+custom_minimum_size = Vector2(0, 72)
+layout_mode = 2
+size_flags_horizontal = 3
 
 [node name="GameTimeLabel" type="Label" parent="Panel/Margin/VBox/Scroll/Content"]
 layout_mode = 2

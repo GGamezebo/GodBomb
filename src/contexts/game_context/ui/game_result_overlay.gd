@@ -100,7 +100,7 @@ func _build_ui() -> void:
 	winner_gap.size = winner_gap.custom_minimum_size
 	_root_layout.add_child(winner_gap)
 
-	_ranking_title = _build_section_title("РЕЙТИНГ")
+	_ranking_title = _build_section_title(LocaleService.text("RESULT_RANKING"))
 	_ranking_title.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	_root_layout.add_child(_ranking_title)
 
@@ -149,7 +149,7 @@ func _build_ui() -> void:
 
 	var menu_label := Label.new()
 	menu_label.name = "StartLabel"
-	menu_label.text = "В МЕНЮ"
+	menu_label.text = LocaleService.text("RESULT_TO_MENU")
 	menu_label.theme_type_variation = &"Hero"
 	menu_label.add_theme_font_size_override("font_size", 72)
 	menu_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -185,7 +185,7 @@ func _build_winner_frame() -> PanelContainer:
 	margin.add_child(inner)
 
 	_winner_title = Label.new()
-	_winner_title.text = "ПОБЕДИТЕЛЬ"
+	_winner_title.text = LocaleService.text("RESULT_WINNER")
 	_winner_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_winner_title.add_theme_font_size_override("font_size", 68)
 	_winner_title.add_theme_color_override("font_color", Color.WHITE)
@@ -201,7 +201,7 @@ func _build_winner_frame() -> PanelContainer:
 	_winner_strip_host.add_child(_winner_strip)
 
 	_winner_subtitle = Label.new()
-	_winner_subtitle.text = "МЕНЬШЕ ШТРАФОВ"
+	_winner_subtitle.text = LocaleService.text("RESULT_FEWER_PENALTIES")
 	_winner_subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_winner_subtitle.add_theme_font_size_override("font_size", 72)
 	_winner_subtitle.add_theme_color_override("font_color", Color.WHITE)

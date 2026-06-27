@@ -288,7 +288,7 @@ func _show_player_choice() -> void:
 	if _syllable_card:
 		_syllable_card.visible = true
 		_syllable_card.set_message("?")
-	_show_hint("Жребий — кто ходит первым?")
+	_show_hint(LocaleService.text("HUD_LOTTERY"))
 	_sync_current_player()
 	call_deferred("_reposition_battle_ui")
 
@@ -298,13 +298,13 @@ func _show_ready_to_start(from_state: String = "") -> void:
 	_player_strip.visible = true
 	if _syllable_card:
 		_syllable_card.visible = true
-		_syllable_card.set_message("Готовы?")
+		_syllable_card.set_message(LocaleService.text("HUD_READY"))
 	_sync_current_player()
 	call_deferred("_reposition_battle_ui")
 	if from_state == FSMGameStates.EXPLOSION and _should_show_time_progress():
 		_show_between_rounds_progress()
 	else:
-		_show_hint("Нажми «Начать раунд»")
+		_show_hint(LocaleService.text("HUD_START_ROUND_HINT"))
 
 
 func _should_show_time_progress() -> bool:
@@ -317,7 +317,7 @@ func _show_between_rounds_progress() -> void:
 	if _hint_banner:
 		_hint_banner.hide_message(false)
 	if _time_progress_banner == null:
-		_show_hint("Нажми «Начать раунд»")
+		_show_hint(LocaleService.text("HUD_START_ROUND_HINT"))
 		return
 	var ratio := game_manager.session.get_match_remaining_ratio()
 	_time_progress_banner.show_progress(ratio)
@@ -335,7 +335,7 @@ func _on_time_progress_finished() -> void:
 	if _time_progress_banner:
 		_time_progress_banner.hide_progress()
 	if _current_state == FSMGameStates.READY_TO_START:
-		_show_hint("Нажми «Начать раунд»")
+		_show_hint(LocaleService.text("HUD_START_ROUND_HINT"))
 
 
 func _cancel_time_progress_timer() -> void:

@@ -51,6 +51,7 @@ func _ready() -> void:
 	call_deferred("_sync_action_button_sizes")
 	call_deferred("_setup_slime_preview_fuse")
 	_build_color_buttons()
+	refresh_localized()
 
 
 func _sync_action_button_sizes() -> void:
@@ -97,6 +98,7 @@ func open_edit_window(index: int, player_name: String, preset_id: int) -> void:
 
 
 func _open_window() -> void:
+	refresh_localized()
 	_sync_action_button_sizes()
 	visible = true
 	z_index = 1
@@ -409,3 +411,17 @@ func _consume_history_name_if_needed(player_name: String) -> void:
 	var recent := account.get_recent_names()
 	if recent.has(player_name):
 		account.consume_recent_name(player_name)
+
+
+func refresh_localized() -> void:
+	var title := get_node_or_null("Panel/Margin/VBox/Title") as Label
+	if title:
+		title.text = LocaleService.text("PLAYER_DEFAULT")
+	if name_edit:
+		name_edit.placeholder_text = LocaleService.text("PLAYER_EDIT_PLACEHOLDER")
+	if cancel_button:
+		cancel_button.action_text = LocaleService.text("EDIT_CANCEL")
+	if ok_button:
+		ok_button.action_text = LocaleService.text("EDIT_ADD")
+	if apply_button:
+		apply_button.action_text = LocaleService.text("EDIT_APPLY")

@@ -5,7 +5,6 @@ const SLIME_PATH := "res://assets/party_kitchen/slimes/%d.svg"
 const TABLE_CENTER := Vector2(540.0, 960.0)
 const PREVIEW_SLIME_SIZE := Vector2(128.0, 128.0)
 const EXPLANATION_BANNER_HEIGHT := 256.0
-const EXPLANATION_TEXT := "Ошибка в слове или случайное нажатие? Выберите, кто переигрывает ход."
 
 @export var game_manager: GameManager
 @export var game_events: GameEvents
@@ -29,6 +28,7 @@ func _ready() -> void:
 	if continue_button:
 		continue_button.pressed.connect(_on_continue_pressed)
 		UiSounds.bind_button(continue_button, &"confirm")
+	_refresh_continue_button()
 	if player_selection_widget:
 		player_selection_widget.emergency_selection_changed.connect(_on_selection_changed)
 	if game_events:
@@ -57,11 +57,11 @@ func _setup_explanation_banner() -> void:
 	var title := explanation_banner.get_node_or_null("Margin/VBox/Title") as Label
 	if title:
 		title.autowrap_mode = TextServer.AUTOWRAP_OFF
-		title.text = "Аварийная пауза"
+		title.text = LocaleService.text("EMERGENCY_TITLE")
 	var text := explanation_banner.get_node_or_null("Margin/VBox/ExplanationText") as RichTextLabel
 	if text:
 		text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		text.text = EXPLANATION_TEXT
+		text.text = LocaleService.text("EMERGENCY_EXPLANATION")
 	call_deferred("_layout_explanation_banner")
 
 
@@ -85,8 +85,7 @@ func open() -> void:
 	player_selection_widget.set_emergency_mode(true, current_index)
 	player_selection_widget.load_from_session_players(session.players)
 	_sync_preview(session.get_current_player().info)
-	if continue_button is StartActionButton:
-		(continue_button as StartActionButton).call_deferred("refresh_label_layout")
+	_refresh_continue_button()
 	call_deferred("_layout_explanation_banner")
 	call_deferred("_layout_preview_on_table")
 	visible = true
@@ -123,6 +122,13 @@ func _sync_preview(info: PlayerInfo) -> void:
 		preview_slime.texture = load(SLIME_PATH % info.preset_id)
 	if preview_name:
 		preview_name.text = info.name
+
+
+func _refresh_continue_button() -> void:
+	if continue_button is StartActionButton:
+		var button := continue_button as StartActionButton
+		button.action_text = LocaleService.text("EMERGENCY_CONTINUE")
+		button.call_deferred("refresh_label_layout")
 
 
 func _on_continue_pressed() -> void:

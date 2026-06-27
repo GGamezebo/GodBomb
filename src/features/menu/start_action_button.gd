@@ -118,13 +118,14 @@ func _apply_enabled_look(active: bool) -> void:
 
 
 func _find_action_label() -> Label:
-	var label := get_node_or_null("ActionLabel") as Label
-	if label:
-		return label
-	label = get_node_or_null("StartLabel") as Label
-	if label:
-		return label
-	return get_node_or_null("DoneLabel") as Label
+	for name in ["ActionLabel", "StartLabel", "DoneLabel", "ContinueLabel"]:
+		var label := get_node_or_null(name) as Label
+		if label:
+			return label
+	for child in get_children():
+		if child is Label:
+			return child as Label
+	return null
 
 
 func _kill_pulse() -> void:

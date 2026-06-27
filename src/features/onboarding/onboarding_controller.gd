@@ -358,28 +358,28 @@ func _present_current_step() -> void:
 			_present_add_players_step()
 		Step.LOBBY_NAME:
 			_show_lobby_step(
-				"Дайте имена",
-				"Удержите слайм ~1,5 с — откроется имя и цвет. Так каждый узнает себя на экране.",
+				LocaleService.text("ONBOARDING_NAME_TITLE"),
+				LocaleService.text("ONBOARDING_NAME_BODY"),
 				_first_player_icon()
 			)
 		Step.LOBBY_SWAP:
 			_present_swap_step()
 		Step.LOBBY_START:
 			_show_lobby_step(
-				"В бой!",
-				"Когда все готовы — нажмите «СТАРТ». Покажем бой на практике — три коротких раунда.",
+				LocaleService.text("ONBOARDING_START_TITLE"),
+				LocaleService.text("ONBOARDING_START_BODY"),
 				_start_button
 			)
 		Step.GAME_CHOICE:
 			_show_game_step(
-				"Жребий",
-				"Сейчас циферблат выберет, кто ходит первым. Следите за подсветкой игрока.",
+				LocaleService.text("ONBOARDING_CHOICE_TITLE"),
+				LocaleService.text("ONBOARDING_CHOICE_BODY"),
 				null
 			)
 		Step.GAME_READY:
 			_show_game_step(
-				"Старт раунда",
-				"Нажмите «Начать раунд» внизу — пойдёт отсчёт, и бомба заведётся.",
+				LocaleService.text("ONBOARDING_READY_TITLE"),
+				LocaleService.text("ONBOARDING_READY_BODY"),
 				_start_round_button
 			)
 		Step.GAME_PLAY:
@@ -394,8 +394,8 @@ func _present_add_players_step() -> void:
 	_overlay.set_pass_through(false)
 	_overlay.set_continue_visible(false)
 	_overlay.show_step(
-		"Соберите команду",
-		"Нажмите «+» и добавьте трёх игроков — так вы освоите стол.",
+		LocaleService.text("ONBOARDING_ADD_TITLE"),
+		LocaleService.text("ONBOARDING_ADD_BODY"),
 		true
 	)
 	_apply_add_player_spotlight()
@@ -421,8 +421,8 @@ func _present_swap_step() -> void:
 	_overlay.set_pass_through(false)
 	_overlay.set_continue_visible(false)
 	_overlay.show_step(
-		"Рассадка",
-		"Перетащите одного слайма на другого — поменяетесь местами. Порядок на экране = порядок вокруг стола.",
+		LocaleService.text("ONBOARDING_SWAP_TITLE"),
+		LocaleService.text("ONBOARDING_SWAP_BODY"),
 		true
 	)
 	if targets.is_empty():
@@ -439,7 +439,7 @@ func _present_play_step() -> void:
 		body = OnboardingTutorialData.play_step_body(card)
 	_overlay.set_pass_through(true)
 	_overlay.set_continue_visible(false)
-	_overlay.show_step("Ваш ход", body, true)
+	_overlay.show_step(LocaleService.text("ONBOARDING_PLAY_TITLE"), body, true)
 	_overlay.clear_spotlight()
 
 
@@ -449,18 +449,18 @@ func _present_explosion_step() -> void:
 	var body := OnboardingTutorialData.explosion_explanation(_tutorial_player_name(explode_idx))
 	_overlay.set_pass_through(true)
 	_overlay.set_continue_visible(false)
-	_overlay.show_step("Время вышло", body, true)
+	_overlay.show_step(LocaleService.text("ONBOARDING_TIME_UP_TITLE"), body, true)
 	_overlay.clear_spotlight()
 
 
 func _present_result_step() -> void:
 	_overlay.set_pass_through(true)
 	_overlay.show_step(
-		"Обучение пройдено!",
-		"Теперь вы знаете правила Тик-Так-Бадабум. Соберите друзей и играйте!",
+		LocaleService.text("ONBOARDING_DONE_TITLE"),
+		LocaleService.text("ONBOARDING_DONE_BODY"),
 		true
 	)
-	_overlay.set_bottom_action("В МЕНЮ")
+	_overlay.set_bottom_action(LocaleService.text("RESULT_TO_MENU"))
 	_overlay.clear_spotlight()
 
 

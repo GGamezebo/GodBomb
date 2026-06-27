@@ -6,7 +6,6 @@ signal closed
 const NEUTRAL_BG := Color(0, 0, 0, 1.0)
 const LOBBY_BLUR_SHADER := preload("res://assets/shaders/bomb_background_blur.gdshader")
 const LOBBY_BLUR_RADIUS := 5.0
-const EXPLANATION_TEXT := "Смените состав за столом — партия не прервётся."
 const EXPLANATION_BANNER_HEIGHT := 192.0
 
 @export var game_manager: GameManager
@@ -105,7 +104,7 @@ func _setup_explanation_banner() -> void:
 	var text := explanation_banner.get_node_or_null("Margin/ExplanationText") as RichTextLabel
 	if text:
 		text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		text.text = EXPLANATION_TEXT
+		text.text = LocaleService.text("LOBBY_EXPLANATION")
 
 
 func _layout_explanation_banner() -> void:

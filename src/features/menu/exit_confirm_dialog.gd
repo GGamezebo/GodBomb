@@ -31,6 +31,7 @@ func _sync_action_button_sizes() -> void:
 
 
 func open() -> void:
+	_refresh_localized()
 	_sync_action_button_sizes()
 	visible = true
 	_show_modal_layer()
@@ -58,6 +59,15 @@ func _on_cancel_pressed() -> void:
 func _on_confirm_pressed() -> void:
 	close()
 	confirmed.emit()
+
+
+func _refresh_localized() -> void:
+	if message_label:
+		message_label.text = LocaleService.text("EXIT_CONFIRM_MESSAGE")
+	if cancel_button:
+		cancel_button.action_text = LocaleService.text("EXIT_CANCEL")
+	if confirm_button:
+		confirm_button.action_text = LocaleService.text("EXIT_CONFIRM")
 
 
 func _show_modal_layer() -> void:

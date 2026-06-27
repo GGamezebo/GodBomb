@@ -30,6 +30,4 @@ static func get_color(preset_id: int) -> Color:
 
 
 static func get_color_name(preset_id: int) -> String:
-	if preset_id < 0 or preset_id >= NAMES.size():
-		return ""
-	return NAMES[preset_id]
+	return LocaleService.get_slime_name(preset_id)

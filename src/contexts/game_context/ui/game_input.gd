@@ -27,6 +27,7 @@ func _ready() -> void:
 	if start_round_button:
 		start_round_button.pressed.connect(_on_start_round_pressed)
 		UiSounds.bind_button(start_round_button, &"confirm")
+		_refresh_start_round_label()
 	if game_events:
 		listener.add(game_events.ev_game_state_changed, _on_game_state_changed)
 	_sync_to_current_state()
@@ -58,6 +59,16 @@ func _sync_to_current_state() -> void:
 	if not game_manager or not game_manager.fsm:
 		return
 	_on_game_state_changed("", game_manager.fsm.get_current_state_name())
+
+
+func _refresh_start_round_label() -> void:
+	if start_round_button == null:
+		return
+	var label := start_round_button.get_node_or_null("StartLabel") as Label
+	if label:
+		label.text = LocaleService.text("HUD_START_ROUND")
+	if start_round_button is StartActionButton:
+		(start_round_button as StartActionButton).action_text = LocaleService.text("HUD_START_ROUND")
 
 
 func _ensure_game_config() -> GameConfig:
