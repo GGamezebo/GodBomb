@@ -18,9 +18,9 @@ const LOCK_FONT_SIZE := 66
 @export var name_edit: LineEdit
 @export var name_history_grid: GridContainer
 @export var slime_preview: TextureRect
-@export var ok_button: StartActionButton
-@export var apply_button: StartActionButton
-@export var cancel_button: StartActionButton
+@export var ok_button: PillStretchButton
+@export var apply_button: PillStretchButton
+@export var cancel_button: PillStretchButton
 @export var colors_grid: GridContainer
 @export var preset_storage: PlayerPresetStorage
 @export var game_config: GameConfig
@@ -46,7 +46,19 @@ func _ready() -> void:
 		name_edit.max_length = PlayerInfo.MAX_NAME_LENGTH
 		name_edit.text_changed.connect(_on_name_changed)
 		name_edit.text_submitted.connect(_on_name_submitted)
+	resized.connect(_sync_action_button_sizes)
+	call_deferred("_sync_action_button_sizes")
 	_build_color_buttons()
+
+
+func _sync_action_button_sizes() -> void:
+	var viewport_size := get_viewport_rect().size
+	if cancel_button:
+		cancel_button.apply_scaled_action_size(viewport_size, true)
+	if ok_button:
+		ok_button.apply_scaled_action_size(viewport_size, true)
+	if apply_button:
+		apply_button.apply_scaled_action_size(viewport_size, true)
 
 
 func open_add_window() -> void:
@@ -78,6 +90,7 @@ func open_edit_window(index: int, player_name: String, preset_id: int) -> void:
 
 
 func _open_window() -> void:
+	_sync_action_button_sizes()
 	visible = true
 	z_index = 1
 	if get_parent() is CanvasLayer:
@@ -318,10 +331,8 @@ func _sync_confirm_buttons() -> void:
 	var can_confirm := has_name and not color_taken
 	if ok_button:
 		ok_button.disabled = not can_confirm
-		ok_button.set_pulse_active(can_confirm)
 	if apply_button:
 		apply_button.disabled = not can_confirm
-		apply_button.set_pulse_active(can_confirm)
 
 
 func _pick_default_history_name() -> String:
