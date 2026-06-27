@@ -1,28 +1,74 @@
-[gd_scene load_steps=2 format=3 uid="uid://loading_screen_godbomb"]
+[gd_scene format=3 uid="uid://d2rtm1xn7xr2y"]
 
-[ext_resource type="Script" path="res://src/ui/loading_screen/loading_screen.gd" id="1"]
+[ext_resource type="Script" uid="uid://2i1oq8vpa8c0" path="res://src/ui/loading_screen/loading_screen.gd" id="1"]
+[ext_resource type="Script" uid="uid://d2t3b5qtwod5n" path="res://src/features/menu/menu_fire_sparks.gd" id="2"]
 
-[node name="LoadingScreen" type="CanvasLayer" node_paths=PackedStringArray("progress_bar", "background")]
+[node name="LoadingScreen" type="CanvasLayer" unique_id=1795406347 node_paths=PackedStringArray("progress_bar", "status_label", "percent_label", "panel", "root")]
+layer = 100
 script = ExtResource("1")
-progress_bar = NodePath("Background/ProgressBar")
-background = NodePath("Background")
+progress_bar = NodePath("Root/Panel/Content/ProgressBar")
+status_label = NodePath("Root/Panel/Content/StatusLabel")
+percent_label = NodePath("Root/Panel/Content/PercentLabel")
+panel = NodePath("Root/Panel")
+root = NodePath("Root")
 
-[node name="Background" type="CanvasGroup" parent="."]
-
-[node name="ColorRect" type="ColorRect" parent="Background"]
+[node name="Root" type="Control" parent="." unique_id=1570392763]
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-color = Color(0.08, 0.08, 0.1, 0.92)
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
 
-[node name="ProgressBar" type="ProgressBar" parent="Background"]
+[node name="Background" type="ColorRect" parent="Root" unique_id=424443836]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+
+[node name="FireSparks" type="Control" parent="Root" unique_id=1618843528]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("2")
+
+[node name="Panel" type="PanelContainer" parent="Root" unique_id=1321305739]
+layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -240.0
-offset_top = -16.0
-offset_right = 240.0
-offset_bottom = 16.0
-show_percentage = false
+offset_left = -380.0
+offset_top = -92.0
+offset_right = 380.0
+offset_bottom = 92.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Content" type="VBoxContainer" parent="Root/Panel" unique_id=749357090]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="StatusLabel" type="Label" parent="Root/Panel/Content" unique_id=1819738631]
+layout_mode = 2
+theme_type_variation = &"Hero"
+text = "ЗАГРУЗКА"
+horizontal_alignment = 1
+
+[node name="ProgressBar" type="ProgressBar" parent="Root/Panel/Content" unique_id=420400038]
+layout_mode = 2
+
+[node name="PercentLabel" type="Label" parent="Root/Panel/Content" unique_id=454593817]
+layout_mode = 2
+text = "0%"
+horizontal_alignment = 1

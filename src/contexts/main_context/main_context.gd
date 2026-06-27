@@ -75,18 +75,35 @@ func switch_game_context(scene_path: String, use_loading_screen: bool = true, da
 
 	if current_loading_screen:
 		current_loading_screen.queue_free()
+		current_loading_screen = null
+
 	if use_loading_screen and loading_screen_scene:
 		current_loading_screen = loading_screen_scene.instantiate()
 		add_child(current_loading_screen)
+		if current_loading_screen.has_method("present"):
+			current_loading_screen.present()
+		await get_tree().process_frame
+		_release_current_context()
+	elif not use_loading_screen:
 		_release_current_context()
 
 	var scene: PackedScene = await _async_load_scene(scene_path, _update_progress)
 
+	if scene == null:
+		is_loading = false
+		push_error("Failed to load scene: %s" % scene_path)
+		if current_loading_screen:
+			current_loading_screen.queue_free()
+			current_loading_screen = null
+		if scene_path == game_context_path:
+			_apply_context_music(true)
+			await switch_game_context(menu_context_path, false, _session_data())
+		return
+
 	if not use_loading_screen:
 		_release_current_context()
 
-	if scene:
-		_on_loading_complete(scene, data)
+	_on_loading_complete(scene, data)
 
 
 func _async_load_scene(path: String, progress_callback: Callable) -> PackedScene:
@@ -117,10 +134,12 @@ func _on_loading_complete(scene: PackedScene, data: Dictionary) -> void:
 	current_context = scene.instantiate()
 	current_context.initialize(data)
 	add_child(current_context)
+	await get_tree().process_frame
 	_apply_context_music(target_path == menu_context_path)
 
 	if current_loading_screen:
 		current_loading_screen.fade_out()
+		current_loading_screen = null
 
 
 func _apply_context_music(in_menu: bool) -> void:
