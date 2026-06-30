@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://language_flag_picker_godbomb"]
+
+[ext_resource type="Script" path="res://src/features/menu/language_flag_picker.gd" id="1"]
+
+[node name="LanguageFlagPicker" type="Control"]
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("1")

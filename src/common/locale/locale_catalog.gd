@@ -25,6 +25,17 @@ const NATIVE_NAMES: Dictionary = {
 	LOCALE_IT: "Italiano",
 }
 
+const FLAG_ICON_PATHS: Dictionary = {
+	LOCALE_RU: "res://assets/ui/flags/flag_ru.svg",
+	LOCALE_EN: "res://assets/ui/flags/flag_en.svg",
+	LOCALE_SR: "res://assets/ui/flags/flag_sr.svg",
+	LOCALE_ES: "res://assets/ui/flags/flag_es.svg",
+	LOCALE_HI: "res://assets/ui/flags/flag_hi.svg",
+	LOCALE_DE: "res://assets/ui/flags/flag_de.svg",
+	LOCALE_FR: "res://assets/ui/flags/flag_fr.svg",
+	LOCALE_IT: "res://assets/ui/flags/flag_it.svg",
+}
+
 
 static func normalize(code: String) -> String:
 	var lowered := code.to_lower()
@@ -44,3 +55,7 @@ static func uses_exclusion_conditions(locale: String) -> bool:
 
 static func native_name(locale: String) -> String:
 	return str(NATIVE_NAMES.get(normalize(locale), NATIVE_NAMES[LOCALE_RU]))
+
+
+static func flag_icon_path(locale: String) -> String:
+	return str(FLAG_ICON_PATHS.get(normalize(locale), FLAG_ICON_PATHS[LOCALE_RU]))

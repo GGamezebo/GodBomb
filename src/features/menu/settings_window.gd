@@ -5,7 +5,8 @@ extends Control
 @export var pdata_controller: Node
 @export var menu_events: MenuEvents
 @export var player_selection_widget: PlayerSelectionWidget
-@export var language_option: OptionButton
+@export var language_picker: LanguageFlagPicker
+@export var language_name_label: Label
 @export var game_time_slider: HSlider
 @export var game_time_label: Label
 @export var music_check: CheckBox
@@ -18,22 +19,26 @@ extends Control
 @export var haptics_value_label: Label
 @export var reset_button: StartActionButton
 @export var close_button: StartActionButton
+@export var settings_scroll: ScrollContainer
 @export var game_config: GameConfig
 
 const SLIDER_GRABBER_INSET := 26.0
+const UiTouchTargets = preload("res://src/common/ui/ui_touch_targets.gd")
+const ModalScroll = preload("res://src/common/ui/modal_scroll.gd")
 
 var _awaiting_reset_confirm: bool = false
 
 
 func _ready() -> void:
 	visible = false
-	_setup_language_option()
+	_setup_language_picker()
 	if not LocaleService.locale_changed.is_connected(_on_locale_changed):
 		LocaleService.locale_changed.connect(_on_locale_changed)
+	_configure_scroll()
+	_configure_touch_sliders()
 	if game_time_slider:
 		game_time_slider.value_changed.connect(_on_game_time_changed)
 		UiSounds.bind_slider(game_time_slider, 1.0)
-		_configure_game_time_slider()
 	if music_check:
 		music_check.toggled.connect(_on_music_toggled)
 		UiSounds.bind_checkbox(music_check)
@@ -59,32 +64,25 @@ func _ready() -> void:
 	_refresh_static_labels()
 
 
-func _setup_language_option() -> void:
-	if language_option == null:
+func _setup_language_picker() -> void:
+	if language_picker == null:
 		return
-	language_option.clear()
-	for i in LocaleCatalog.ORDER.size():
-		var code := LocaleCatalog.ORDER[i]
-		language_option.add_item(LocaleCatalog.native_name(code), i)
-	if not language_option.item_selected.is_connected(_on_language_selected):
-		language_option.item_selected.connect(_on_language_selected)
+	if not language_picker.language_selected.is_connected(_on_language_selected):
+		language_picker.language_selected.connect(_on_language_selected)
+	language_picker.rebuild()
+	_sync_language_picker()
 
 
 func _on_locale_changed(_locale: String) -> void:
-	_setup_language_option()
 	_refresh_static_labels()
-	_sync_language_option()
+	_sync_language_picker()
 
 
 func _refresh_static_labels() -> void:
 	var title := get_node_or_null("Panel/Margin/VBox/Title") as Label
 	if title:
 		title.text = LocaleService.text("SETTINGS_TITLE")
-	var language_caption := get_node_or_null(
-		"Panel/Margin/VBox/Scroll/Content/LanguageRow/LanguageCaption"
-	) as Label
-	if language_caption:
-		language_caption.text = LocaleService.text("SETTINGS_LANGUAGE")
+	_update_language_name_label()
 	if music_check:
 		music_check.text = LocaleService.text("SETTINGS_MUSIC_MENU")
 	var music_caption := get_node_or_null(
@@ -115,16 +113,25 @@ func _refresh_static_labels() -> void:
 		_update_game_time_label(int(game_time_slider.value))
 
 
-func _sync_language_option() -> void:
-	if language_option == null or account == null:
+func _sync_language_picker() -> void:
+	if language_picker == null:
 		return
-	var idx := LocaleCatalog.ORDER.find(LocaleCatalog.normalize(account.get_language()))
+	var code := LocaleCatalog.LOCALE_RU
+	if account:
+		code = LocaleCatalog.normalize(account.get_language())
+	elif LocaleService:
+		code = LocaleService.get_locale()
+	var idx := LocaleCatalog.ORDER.find(code)
 	if idx < 0:
 		idx = 0
-	if language_option.selected != idx:
-		language_option.set_block_signals(true)
-		language_option.select(idx)
-		language_option.set_block_signals(false)
+	language_picker.set_selected_index(idx, false)
+	_update_language_name_label()
+
+
+func _update_language_name_label() -> void:
+	if language_name_label == null:
+		return
+	language_name_label.text = LocaleCatalog.native_name(LocaleService.get_locale())
 
 
 func _on_language_selected(index: int) -> void:
@@ -141,23 +148,15 @@ func _on_language_selected(index: int) -> void:
 		player_selection_widget.reload_from_account()
 
 
-func _configure_game_time_slider() -> void:
-	if game_time_slider == null:
-		return
-	game_time_slider.clip_contents = false
-	var row := game_time_slider.get_parent() as Control
-	if row:
-		row.clip_contents = false
-	var scroll := _find_scroll_container(game_time_slider)
+func _configure_scroll() -> void:
+	var scroll := settings_scroll if settings_scroll else _find_scroll_container(self)
 	if scroll:
-		scroll.clip_contents = false
-	for style_name in ["slider", "grabber_area", "grabber_area_highlight"]:
-		var style := game_time_slider.get_theme_stylebox(style_name, &"HSlider")
-		if style is StyleBoxFlat:
-			var tuned := style.duplicate() as StyleBoxFlat
-			tuned.content_margin_left = SLIDER_GRABBER_INSET
-			tuned.content_margin_right = SLIDER_GRABBER_INSET
-			game_time_slider.add_theme_stylebox_override(style_name, tuned)
+		ModalScroll.configure(scroll)
+
+
+func _configure_touch_sliders() -> void:
+	for slider: HSlider in [game_time_slider, music_slider, sfx_slider, haptics_slider]:
+		UiTouchTargets.configure_slider(slider, SLIDER_GRABBER_INSET)
 
 
 func _find_scroll_container(from: Node) -> ScrollContainer:
@@ -173,11 +172,12 @@ func open() -> void:
 	_awaiting_reset_confirm = false
 	if reset_button:
 		reset_button.text = LocaleService.text("SETTINGS_RESET")
-	_sync_language_option()
+	_sync_language_picker()
 	_refresh_static_labels()
 	_sync_from_account()
 	if account and not account.changed.is_connected(_sync_from_account):
 		account.changed.connect(_sync_from_account)
+	ModalScroll.reset_position(settings_scroll if settings_scroll else _find_scroll_container(self))
 	visible = true
 	_show_modal_layer()
 	UiSounds.play_modal_open()

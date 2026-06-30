@@ -1,9 +1,10 @@
-[gd_scene load_steps=3 format=3 uid="uid://settings_window_godbomb"]
+[gd_scene format=3 uid="uid://it4or70mm86m"]
 
-[ext_resource type="Script" path="res://src/features/menu/settings_window.gd" id="1"]
-[ext_resource type="PackedScene" path="res://src/features/menu/pill_action_button.tscn" id="2"]
+[ext_resource type="Script" uid="uid://dfio365ohtkva" path="res://src/features/menu/settings_window.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://bff3xhmdudpjx" path="res://src/features/menu/pill_action_button.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://src/features/menu/language_flag_picker.tscn" id="3"]
 
-[node name="SettingsWindow" type="Control" node_paths=PackedStringArray("language_option", "game_time_slider", "game_time_label", "music_check", "music_slider", "music_value_label", "sfx_slider", "sfx_value_label", "haptics_check", "haptics_slider", "haptics_value_label", "reset_button", "close_button")]
+[node name="SettingsWindow" type="Control" unique_id=2113593075 node_paths=PackedStringArray("language_picker", "language_name_label", "settings_scroll", "game_time_slider", "game_time_label", "music_check", "music_slider", "music_value_label", "sfx_slider", "sfx_value_label", "haptics_check", "haptics_slider", "haptics_value_label", "reset_button", "close_button")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -11,31 +12,32 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1")
-language_option = NodePath("Panel/Margin/VBox/Scroll/Content/LanguageRow/LanguageOption")
-game_time_slider = NodePath("Panel/Margin/VBox/Scroll/Content/GameTimeRow/GameTimeSlider")
-game_time_label = NodePath("Panel/Margin/VBox/Scroll/Content/GameTimeLabel")
+language_picker = NodePath("Panel/Margin/VBox/Scroll/Content/LanguageSection/LanguageFlagPicker")
+language_name_label = NodePath("Panel/Margin/VBox/Scroll/Content/LanguageSection/LanguageNameLabel")
+settings_scroll = NodePath("Panel/Margin/VBox/Scroll")
+game_time_slider = NodePath("Panel/Margin/VBox/Scroll/Content/GameTimeSection/GameTimeRow/GameTimeSlider")
+game_time_label = NodePath("Panel/Margin/VBox/Scroll/Content/GameTimeSection/GameTimeLabel")
 music_check = NodePath("Panel/Margin/VBox/Scroll/Content/MusicCheck")
-music_slider = NodePath("Panel/Margin/VBox/Scroll/Content/MusicRow/MusicSlider")
-music_value_label = NodePath("Panel/Margin/VBox/Scroll/Content/MusicRow/MusicValueLabel")
-sfx_slider = NodePath("Panel/Margin/VBox/Scroll/Content/SfxRow/SfxSlider")
-sfx_value_label = NodePath("Panel/Margin/VBox/Scroll/Content/SfxRow/SfxValueLabel")
+music_slider = NodePath("Panel/Margin/VBox/Scroll/Content/MusicRow/MusicSliderRow/MusicSlider")
+music_value_label = NodePath("Panel/Margin/VBox/Scroll/Content/MusicRow/MusicSliderRow/MusicValueLabel")
+sfx_slider = NodePath("Panel/Margin/VBox/Scroll/Content/SfxRow/SfxSliderRow/SfxSlider")
+sfx_value_label = NodePath("Panel/Margin/VBox/Scroll/Content/SfxRow/SfxSliderRow/SfxValueLabel")
 haptics_check = NodePath("Panel/Margin/VBox/Scroll/Content/HapticsCheck")
-haptics_slider = NodePath("Panel/Margin/VBox/Scroll/Content/HapticsRow/HapticsSlider")
-haptics_value_label = NodePath("Panel/Margin/VBox/Scroll/Content/HapticsRow/HapticsValueLabel")
-reset_button = NodePath("Panel/Margin/VBox/Scroll/Content/ResetButton")
+haptics_slider = NodePath("Panel/Margin/VBox/Scroll/Content/HapticsRow/HapticsSliderRow/HapticsSlider")
+haptics_value_label = NodePath("Panel/Margin/VBox/Scroll/Content/HapticsRow/HapticsSliderRow/HapticsValueLabel")
+reset_button = NodePath("Panel/Margin/VBox/ResetButton")
 close_button = NodePath("Panel/Margin/VBox/CloseButton")
 
-[node name="Dimmer" type="ColorRect" parent="."]
+[node name="Dimmer" type="ColorRect" parent="." unique_id=947348827]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 0
 color = Color(0.04, 0.03, 0.025, 0.82)
 
-[node name="Panel" type="PanelContainer" parent="."]
+[node name="Panel" type="PanelContainer" parent="." unique_id=389415392]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -47,174 +49,180 @@ offset_bottom = -64.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Margin" type="MarginContainer" parent="Panel"]
+[node name="Margin" type="MarginContainer" parent="Panel" unique_id=1445318871]
 layout_mode = 2
 theme_override_constants/margin_left = 48
 theme_override_constants/margin_top = 48
 theme_override_constants/margin_right = 48
 theme_override_constants/margin_bottom = 48
 
-[node name="VBox" type="VBoxContainer" parent="Panel/Margin"]
+[node name="VBox" type="VBoxContainer" parent="Panel/Margin" unique_id=1560680500]
 layout_mode = 2
 theme_override_constants/separation = 28
 
-[node name="Title" type="Label" parent="Panel/Margin/VBox"]
+[node name="Title" type="Label" parent="Panel/Margin/VBox" unique_id=1727621705]
 layout_mode = 2
 theme_type_variation = &"ModalTitle"
 text = "Настройки"
 horizontal_alignment = 1
 
-[node name="Scroll" type="ScrollContainer" parent="Panel/Margin/VBox"]
+[node name="Scroll" type="ScrollContainer" parent="Panel/Margin/VBox" unique_id=1785878022]
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
-clip_contents = false
+vertical_scroll_mode = 2
+scroll_deadzone = 16
 
-[node name="Content" type="VBoxContainer" parent="Panel/Margin/VBox/Scroll"]
+[node name="Content" type="VBoxContainer" parent="Panel/Margin/VBox/Scroll" unique_id=409434781]
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_vertical = 0
 theme_override_constants/separation = 28
 
-[node name="LanguageRow" type="HBoxContainer" parent="Panel/Margin/VBox/Scroll/Content"]
+[node name="LanguageSection" type="VBoxContainer" parent="Panel/Margin/VBox/Scroll/Content" unique_id=604513787]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="LanguageNameLabel" type="Label" parent="Panel/Margin/VBox/Scroll/Content/LanguageSection" unique_id=596107547]
+layout_mode = 2
+theme_type_variation = &"ModalTitle"
+theme_override_font_sizes/font_size = 44
+text = "Русский"
+horizontal_alignment = 1
+
+[node name="LanguageFlagPicker" parent="Panel/Margin/VBox/Scroll/Content/LanguageSection" unique_id=1626771692 instance=ExtResource("3")]
+
+[node name="GameTimeSection" type="VBoxContainer" parent="Panel/Margin/VBox/Scroll/Content" unique_id=428763996]
 layout_mode = 2
 theme_override_constants/separation = 20
 
-[node name="LanguageCaption" type="Label" parent="Panel/Margin/VBox/Scroll/Content/LanguageRow"]
-custom_minimum_size = Vector2(320, 0)
-layout_mode = 2
-theme_type_variation = &"ModalLabel"
-text = "Язык"
-
-[node name="LanguageOption" type="OptionButton" parent="Panel/Margin/VBox/Scroll/Content/LanguageRow"]
-custom_minimum_size = Vector2(0, 72)
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="GameTimeLabel" type="Label" parent="Panel/Margin/VBox/Scroll/Content"]
+[node name="GameTimeLabel" type="Label" parent="Panel/Margin/VBox/Scroll/Content/GameTimeSection" unique_id=1401038742]
 layout_mode = 2
 theme_type_variation = &"ModalLabel"
 text = "Длительность партии: 5 мин"
 
-[node name="GameTimeRow" type="Control" parent="Panel/Margin/VBox/Scroll/Content"]
-custom_minimum_size = Vector2(0, 88)
+[node name="GameTimeRow" type="Control" parent="Panel/Margin/VBox/Scroll/Content/GameTimeSection" unique_id=492329546]
+custom_minimum_size = Vector2(0, 96)
 layout_mode = 2
 size_flags_horizontal = 3
-clip_contents = false
 
-[node name="GameTimeSlider" type="HSlider" parent="Panel/Margin/VBox/Scroll/Content/GameTimeRow"]
+[node name="GameTimeSlider" type="HSlider" parent="Panel/Margin/VBox/Scroll/Content/GameTimeSection/GameTimeRow" unique_id=1017049148]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 26.0
-offset_top = 0.0
 offset_right = -26.0
-offset_bottom = 0.0
 grow_horizontal = 2
 grow_vertical = 2
 min_value = 1.0
 max_value = 30.0
 value = 5.0
 
-[node name="MusicCheck" type="CheckBox" parent="Panel/Margin/VBox/Scroll/Content"]
+[node name="MusicCheck" type="CheckBox" parent="Panel/Margin/VBox/Scroll/Content" unique_id=1077537578]
 custom_minimum_size = Vector2(0, 72)
 layout_mode = 2
 theme_type_variation = &"ModalCheckBox"
 button_pressed = true
 text = "Музыка в меню"
 
-[node name="MusicRow" type="HBoxContainer" parent="Panel/Margin/VBox/Scroll/Content"]
+[node name="MusicRow" type="VBoxContainer" parent="Panel/Margin/VBox/Scroll/Content" unique_id=259983789]
 layout_mode = 2
 theme_override_constants/separation = 20
 
-[node name="MusicCaption" type="Label" parent="Panel/Margin/VBox/Scroll/Content/MusicRow"]
-custom_minimum_size = Vector2(320, 0)
+[node name="MusicCaption" type="Label" parent="Panel/Margin/VBox/Scroll/Content/MusicRow" unique_id=1370433002]
 layout_mode = 2
 theme_type_variation = &"ModalLabel"
 text = "Громкость музыки"
 
-[node name="MusicSlider" type="HSlider" parent="Panel/Margin/VBox/Scroll/Content/MusicRow"]
-custom_minimum_size = Vector2(0, 88)
+[node name="MusicSliderRow" type="HBoxContainer" parent="Panel/Margin/VBox/Scroll/Content/MusicRow" unique_id=2120045196]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="MusicSlider" type="HSlider" parent="Panel/Margin/VBox/Scroll/Content/MusicRow/MusicSliderRow" unique_id=1510705256]
+custom_minimum_size = Vector2(0, 96)
 layout_mode = 2
 size_flags_horizontal = 3
-max_value = 100.0
 value = 60.0
 
-[node name="MusicValueLabel" type="Label" parent="Panel/Margin/VBox/Scroll/Content/MusicRow"]
+[node name="MusicValueLabel" type="Label" parent="Panel/Margin/VBox/Scroll/Content/MusicRow/MusicSliderRow" unique_id=1104673642]
 custom_minimum_size = Vector2(96, 0)
 layout_mode = 2
 theme_type_variation = &"ModalLabel"
 text = "60%"
 horizontal_alignment = 2
 
-[node name="SfxRow" type="HBoxContainer" parent="Panel/Margin/VBox/Scroll/Content"]
+[node name="SfxRow" type="VBoxContainer" parent="Panel/Margin/VBox/Scroll/Content" unique_id=906899063]
 layout_mode = 2
 theme_override_constants/separation = 20
 
-[node name="SfxCaption" type="Label" parent="Panel/Margin/VBox/Scroll/Content/SfxRow"]
-custom_minimum_size = Vector2(320, 0)
+[node name="SfxCaption" type="Label" parent="Panel/Margin/VBox/Scroll/Content/SfxRow" unique_id=157385490]
 layout_mode = 2
 theme_type_variation = &"ModalLabel"
 text = "Громкость звуков"
 
-[node name="SfxSlider" type="HSlider" parent="Panel/Margin/VBox/Scroll/Content/SfxRow"]
-custom_minimum_size = Vector2(0, 88)
+[node name="SfxSliderRow" type="HBoxContainer" parent="Panel/Margin/VBox/Scroll/Content/SfxRow" unique_id=1644697304]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="SfxSlider" type="HSlider" parent="Panel/Margin/VBox/Scroll/Content/SfxRow/SfxSliderRow" unique_id=196910153]
+custom_minimum_size = Vector2(0, 96)
 layout_mode = 2
 size_flags_horizontal = 3
-max_value = 100.0
 value = 100.0
 
-[node name="SfxValueLabel" type="Label" parent="Panel/Margin/VBox/Scroll/Content/SfxRow"]
+[node name="SfxValueLabel" type="Label" parent="Panel/Margin/VBox/Scroll/Content/SfxRow/SfxSliderRow" unique_id=2047392320]
 custom_minimum_size = Vector2(96, 0)
 layout_mode = 2
 theme_type_variation = &"ModalLabel"
 text = "100%"
 horizontal_alignment = 2
 
-[node name="HapticsCheck" type="CheckBox" parent="Panel/Margin/VBox/Scroll/Content"]
+[node name="HapticsCheck" type="CheckBox" parent="Panel/Margin/VBox/Scroll/Content" unique_id=1899763213]
 custom_minimum_size = Vector2(0, 72)
 layout_mode = 2
 theme_type_variation = &"ModalCheckBox"
 button_pressed = true
 text = "Вибрация"
 
-[node name="HapticsRow" type="HBoxContainer" parent="Panel/Margin/VBox/Scroll/Content"]
+[node name="HapticsRow" type="VBoxContainer" parent="Panel/Margin/VBox/Scroll/Content" unique_id=1399950180]
 layout_mode = 2
 theme_override_constants/separation = 20
 
-[node name="HapticsCaption" type="Label" parent="Panel/Margin/VBox/Scroll/Content/HapticsRow"]
-custom_minimum_size = Vector2(320, 0)
+[node name="HapticsCaption" type="Label" parent="Panel/Margin/VBox/Scroll/Content/HapticsRow" unique_id=1049519258]
 layout_mode = 2
 theme_type_variation = &"ModalLabel"
 text = "Мощность вибрации"
 
-[node name="HapticsSlider" type="HSlider" parent="Panel/Margin/VBox/Scroll/Content/HapticsRow"]
-custom_minimum_size = Vector2(0, 88)
+[node name="HapticsSliderRow" type="HBoxContainer" parent="Panel/Margin/VBox/Scroll/Content/HapticsRow" unique_id=903177841]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="HapticsSlider" type="HSlider" parent="Panel/Margin/VBox/Scroll/Content/HapticsRow/HapticsSliderRow" unique_id=124727431]
+custom_minimum_size = Vector2(0, 96)
 layout_mode = 2
 size_flags_horizontal = 3
-max_value = 100.0
 value = 100.0
 
-[node name="HapticsValueLabel" type="Label" parent="Panel/Margin/VBox/Scroll/Content/HapticsRow"]
+[node name="HapticsValueLabel" type="Label" parent="Panel/Margin/VBox/Scroll/Content/HapticsRow/HapticsSliderRow" unique_id=658968865]
 custom_minimum_size = Vector2(96, 0)
 layout_mode = 2
 theme_type_variation = &"ModalLabel"
 text = "100%"
 horizontal_alignment = 2
 
-[node name="ResetHint" type="Label" parent="Panel/Margin/VBox/Scroll/Content"]
+[node name="ResetHint" type="Label" parent="Panel/Margin/VBox" unique_id=43390430]
 layout_mode = 2
 theme_type_variation = &"ModalMuted"
 text = "Сбросит настройки, подсказки и имена игроков по умолчанию."
 autowrap_mode = 3
 
-[node name="ResetButton" parent="Panel/Margin/VBox/Scroll/Content" instance=ExtResource("2")]
+[node name="ResetButton" parent="Panel/Margin/VBox" unique_id=1343477059 instance=ExtResource("2")]
+custom_minimum_size = Vector2(0, 220)
 layout_mode = 2
 action_text = "Сбросить прогресс"
 
-[node name="ActionLabel" parent="Panel/Margin/VBox/Scroll/Content/ResetButton" index="0"]
-theme_override_font_sizes/font_size = 40
-
-[node name="CloseButton" parent="Panel/Margin/VBox" instance=ExtResource("2")]
+[node name="CloseButton" parent="Panel/Margin/VBox" unique_id=1579203385 instance=ExtResource("2")]
+custom_minimum_size = Vector2(0, 220)
 layout_mode = 2
 action_text = "Закрыть"

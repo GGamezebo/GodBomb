@@ -4,9 +4,7 @@ extends Control
 signal onboarding_continue_pressed
 signal tutorial_requested
 
-const SCROLL_TRACK := Color(0.08, 0.06, 0.05, 0.42)
-const SCROLL_GRABBER := Color(0.78, 0.48, 0.28, 0.9)
-const SCROLL_GRABBER_HI := Color(0.94, 0.6, 0.34, 0.98)
+const ModalScroll = preload("res://src/common/ui/modal_scroll.gd")
 @export var rules_scroll: ScrollContainer
 @export var rules_text: RichTextLabel
 @export var close_button: StartActionButton
@@ -31,7 +29,7 @@ func _ready() -> void:
 		rules_text.bbcode_enabled = true
 		rules_text.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if rules_scroll:
-		_configure_scroll(rules_scroll)
+		ModalScroll.configure(rules_scroll)
 		if not rules_scroll.resized.is_connected(_queue_rules_layout):
 			rules_scroll.resized.connect(_queue_rules_layout)
 	if close_button:
@@ -82,7 +80,7 @@ func _open_common() -> void:
 	_show_modal_layer()
 	_layout_width = -1
 	if rules_scroll:
-		rules_scroll.scroll_vertical = 0
+		ModalScroll.reset_position(rules_scroll)
 	_queue_rules_layout()
 	UiSounds.play_modal_open()
 
@@ -164,38 +162,7 @@ func _sync_rules_text_layout() -> void:
 	rules_text.custom_maximum_size.x = text_width
 	await get_tree().process_frame
 	if rules_scroll:
-		rules_scroll.scroll_vertical = 0
-
-
-static func _configure_scroll(scroll: ScrollContainer) -> void:
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
-	scroll.scroll_deadzone = 16
-	scroll.scroll_vertical_custom_step = 80.0
-	scroll.clip_contents = true
-	_style_vertical_scroll_bar(scroll.get_v_scroll_bar())
-
-
-static func _style_vertical_scroll_bar(bar: VScrollBar) -> void:
-	if bar == null:
-		return
-	bar.custom_minimum_size.x = 12
-	var track := StyleBoxFlat.new()
-	track.bg_color = SCROLL_TRACK
-	track.set_corner_radius_all(6)
-	track.content_margin_top = 6.0
-	track.content_margin_bottom = 6.0
-	track.content_margin_left = 2.0
-	track.content_margin_right = 2.0
-	var grabber := StyleBoxFlat.new()
-	grabber.bg_color = SCROLL_GRABBER
-	grabber.set_corner_radius_all(6)
-	var grabber_hi := grabber.duplicate() as StyleBoxFlat
-	grabber_hi.bg_color = SCROLL_GRABBER_HI
-	bar.add_theme_stylebox_override("scroll", track)
-	bar.add_theme_stylebox_override("grabber", grabber)
-	bar.add_theme_stylebox_override("grabber_highlight", grabber_hi)
-	bar.add_theme_constant_override("minimum_grabber_size", 64)
+		ModalScroll.reset_position(rules_scroll)
 
 
 func _show_modal_layer() -> void:
