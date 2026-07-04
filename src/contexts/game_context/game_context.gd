@@ -49,6 +49,7 @@ func deinit() -> void:
 	pass
 
 
+
 func _ensure_runtime_resources() -> void:
 	if not game_events:
 		game_events = DEFAULT_GAME_EVENTS.duplicate(true)
