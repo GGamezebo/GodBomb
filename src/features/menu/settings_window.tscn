@@ -220,7 +220,7 @@ vertical_alignment = 1
 [node name="ResetHint" type="Label" parent="Panel/Margin/VBox" unique_id=43390430]
 layout_mode = 2
 theme_type_variation = &"ModalMuted"
-text = "Сбросит настройки, подсказки и имена игроков по умолчанию."
+text = "Вернуть дефолтные настройки и имена игроков."
 autowrap_mode = 3
 
 [node name="ResetButton" parent="Panel/Margin/VBox" unique_id=1343477059 instance=ExtResource("2")]
