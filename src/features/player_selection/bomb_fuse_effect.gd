@@ -3,7 +3,7 @@ extends Control
 
 const FUSE_TIP_DESIGN := Vector2(68.0, 20.0)
 const DESIGN_SLIME_SIZE := 128.0
-const BASE_SMOKE_GRAVITY := Vector2(0.0, -16.0)
+const BASE_SMOKE_GRAVITY := Vector2(0.0, -36.0)
 
 var _fire: CPUParticles2D
 var _embers: CPUParticles2D
