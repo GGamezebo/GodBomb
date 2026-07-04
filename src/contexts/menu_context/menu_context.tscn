@@ -7,10 +7,10 @@
 [ext_resource type="Resource" path="res://src/common/menu_events.tres" id="5"]
 [ext_resource type="PackedScene" uid="uid://duug5w0r0cqrv" path="res://src/features/player_selection/player_selection_widget.tscn" id="6"]
 [ext_resource type="Texture2D" uid="uid://b27y0jjb7mmmy" path="res://assets/party_kitchen/buttons/start_active.svg" id="8"]
-[ext_resource type="Texture2D" uid="uid://vgrig0lw4nx4" path="res://assets/textures/Background/Background1.png" id="8_ksiyf"]
+[ext_resource type="Texture2D" uid="uid://vgrig0lw4nx4" path="res://assets/textures/Background/Background.png" id="8_ksiyf"]
 [ext_resource type="Texture2D" uid="uid://cjgo8et40dwnd" path="res://assets/party_kitchen/buttons/start_inactive.svg" id="9"]
-[ext_resource type="PackedScene" path="res://src/features/menu/settings_window.tscn" id="10"]
-[ext_resource type="PackedScene" path="res://src/features/menu/rules_window.tscn" id="11"]
+[ext_resource type="PackedScene" uid="uid://it4or70mm86m" path="res://src/features/menu/settings_window.tscn" id="10"]
+[ext_resource type="PackedScene" uid="uid://dulm6j2b8mwrm" path="res://src/features/menu/rules_window.tscn" id="11"]
 [ext_resource type="Texture2D" uid="uid://cmjhdvew13air" path="res://assets/party_kitchen/buttons/icon_settings.svg" id="12"]
 [ext_resource type="Texture2D" uid="uid://b72rn4jb7t7eq" path="res://assets/party_kitchen/buttons/icon_music_on.svg" id="13"]
 [ext_resource type="Texture2D" uid="uid://cbb8gsai6lwuy" path="res://assets/party_kitchen/buttons/icon_music_off.svg" id="14"]
@@ -178,8 +178,14 @@ vertical_alignment = 1
 layer = 30
 visible = false
 
-[node name="SettingsWindow" parent="ModalLayer" unique_id=1437366510 instance=ExtResource("10")]
+[node name="SettingsWindow" parent="ModalLayer" unique_id=1437366510 node_paths=PackedStringArray("music_slider", "music_value_label", "sfx_slider", "sfx_value_label", "haptics_slider", "haptics_value_label") instance=ExtResource("10")]
 visible = false
+music_slider = NodePath("Panel/Margin/VBox/Scroll/Content/MusicRow/MusicSliderRow/MusicSlider")
+music_value_label = NodePath("Panel/Margin/VBox/Scroll/Content/MusicRow/MusicSliderRow/MusicValueLabel")
+sfx_slider = NodePath("Panel/Margin/VBox/Scroll/Content/SfxRow/SfxSliderRow/SfxSlider")
+sfx_value_label = NodePath("Panel/Margin/VBox/Scroll/Content/SfxRow/SfxSliderRow/SfxValueLabel")
+haptics_slider = NodePath("Panel/Margin/VBox/Scroll/Content/HapticsRow/HapticsSliderRow/HapticsSlider")
+haptics_value_label = NodePath("Panel/Margin/VBox/Scroll/Content/HapticsRow/HapticsSliderRow/HapticsValueLabel")
 
 [node name="RulesWindow" parent="ModalLayer" unique_id=1052287132 instance=ExtResource("11")]
 visible = false

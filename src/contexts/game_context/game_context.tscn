@@ -23,7 +23,7 @@
 [ext_resource type="AudioStream" uid="uid://7yrpfgssj2v0" path="res://assets/audio/sfx/FastTick.mp3" id="21"]
 [ext_resource type="Script" uid="uid://d26o15jgt3s4y" path="res://src/features/explosion/explosion_effect.gd" id="24"]
 [ext_resource type="Script" uid="uid://qjkbatpnhuo" path="res://core/systems/haptics/haptics_manager.gd" id="25"]
-[ext_resource type="Texture2D" uid="uid://vgrig0lw4nx4" path="res://assets/textures/Background/Background1.png" id="26_ro4vc"]
+[ext_resource type="Texture2D" uid="uid://vgrig0lw4nx4" path="res://assets/textures/Background/Background.png" id="26_ro4vc"]
 [ext_resource type="Script" uid="uid://dkplswcbvqptx" path="res://src/features/background/game_bomb_background.gd" id="27"]
 [ext_resource type="Script" uid="uid://b4n1w2jmpoutu" path="res://src/features/bomb/bomb_dial_glass.gd" id="27_glass"]
 [ext_resource type="Texture2D" uid="uid://b27y0jjb7mmmy" path="res://assets/party_kitchen/buttons/start_active.svg" id="28"]
