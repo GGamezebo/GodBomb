@@ -88,6 +88,44 @@ func ensure_recent_names_initialized() -> void:
 		emit_changed()
 
 
+## Re-localizes every default (color) name in the roster and in the recent-name
+## history to `target_locale`. Custom names entered by the player are untouched.
+## Returns true if anything changed.
+func retranslate_default_names(target_locale: String) -> bool:
+	var locale := LocaleCatalog.normalize(target_locale)
+	var did_change := false
+
+	var players = data.get("players", [])
+	if players is Array:
+		for entry in players:
+			if entry is Dictionary:
+				var current := PlayerInfo.sanitize_name(str(entry.get("name", "")))
+				var remapped := PlayerInfo.sanitize_name(
+					LocaleStrings.remap_default_name(current, locale)
+				)
+				if remapped != current and not remapped.is_empty():
+					entry["name"] = remapped
+					did_change = true
+
+	var recent := get_recent_names()
+	var new_recent: Array[String] = []
+	for player_name in recent:
+		var remapped_name := PlayerInfo.sanitize_name(
+			LocaleStrings.remap_default_name(player_name, locale)
+		)
+		if remapped_name.is_empty():
+			continue
+		if not new_recent.has(remapped_name):
+			new_recent.append(remapped_name)
+	if new_recent != recent:
+		data["recent_player_names"] = _trim_recent_names(new_recent)
+		did_change = true
+
+	if did_change:
+		emit_changed()
+	return did_change
+
+
 func get_language() -> String:
 	ensure_language_initialized()
 	return LocaleCatalog.normalize(str(data.get("language", LocaleCatalog.LOCALE_RU)))

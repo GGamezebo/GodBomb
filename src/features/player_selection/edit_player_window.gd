@@ -425,3 +425,16 @@ func refresh_localized() -> void:
 		ok_button.action_text = LocaleService.text("EDIT_ADD")
 	if apply_button:
 		apply_button.action_text = LocaleService.text("EDIT_APPLY")
+	if visible:
+		_relocalize_open_state()
+
+
+func _relocalize_open_state() -> void:
+	var current := _get_name_field_text()
+	var remapped := PlayerInfo.sanitize_name(
+		LocaleStrings.remap_default_name(current, LocaleService.get_locale())
+	)
+	if remapped != current and not remapped.is_empty():
+		_set_name_field(remapped, false)
+	_refresh_name_history()
+	_sync_confirm_buttons()

@@ -295,3 +295,27 @@ static func get_slime_name(locale: String, preset_id: int) -> String:
 	if preset_id < 0 or preset_id >= names.size():
 		return ""
 	return names[preset_id]
+
+
+## Returns the color index if `player_name` matches a default slime name in any
+## supported locale, otherwise -1. Colors share the same order across locales,
+## so the index is unambiguous regardless of the source language.
+static func default_slime_index(player_name: String) -> int:
+	var trimmed := player_name.strip_edges()
+	if trimmed.is_empty():
+		return -1
+	for locale: String in LocaleCatalog.ORDER:
+		var names := get_slime_names(locale)
+		for i in names.size():
+			if names[i].strip_edges() == trimmed:
+				return i
+	return -1
+
+
+## If `player_name` is a default color name (in any locale), returns the matching
+## default name for `target_locale`; otherwise returns `player_name` unchanged.
+static func remap_default_name(player_name: String, target_locale: String) -> String:
+	var index := default_slime_index(player_name)
+	if index < 0:
+		return player_name
+	return get_slime_name(target_locale, index)

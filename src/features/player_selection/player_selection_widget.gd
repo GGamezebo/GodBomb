@@ -77,9 +77,34 @@ func _ready() -> void:
 
 
 func refresh_localized() -> void:
+	_retranslate_default_names()
 	if edit_player_window and edit_player_window.has_method("refresh_localized"):
 		edit_player_window.refresh_localized()
 	_update_start_button()
+
+
+func _retranslate_default_names() -> void:
+	if not account:
+		return
+	var locale := LocaleService.get_locale()
+	var account_changed := account.retranslate_default_names(locale)
+	var icons_changed := false
+	for icon in _player_icons:
+		var info := icon.get_player_info()
+		if info == null:
+			continue
+		var remapped := PlayerInfo.sanitize_name(
+			LocaleStrings.remap_default_name(info.name, locale)
+		)
+		if remapped != info.name and not remapped.is_empty():
+			info.name = remapped
+			if icon.name_label:
+				icon.name_label.text = remapped
+			icons_changed = true
+	if icons_changed:
+		_schedule_position_update()
+	if account_changed or icons_changed:
+		_save_account()
 
 
 func set_battle_mode(enabled: bool) -> void:
