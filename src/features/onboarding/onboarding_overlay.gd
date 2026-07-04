@@ -25,10 +25,6 @@ const SKIP_BUTTON_SIZE_SCALE := 0.9
 
 var _root: Control
 var _full_dim: ColorRect
-var _dim_top: ColorRect
-var _dim_bottom: ColorRect
-var _dim_left: ColorRect
-var _dim_right: ColorRect
 var _spotlight_visual: ColorRect
 var _spotlight_material: ShaderMaterial
 var _bottom_margin: MarginContainer
@@ -43,7 +39,6 @@ var _skip_button: StartActionButton
 var _continue_button: StartActionButton
 var _spotlight_center := Vector2.ZERO
 var _spotlight_radius := 0.0
-var _spotlight_hole := Rect2()
 var _use_spotlight := false
 var _focus_control: Control
 var _pass_through := false
@@ -71,22 +66,6 @@ func _build_ui() -> void:
 	_full_dim = _make_dim_rect()
 	_full_dim.mouse_filter = Control.MOUSE_FILTER_STOP
 	_root.add_child(_full_dim)
-
-	for name in ["Top", "Bottom", "Left", "Right"]:
-		var dim := _make_dim_rect()
-		dim.name = "Dim%s" % name
-		dim.visible = false
-		dim.mouse_filter = Control.MOUSE_FILTER_STOP
-		_root.add_child(dim)
-		match name:
-			"Top":
-				_dim_top = dim
-			"Bottom":
-				_dim_bottom = dim
-			"Left":
-				_dim_left = dim
-			"Right":
-				_dim_right = dim
 
 	_spotlight_material = ShaderMaterial.new()
 	_spotlight_material.shader = SPOTLIGHT_SHADER
@@ -334,12 +313,47 @@ func _apply_spotlight_from_rect(rect: Rect2, padding: float) -> void:
 func _apply_spotlight_from_circle(center: Vector2, radius: float) -> void:
 	_spotlight_center = center
 	_spotlight_radius = maxf(radius, SPOTLIGHT_MIN_RADIUS)
-	_spotlight_hole = Rect2(
-		center - Vector2.ONE * _spotlight_radius,
-		Vector2.ONE * _spotlight_radius * 2.0
-	)
 	_use_spotlight = true
 	_layout_dim()
+
+
+func _input(event: InputEvent) -> void:
+	if not visible or _pass_through or not _use_spotlight:
+		return
+	if not _is_spotlight_blocking_event(event):
+		return
+	var pos := _event_global_position(event)
+	if pos.distance_to(_spotlight_center) <= _spotlight_radius:
+		return
+	if _is_overlay_chrome_click(pos):
+		return
+	get_viewport().set_input_as_handled()
+
+
+func _is_overlay_chrome_click(pos: Vector2) -> bool:
+	if _bottom_dock.get_global_rect().has_point(pos):
+		return true
+	return false
+
+
+func _is_spotlight_blocking_event(event: InputEvent) -> bool:
+	if event is InputEventMouseButton:
+		return (event as InputEventMouseButton).pressed
+	if event is InputEventScreenTouch:
+		return (event as InputEventScreenTouch).pressed
+	return false
+
+
+func _event_global_position(event: InputEvent) -> Vector2:
+	if event is InputEventMouseButton:
+		return (event as InputEventMouseButton).global_position
+	if event is InputEventMouseMotion:
+		return (event as InputEventMouseMotion).global_position
+	if event is InputEventScreenTouch:
+		return (event as InputEventScreenTouch).position
+	if event is InputEventScreenDrag:
+		return (event as InputEventScreenDrag).position
+	return Vector2.ZERO
 
 
 func clear_spotlight() -> void:
@@ -424,48 +438,21 @@ func _layout_dim() -> void:
 		return
 	if _pass_through:
 		_full_dim.visible = false
-		_hide_spotlight_layers()
+		_spotlight_visual.visible = false
 		return
 	if not _use_spotlight:
 		_full_dim.visible = true
-		_hide_spotlight_layers()
+		_spotlight_visual.visible = false
 		return
 
 	_full_dim.visible = false
 	_spotlight_visual.visible = true
-	_dim_top.visible = true
-	_dim_bottom.visible = true
-	_dim_left.visible = true
-	_dim_right.visible = true
 
 	var viewport := get_viewport().get_visible_rect()
-	var hole := _spotlight_hole
-	hole.position = hole.position - viewport.position
-
-	_dim_top.position = Vector2.ZERO
-	_dim_top.size = Vector2(viewport.size.x, maxf(0.0, hole.position.y))
-
-	_dim_bottom.position = Vector2(0.0, hole.end.y)
-	_dim_bottom.size = Vector2(viewport.size.x, maxf(0.0, viewport.size.y - hole.end.y))
-
-	_dim_left.position = Vector2(0.0, hole.position.y)
-	_dim_left.size = Vector2(maxf(0.0, hole.position.x), hole.size.y)
-
-	_dim_right.position = Vector2(hole.end.x, hole.position.y)
-	_dim_right.size = Vector2(maxf(0.0, viewport.size.x - hole.end.x), hole.size.y)
-
 	var center := _spotlight_center - viewport.position
 	_spotlight_material.set_shader_parameter("viewport_size", viewport.size)
 	_spotlight_material.set_shader_parameter("hole_center_px", center)
 	_spotlight_material.set_shader_parameter("hole_radius_px", _spotlight_radius)
-
-
-func _hide_spotlight_layers() -> void:
-	_spotlight_visual.visible = false
-	_dim_top.visible = false
-	_dim_bottom.visible = false
-	_dim_left.visible = false
-	_dim_right.visible = false
 
 
 func _on_skip_pressed() -> void:

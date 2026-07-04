@@ -242,8 +242,10 @@ func _on_overlay_continue_pressed() -> void:
 func _on_menu_players_changed(_info: PlayerInfo = null) -> void:
 	if _skipping_step:
 		return
-	if _step == Step.LOBBY_ADD and _lobby_player_count() >= LOBBY_TARGET_PLAYERS:
-		_advance()
+	if _step == Step.LOBBY_ADD:
+		call_deferred("_apply_add_player_spotlight")
+		if _lobby_player_count() >= LOBBY_TARGET_PLAYERS:
+			_advance()
 
 
 func _on_menu_player_modified(_info: PlayerInfo = null, _index: int = -1) -> void:
@@ -405,8 +407,20 @@ func _present_add_players_step() -> void:
 func _apply_add_player_spotlight() -> void:
 	if _step != Step.LOBBY_ADD or _player_widget == null:
 		return
-	if _player_widget.add_player_button:
-		_overlay.set_spotlight_control(_player_widget.add_player_button)
+	var count := _lobby_player_count()
+	var targets: Array = []
+	if count < LOBBY_TARGET_PLAYERS and _player_widget.add_player_button:
+		targets.append(_player_widget.add_player_button)
+	if count > 0:
+		var last_icon := _player_widget.get_player_icon_at(count - 1)
+		if last_icon:
+			targets.append(last_icon)
+	if targets.is_empty():
+		_overlay.clear_spotlight()
+	elif targets.size() == 1:
+		_overlay.set_spotlight_control(targets[0] as Control)
+	else:
+		_overlay.set_spotlight_controls(targets)
 
 
 func _present_swap_step() -> void:
