@@ -9,7 +9,6 @@
 [ext_resource type="Resource" path="res://src/common/menu_events.tres" id="7"]
 [ext_resource type="Texture2D" uid="uid://dvlu4xtqm3p2e" path="res://assets/party_kitchen/buttons/add_player.svg" id="8"]
 [ext_resource type="Texture2D" uid="uid://barvyayav0plu" path="res://assets/party_kitchen/buttons/remove_player.svg" id="9"]
-[ext_resource type="Texture2D" uid="uid://cyemvf284wyqa" path="res://assets/party_kitchen/table.svg" id="10"]
 
 [ext_resource type="Script" path="res://src/features/menu/bomb_table_action_button.gd" id="11"]
 
@@ -42,18 +41,6 @@ offset_left = 220.0
 offset_top = 640.0
 offset_right = 860.0
 offset_bottom = 1280.0
-
-[node name="Table" type="TextureRect" parent="TableArea" unique_id=1694545373]
-visible = false
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-texture = ExtResource("10")
-expand_mode = 1
-stretch_mode = 5
 
 [node name="ChairsLayer" type="Control" parent="TableArea" unique_id=1921242137]
 z_index = 1
