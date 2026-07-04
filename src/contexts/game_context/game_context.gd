@@ -14,28 +14,30 @@ const DEFAULT_MENU_EVENTS := preload("res://src/common/menu_events.tres")
 @export var game_manager: GameManager
 @export var battle_chrome: GameBattleChrome
 
-var _initialized: bool = false
+var _session_configured: bool = false
+var _game_time_listener: EventListener = EventListener.new()
 
 
 func _ready() -> void:
-	if not _initialized:
+	if not _session_configured:
 		initialize({})
 
 
 func initialize(data: Dictionary) -> void:
-	if _initialized:
-		return
-	_initialized = true
 	_ensure_runtime_resources()
 
 	var session_account: PDataAccount = data.get("account", account)
 	if session_account:
 		account = session_account
-	if game_manager and game_config and session_account:
+
+	if game_manager and game_config and account:
 		if not game_manager.game_events and game_events:
 			game_manager.game_events = game_events
 		LocaleService.apply_cards_to(game_config)
-		game_manager.setup_session(game_config, session_account)
+		game_manager.setup_session(game_config, account)
+		_session_configured = true
+		_bind_game_time_listener()
+
 	if battle_chrome:
 		battle_chrome.game_manager = game_manager
 		battle_chrome.game_events = game_events
@@ -46,8 +48,20 @@ func initialize(data: Dictionary) -> void:
 
 
 func deinit() -> void:
-	pass
+	_game_time_listener.deinit()
 
+
+func _bind_game_time_listener() -> void:
+	if not menu_events:
+		return
+	_game_time_listener.deinit()
+	_game_time_listener.add(menu_events.ev_game_time_changed, _on_game_time_changed)
+
+
+func _on_game_time_changed(_minutes: int) -> void:
+	if not game_manager or not account:
+		return
+	game_manager.refresh_session_account(account)
 
 
 func _ensure_runtime_resources() -> void:

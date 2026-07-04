@@ -8,6 +8,7 @@ var session: GameSession = GameSession.new()
 var states: Array[StateBase] = []
 var _session_ready: bool = false
 var _paused: bool = false
+var _account: PDataAccount = null
 
 
 func _ready() -> void:
@@ -23,11 +24,21 @@ func _exit_tree() -> void:
 func setup_session(game_config: GameConfig, account: PDataAccount) -> void:
 	if not game_events:
 		game_events = load("res://src/common/game_events.tres") as GameEvents
+	_account = account
 	session.setup(game_config, game_events, account)
 	_session_ready = true
 	if fsm == null:
 		_start_fsm()
 	set_process(true)
+
+
+func refresh_session_account(account: PDataAccount) -> void:
+	if not account:
+		return
+	_account = account
+	if not _session_ready:
+		return
+	session.ensure_card_deck_for_game_time(account.get_game_time_minutes())
 
 
 func set_paused(paused: bool) -> void:
@@ -190,6 +201,8 @@ func _apply_tutorial_explosion_at(player_index: int) -> void:
 
 
 func start_round() -> void:
+	if _account:
+		session.ensure_card_deck_for_game_time(_account.get_game_time_minutes())
 	session.reset_round()
 	fsm.add_event(FSMGameEvents.START_ROUND)
 

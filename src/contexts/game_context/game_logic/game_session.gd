@@ -20,6 +20,7 @@ var explosion_duration: float = 0.0
 var explosion_is_countdown: bool = false
 var match_cards_total: int = 0
 var is_tutorial: bool = false
+var _deck_game_time_minutes: int = -1
 
 
 func setup(p_config: GameConfig, p_events: GameEvents, account: PDataAccount) -> void:
@@ -34,7 +35,7 @@ func setup(p_config: GameConfig, p_events: GameEvents, account: PDataAccount) ->
 		var info := account.player_info_from_dict(entry)
 		players.append(GamePlayer.new(info, i))
 
-	_build_card_deck(account.get_game_time_minutes())
+	rebuild_card_deck(account.get_game_time_minutes())
 	current_player_index = randi() % maxi(players.size(), 1)
 	max_rand_player_choices = 40 + randi() % maxi(players.size(), 1)
 	_emit_current_player()
@@ -100,6 +101,23 @@ func _player_key(info: PlayerInfo) -> String:
 	return "%d|%s" % [info.preset_id, info.name]
 
 
+func rebuild_card_deck(game_time_minutes: int) -> void:
+	if is_tutorial:
+		return
+	cards.clear()
+	current_card = null
+	_build_card_deck(game_time_minutes)
+	_deck_game_time_minutes = game_time_minutes
+
+
+func ensure_card_deck_for_game_time(game_time_minutes: int) -> void:
+	if is_tutorial:
+		return
+	if game_time_minutes == _deck_game_time_minutes and not cards.is_empty():
+		return
+	rebuild_card_deck(game_time_minutes)
+
+
 func _build_card_deck(game_time_minutes: int) -> void:
 	var card_strings: Array[String] = []
 	for syllable in game_config.cards:
@@ -124,6 +142,7 @@ func apply_tutorial_deck(entries: Array) -> void:
 	cards.clear()
 	current_card = null
 	is_tutorial = true
+	_deck_game_time_minutes = -1
 	for player in players:
 		player.score = 0
 	for entry in entries:

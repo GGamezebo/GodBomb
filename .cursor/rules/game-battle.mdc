@@ -29,3 +29,5 @@ State UI: choice/ready/countdown/play share dial layout · ready=«Готовы?
 **Audio:** gameplay → `GameSound` · UI buttons → `UiSounds` → `audio.mdc`.
 
 **Core:** `game_manager.gd` `game_session.gd` `game_sound.gd` `word_condition.gd`
+
+**Match length:** deck size from `account.game_time_minutes` via `GameSession.rebuild_card_deck()` · refreshed on `setup_session`, `start_round`, and `ev_game_time_changed`.

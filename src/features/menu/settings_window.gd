@@ -27,6 +27,7 @@ const UiTouchTargets = preload("res://src/common/ui/ui_touch_targets.gd")
 const ModalScroll = preload("res://src/common/ui/modal_scroll.gd")
 
 var _awaiting_reset_confirm: bool = false
+var _syncing_account: bool = false
 
 
 func _ready() -> void:
@@ -200,6 +201,7 @@ func _input(event: InputEvent) -> void:
 func _sync_from_account() -> void:
 	if not account:
 		return
+	_syncing_account = true
 	if game_time_slider:
 		game_time_slider.min_value = 1
 		game_time_slider.max_value = 30
@@ -219,10 +221,11 @@ func _sync_from_account() -> void:
 		haptics_slider.value = account.get_haptics_strength() * 100.0
 		_update_haptics_label(account.get_haptics_strength())
 	_update_haptics_controls_enabled()
+	_syncing_account = false
 
 
 func _on_game_time_changed(value: float) -> void:
-	if not account:
+	if _syncing_account or not account:
 		return
 	var minutes := int(value)
 	account.set_game_time_minutes(minutes)
