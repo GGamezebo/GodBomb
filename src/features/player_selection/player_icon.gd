@@ -104,11 +104,6 @@ func _setup_hold_overlays() -> void:
 	_hold_progress_ring.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_hold_progress_ring)
 
-	_hold_idle_hint = HoldEditIdleHint.new()
-	_hold_idle_hint.z_index = 5
-	_hold_idle_hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(_hold_idle_hint)
-
 
 func set_idle_hold_hint_visible(show_hint: bool) -> void:
 	if _hold_idle_hint:
@@ -123,11 +118,6 @@ func _layout_hold_overlays() -> void:
 		var ring_size := Vector2(244, 244)
 		_hold_progress_ring.position = seat_anchor - ring_size * 0.5
 		_hold_progress_ring.size = ring_size
-	if _hold_idle_hint:
-		_hold_idle_hint.position = slime_rect.position + Vector2(
-			slime_rect.size.x - _hold_idle_hint.size.x - 8.0,
-			12.0
-		)
 
 
 func get_drag_state() -> DragState:
