@@ -102,7 +102,7 @@ func _refresh_static_labels() -> void:
 	) as Label
 	if haptics_caption:
 		haptics_caption.text = LocaleService.text("SETTINGS_HAPTICS_STRENGTH")
-	var reset_hint := get_node_or_null("Panel/Margin/VBox/Scroll/Content/ResetHint") as Label
+	var reset_hint := get_node_or_null("Panel/Margin/VBox/ResetHint") as Label
 	if reset_hint:
 		reset_hint.text = LocaleService.text("SETTINGS_RESET_HINT")
 	if close_button:
