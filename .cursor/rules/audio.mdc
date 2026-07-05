@@ -10,8 +10,8 @@ alwaysApply: false
 
 ## Menu music
 
-`GameAudioController` → `music_player` on `MusicPlayer` (`background.mp3`).  
-`set_in_battle(false)` + `music_enabled` → loop. `set_in_battle(true)` → stop.
+`GameAudioController` → `music_player` on `MusicPlayer` (`background.mp3`, ~120s seamless loop, procedural).  
+Regen: `python tools/generate_menu_music.py` · `set_in_battle(false)` + `music_enabled` → loop.
 
 ## Gameplay SFX — `GameSound` (`game_sound.gd`)
 
