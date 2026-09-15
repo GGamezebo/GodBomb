@@ -21,6 +21,7 @@ var _action_hints: GameActionHints
 var _battle_layer: Control
 var _countdown_label: Label
 var _explosion_overlay: GameExplosionOverlay
+var _splash_overlay: BattleSplashOverlay
 var _result_overlay: GameResultOverlay
 var _current_state: String = ""
 var _last_choice_player_index: int = -1
@@ -38,6 +39,7 @@ func _ready() -> void:
 		listener.add(game_events.ev_countdown_tick_changed, _on_countdown_tick)
 		listener.add(game_events.ev_card_changed, _on_card_changed)
 		listener.add(game_events.ev_touch_next_player, _on_turn_passed)
+		listener.add(game_events.ev_battle_splash, _on_battle_splash)
 	call_deferred("_sync_to_current_state")
 
 
@@ -111,6 +113,9 @@ func _reposition_battle_ui() -> void:
 	if _explosion_overlay and _explosion_overlay.visible:
 		_explosion_overlay.size = design_root.size
 		_explosion_overlay.relayout()
+	if _splash_overlay and _splash_overlay.visible:
+		_splash_overlay.size = design_root.size
+		_splash_overlay.relayout()
 
 
 func _build_ui() -> void:
@@ -156,12 +161,19 @@ func _build_ui() -> void:
 	design_root.add_child(_countdown_label)
 
 	_build_explosion_overlay(design_root)
+	_build_splash_overlay(design_root)
 	_build_result_overlay()
 
 
 func _build_explosion_overlay(design_root: Control) -> void:
 	_explosion_overlay = GameExplosionOverlay.new()
 	design_root.add_child(_explosion_overlay)
+
+
+func _build_splash_overlay(design_root: Control) -> void:
+	_splash_overlay = BattleSplashOverlay.new()
+	_splash_overlay.finished.connect(_on_splash_finished)
+	design_root.add_child(_splash_overlay)
 
 
 func _build_result_overlay() -> void:
@@ -198,6 +210,8 @@ func _hide_all() -> void:
 		_countdown_label.visible = false
 	if _explosion_overlay:
 		_explosion_overlay.hide_overlay()
+	if _splash_overlay and not (game_manager and game_manager.is_awaiting_battle_splash()):
+		_splash_overlay.hide_overlay()
 	if _result_overlay:
 		_result_overlay.hide_overlay()
 	if result_panel:
@@ -213,6 +227,12 @@ func _sync_to_current_state() -> void:
 
 func _on_game_state_changed(from_state: String, to_state: String) -> void:
 	_current_state = to_state
+	if (
+		to_state == FSMGameStates.EXPLOSION
+		and game_manager
+		and game_manager.is_awaiting_battle_splash()
+	):
+		return
 	_hide_all()
 	match to_state:
 		FSMGameStates.PLAYER_CHOICE:
@@ -310,6 +330,8 @@ func _show_ready_to_start(from_state: String = "") -> void:
 func _should_show_time_progress() -> bool:
 	if game_manager == null or game_manager.session == null:
 		return false
+	if game_manager.session.is_overtime:
+		return false
 	return game_manager.session.match_cards_total > 1
 
 
@@ -375,7 +397,35 @@ func _show_explosion() -> void:
 	_explosion_overlay.show_for_player(player)
 
 
+func _on_battle_splash(kind: String, player: GamePlayer) -> void:
+	if _explosion_overlay:
+		_explosion_overlay.hide_overlay()
+	if _splash_overlay == null:
+		_on_splash_finished()
+		return
+	var title := ""
+	var body := ""
+	var splash_player: GamePlayer = null
+	if kind == GameSession.SPLASH_OVERTIME:
+		title = LocaleService.text("OVERTIME_TITLE")
+		body = LocaleService.text("OVERTIME_BODY")
+	else:
+		var player_name := ""
+		if player != null:
+			player_name = player.info.name
+			splash_player = player
+		title = LocaleService.textf("PLAYER_ELIMINATED", [player_name])
+	_splash_overlay.show_splash(title, body, splash_player)
+
+
+func _on_splash_finished() -> void:
+	if game_manager:
+		game_manager.finish_battle_splash()
+
+
 func _show_result() -> void:
+	if _splash_overlay:
+		_splash_overlay.hide_overlay()
 	if not _result_overlay or not game_manager:
 		return
 	var sorted := game_manager.session.get_sorted_results()

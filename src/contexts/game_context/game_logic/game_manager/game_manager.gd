@@ -9,6 +9,8 @@ var states: Array[StateBase] = []
 var _session_ready: bool = false
 var _paused: bool = false
 var _account: PDataAccount = null
+var _awaiting_splash: bool = false
+var _pending_post_explosion_event: String = ""
 
 
 func _ready() -> void:
@@ -27,6 +29,8 @@ func setup_session(game_config: GameConfig, account: PDataAccount) -> void:
 	_account = account
 	session.setup(game_config, game_events, account)
 	_session_ready = true
+	_awaiting_splash = false
+	_pending_post_explosion_event = ""
 	if fsm == null:
 		_start_fsm()
 	set_process(true)
@@ -46,13 +50,13 @@ func set_paused(paused: bool) -> void:
 
 
 func resync_players_from_account(account: PDataAccount) -> void:
-	if not _session_ready or not account:
+	if not _session_ready or not account or session.is_overtime:
 		return
 	session.resync_players_from_account(account)
 
 
 func resync_players_from_entries(entries: Array) -> void:
-	if not _session_ready:
+	if not _session_ready or session.is_overtime:
 		return
 	var roster_account := PDataAccount.new()
 	roster_account.set_players(entries.duplicate(true))
@@ -228,6 +232,10 @@ func continue_emergency(player_index: int) -> void:
 	if session.is_tutorial:
 		call_deferred("_deferred_tutorial_scripted_explosion")
 		return
+	if player_index < 0 or player_index >= session.players.size():
+		player_index = session.current_player_index
+	elif not session.players[player_index].is_active:
+		player_index = session.current_player_index
 	session.set_current_player_index(player_index)
 	session.try_add_bonus_bomb_time()
 	if session.bomb_is_alerted and game_events:
@@ -262,19 +270,84 @@ func _process_play(delta: float) -> void:
 
 
 func _process_explosion(delta: float) -> void:
+	if _awaiting_splash:
+		return
 	if session.update_explosion(delta):
 		_on_explosion_finished()
 
 
 func _on_explosion_finished() -> void:
+	if _awaiting_splash:
+		return
+	if session.is_tutorial:
+		_finish_tutorial_explosion()
+		return
+	if session.is_overtime:
+		_finish_overtime_explosion()
+		return
+	if session.next_card():
+		session.next_player()
+		session.reset_round()
+		fsm.add_event(FSMGameEvents.EXPLOSION_DONE)
+		return
+	if session.has_unique_leader():
+		fsm.add_event(FSMGameEvents.MATCH_END)
+		return
+	session.enter_overtime()
+	session.ensure_overtime_card()
+	session.next_player()
+	session.reset_round()
+	_queue_post_explosion(FSMGameEvents.EXPLOSION_DONE, GameSession.SPLASH_OVERTIME, null)
+
+
+func _finish_tutorial_explosion() -> void:
 	if session.next_card():
 		session.next_player()
 		session.reset_round()
 		fsm.add_event(FSMGameEvents.EXPLOSION_DONE)
 	else:
-		if session.is_tutorial:
-			session.apply_tutorial_final_scores()
+		session.apply_tutorial_final_scores()
 		fsm.add_event(FSMGameEvents.MATCH_END)
+
+
+func _finish_overtime_explosion() -> void:
+	var exploded := session.get_current_player()
+	session.eliminate_player(exploded)
+	if session.active_count() <= 1:
+		_queue_post_explosion(FSMGameEvents.MATCH_END, GameSession.SPLASH_ELIMINATED, exploded)
+		return
+	session.ensure_overtime_card()
+	session.next_player()
+	session.reset_round()
+	_queue_post_explosion(FSMGameEvents.EXPLOSION_DONE, GameSession.SPLASH_ELIMINATED, exploded)
+
+
+func _queue_post_explosion(event: String, splash_kind: String, player: GamePlayer) -> void:
+	_pending_post_explosion_event = event
+	if splash_kind.is_empty() or game_events == null:
+		_emit_pending_post_explosion()
+		return
+	_awaiting_splash = true
+	game_events.ev_battle_splash.emit(splash_kind, player)
+
+
+func finish_battle_splash() -> void:
+	if not _awaiting_splash:
+		return
+	_awaiting_splash = false
+	_emit_pending_post_explosion()
+
+
+func is_awaiting_battle_splash() -> bool:
+	return _awaiting_splash
+
+
+func _emit_pending_post_explosion() -> void:
+	var event := _pending_post_explosion_event
+	_pending_post_explosion_event = ""
+	if event.is_empty() or fsm == null:
+		return
+	fsm.add_event(event)
 
 
 func _get_tutorial_round_index() -> int:

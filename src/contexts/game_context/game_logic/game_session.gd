@@ -1,6 +1,10 @@
 class_name GameSession
 extends RefCounted
 
+const SPLASH_OVERTIME := "overtime"
+const SPLASH_ELIMINATED := "eliminated"
+const _STILL_IN := 1_000_000
+
 var game_config: GameConfig
 var game_events: GameEvents
 var players: Array[GamePlayer] = []
@@ -20,7 +24,9 @@ var explosion_duration: float = 0.0
 var explosion_is_countdown: bool = false
 var match_cards_total: int = 0
 var is_tutorial: bool = false
+var is_overtime: bool = false
 var _deck_game_time_minutes: int = -1
+var _knockout_seq: int = 0
 
 
 func setup(p_config: GameConfig, p_events: GameEvents, account: PDataAccount) -> void:
@@ -36,19 +42,28 @@ func setup(p_config: GameConfig, p_events: GameEvents, account: PDataAccount) ->
 		players.append(GamePlayer.new(info, i))
 
 	rebuild_card_deck(account.get_game_time_minutes())
+	is_overtime = false
+	_knockout_seq = 0
 	current_player_index = randi() % maxi(players.size(), 1)
 	max_rand_player_choices = 40 + randi() % maxi(players.size(), 1)
 	_emit_current_player()
 
 
 func resync_players_from_account(account: PDataAccount) -> void:
+	if is_overtime:
+		return
 	if players.is_empty():
 		setup(game_config, game_events, account)
 		return
 
 	var score_by_key: Dictionary = {}
+	var active_by_key: Dictionary = {}
+	var eliminated_by_key: Dictionary = {}
 	for player in players:
-		score_by_key[_player_key(player.info)] = player.score
+		var key := _player_key(player.info)
+		score_by_key[key] = player.score
+		active_by_key[key] = player.is_active
+		eliminated_by_key[key] = player.eliminated_at
 
 	var current_key := _player_key(get_current_player().info) if not players.is_empty() else ""
 	var previous_index := current_player_index
@@ -60,7 +75,10 @@ func resync_players_from_account(account: PDataAccount) -> void:
 	for i in account_players.size():
 		var info := account.player_info_from_dict(account_players[i])
 		var player := GamePlayer.new(info, i)
-		player.score = int(score_by_key.get(_player_key(info), 0))
+		var key := _player_key(info)
+		player.score = int(score_by_key.get(key, 0))
+		player.is_active = bool(active_by_key.get(key, true))
+		player.eliminated_at = int(eliminated_by_key.get(key, -1))
 		players.append(player)
 
 	if players.is_empty():
@@ -102,7 +120,7 @@ func _player_key(info: PlayerInfo) -> String:
 
 
 func rebuild_card_deck(game_time_minutes: int) -> void:
-	if is_tutorial:
+	if is_tutorial or is_overtime:
 		return
 	cards.clear()
 	current_card = null
@@ -111,7 +129,7 @@ func rebuild_card_deck(game_time_minutes: int) -> void:
 
 
 func ensure_card_deck_for_game_time(game_time_minutes: int) -> void:
-	if is_tutorial:
+	if is_tutorial or is_overtime:
 		return
 	if game_time_minutes == _deck_game_time_minutes and not cards.is_empty():
 		return
@@ -143,8 +161,12 @@ func apply_tutorial_deck(entries: Array) -> void:
 	current_card = null
 	is_tutorial = true
 	_deck_game_time_minutes = -1
+	is_overtime = false
+	_knockout_seq = 0
 	for player in players:
 		player.score = 0
+		player.is_active = true
+		player.eliminated_at = -1
 	for entry in entries:
 		cards.append(GameCard.new(str(entry["syllable"]), int(entry["condition"])))
 	match_cards_total = cards.size()
@@ -193,10 +215,14 @@ func set_current_player_index(index: int) -> void:
 
 
 func next_player() -> void:
-	if current_player_index >= players.size() - 1:
-		set_current_player_index(0)
-	else:
-		set_current_player_index(current_player_index + 1)
+	var count := players.size()
+	if count == 0:
+		return
+	for _step in count:
+		current_player_index = (current_player_index + 1) % count
+		if players[current_player_index].is_active:
+			break
+	_emit_current_player()
 	try_add_bonus_bomb_time()
 
 
@@ -244,20 +270,73 @@ func update_explosion(delta: float) -> bool:
 
 func next_card() -> bool:
 	if cards.is_empty():
-		if is_tutorial:
-			return false
-		var result := get_sorted_results()
-		if result.size() > 1 and result[0].score == result[1].score:
-			var random_index := randi() % game_config.cards.size()
-			cards.append(GameCard.new(game_config.cards[random_index], WordCondition.random()))
-			match_cards_total += 1
-		else:
-			return false
-
+		return false
 	current_card = cards.pop_front()
 	if game_events:
 		game_events.ev_card_changed.emit(current_card)
 	return true
+
+
+func ensure_overtime_card() -> bool:
+	if cards.is_empty():
+		_append_random_card()
+	return next_card()
+
+
+func _append_random_card() -> void:
+	if game_config == null or game_config.cards.is_empty():
+		return
+	var random_index := randi() % game_config.cards.size()
+	cards.append(GameCard.new(game_config.cards[random_index], WordCondition.random()))
+
+
+func get_min_score() -> int:
+	if players.is_empty():
+		return 0
+	var min_score := players[0].score
+	for player in players:
+		if player.score < min_score:
+			min_score = player.score
+	return min_score
+
+
+func has_unique_leader() -> bool:
+	if players.size() <= 1:
+		return true
+	var min_score := get_min_score()
+	var tied := 0
+	for player in players:
+		if player.score == min_score:
+			tied += 1
+			if tied > 1:
+				return false
+	return true
+
+
+func active_count() -> int:
+	var n := 0
+	for player in players:
+		if player.is_active:
+			n += 1
+	return n
+
+
+func enter_overtime() -> void:
+	is_overtime = true
+	_knockout_seq = 0
+	var min_score := get_min_score()
+	for player in players:
+		if player.score > min_score:
+			player.is_active = false
+			player.eliminated_at = 0
+
+
+func eliminate_player(player: GamePlayer) -> void:
+	if player == null or not player.is_active:
+		return
+	_knockout_seq += 1
+	player.is_active = false
+	player.eliminated_at = _knockout_seq
 
 
 func get_rounds_remaining() -> int:
@@ -277,9 +356,17 @@ func get_sorted_results() -> Array[GamePlayer]:
 	var result: Array[GamePlayer] = []
 	result.assign(players)
 	result.sort_custom(func(a: GamePlayer, b: GamePlayer) -> bool:
-		return a.score < b.score
+		if a.score != b.score:
+			return a.score < b.score
+		return _rank_eliminated_at(a) > _rank_eliminated_at(b)
 	)
 	return result
+
+
+func _rank_eliminated_at(player: GamePlayer) -> int:
+	if player.eliminated_at < 0:
+		return _STILL_IN
+	return player.eliminated_at
 
 
 func get_player_choice_index() -> int:

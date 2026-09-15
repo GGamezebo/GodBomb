@@ -6,7 +6,9 @@ alwaysApply: false
 
 # Бой
 
-**FSM:** choice → ready → countdown → play ⇄ **emergency** → explosion → ready|result. First card at countdown end if null. After boom: next_card→next_player→ready.
+**FSM:** choice → ready → countdown → play ⇄ **emergency** → explosion → ready|result. First card at countdown end if null. After boom: next_card→next_player→ready, or match end / overtime.
+
+**Overtime knockout:** deck empty after boom → unique min score = `result`. Tie on min → `enter_overtime()` (non-leaders `eliminated_at=0`), splash `OVERTIME_*`, roster button hidden, extra cards until one active. Each OT boom: +1 and out, splash `PLAYER_ELIMINATED`. Rank: score ASC, `eliminated_at` DESC (`GameSession.get_sorted_results`). Splash: `BattleSplashOverlay` via `ev_battle_splash`, hold `explosion` until tap/~3.5s. Tutorial skips OT.
 
 **UI init trap:** FSM starts in `initialize()` before child `_ready`. HUD + `game_input` MUST `_sync_to_current_state()` in `_ready`.
 
@@ -22,7 +24,7 @@ State UI: choice/ready/countdown/play share dial layout · ready=«Готовы?
 
 **Emergency:** `BattleEmergencyOverlay` + `EmergencyState` · `PlayerSelectionWidget.set_emergency_mode()` · `GameBattleChrome/EmergencyButton` · icon `icon_emergency.svg`.
 
-**Battle lobby overlay:** `BattlePlayerLobbyOverlay` — edit roster mid-game · Done = confirm if roster ok else click · reuses `PlayerSelectionWidget` + `StartActionButton`.
+**Battle lobby overlay:** `BattlePlayerLobbyOverlay` — edit roster mid-game · hidden/locked in overtime · Done = confirm if roster ok else click · reuses `PlayerSelectionWidget` + `StartActionButton`.
 
 **Visual:** `GameBombBackground` — player-color backdrop · `DisplayBomb`/`BombDialGlass` dial glass (`BombDialLayout` cover-scale 800@138,550) · hides with bomb on explosion/result · alert pulse · bomb flash/shake on explosion · `ExplosionEffect` · `GameResultOverlay` full-screen winner tint, rank scroll only, celebration particles.
 
@@ -30,4 +32,4 @@ State UI: choice/ready/countdown/play share dial layout · ready=«Готовы?
 
 **Core:** `game_manager.gd` `game_session.gd` `game_sound.gd` `word_condition.gd`
 
-**Match length:** deck size from `account.game_time_minutes` via `GameSession.rebuild_card_deck()` · refreshed on `setup_session`, `start_round`, and `ev_game_time_changed`.
+**Match length:** deck size from `account.game_time_minutes` via `GameSession.rebuild_card_deck()` · refreshed on `setup_session`, `start_round`, and `ev_game_time_changed`. OT does not rebuild the deck.

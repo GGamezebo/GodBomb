@@ -4,6 +4,8 @@ extends RefCounted
 var info: PlayerInfo
 var index: int
 var score: int = 0
+var is_active: bool = true
+var eliminated_at: int = -1
 
 
 func _init(p_info: PlayerInfo, p_index: int) -> void:

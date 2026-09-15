@@ -96,7 +96,8 @@ func _set_top_bar_mode(state: String, bar_visible: bool) -> void:
 	if exit_button:
 		exit_button.visible = bar_visible and state == FSMGameStates.READY_TO_START
 	if players_button:
-		players_button.visible = bar_visible and state == FSMGameStates.READY_TO_START
+		var overtime := game_manager != null and game_manager.session != null and game_manager.session.is_overtime
+		players_button.visible = bar_visible and state == FSMGameStates.READY_TO_START and not overtime
 	if emergency_button:
 		emergency_button.visible = bar_visible and state == FSMGameStates.PLAY
 	if not bar_visible or state != FSMGameStates.READY_TO_START:
@@ -169,6 +170,8 @@ func _finish_exit_to_menu() -> void:
 
 
 func _on_players_pressed() -> void:
+	if game_manager and game_manager.session and game_manager.session.is_overtime:
+		return
 	_set_players_overlay(not _players_overlay_open)
 
 

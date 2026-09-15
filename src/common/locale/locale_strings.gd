@@ -18,7 +18,7 @@ const RULES_TEXT_RU := """[font_size=36]Весёлая словесная игр
 Между раундами мелькает полоска — сколько партии ещё осталось.
 
 [font_size=40][b]Кто победил?[/b][/font_size]
-В конце — таблица результатов. Меньше штрафов — выше место.
+В конце — таблица результатов. Меньше штрафов — выше место. Если у нескольких игроков одинаковый минимум, основное время заканчивается и они играют на вылет: остальные выбывают, пока не останется один победитель. Кто продержался дольше при равных штрафах — выше в рейтинге.
 
 [font_size=40][b]Сбор игроков[/b][/font_size]
 От 2 до 12 человек. [b]+[/b] — добавить, перетащите слайм на соседа — сменить место, удержите 1,5 с — имя и цвет.
@@ -56,7 +56,7 @@ Every time is different: the timer is random. It may blow up right away or give 
 Between rounds a bar flashes — how much of the match is left.
 
 [font_size=40][b]Who wins?[/b][/font_size]
-At the end — a scoreboard. Fewer penalties — higher rank.
+At the end — a scoreboard. Fewer penalties — higher rank. If several players share the lowest score, regulation ends and they play knockout: everyone else is out until one winner remains. Among equal scores, whoever lasted longer ranks higher.
 
 [font_size=40][b]Gathering players[/b][/font_size]
 2 to 12 people. [b]+[/b] to add, drag a slime onto a neighbor to swap seats, hold 1.5 s for name and color.
@@ -154,6 +154,9 @@ const _RU: Dictionary = {
 	"ONBOARDING_DONE_BODY": "Теперь вы знаете правила Тик-Так-Бадабум. Соберите друзей и играйте!",
 	"TUTORIAL_PLAY_BODY": "Слог «%s» — %s.\nПодойдут слова: %s.\nНапример: «%s».\n%s",
 	"TUTORIAL_EXPLOSION": "%s не успел(а) придумать слово — бомба взорвалась.",
+	"OVERTIME_TITLE": "Основное время истекло",
+	"OVERTIME_BODY": "Игру продолжают игроки с одинаковым наименьшим числом штрафов. Остальные выбывают.",
+	"PLAYER_ELIMINATED": "%s выбывает из игры",
 }
 
 const _EN: Dictionary = {
@@ -233,6 +236,9 @@ const _EN: Dictionary = {
 	"ONBOARDING_DONE_BODY": "Now you know the rules of Tic-Tac-Bada-Boom. Gather friends and play!",
 	"TUTORIAL_PLAY_BODY": "Syllable «%s» — %s.\nWords like: %s.\nFor example: «%s».\n%s",
 	"TUTORIAL_EXPLOSION": "%s ran out of time — the bomb exploded.",
+	"OVERTIME_TITLE": "Regulation time is over",
+	"OVERTIME_BODY": "Players tied for the fewest penalties continue. Everyone else is out.",
+	"PLAYER_ELIMINATED": "%s is out of the game",
 }
 
 const _SLIME_RU: Array[String] = [

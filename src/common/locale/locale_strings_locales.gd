@@ -12,7 +12,7 @@ Izgovori reč naglas i kratko tapni ekran da predaš bombu sledećem.
 Tajmer je skriven i nasumičan: nekad eksplodira odmah, nekad posle više krugova.
 
 [font_size=40][b]Ko pobeđuje?[/b][/font_size]
-Na kraju partije pobeđuje igrač sa najmanje kaznenih poena.
+Na kraju partije pobeđuje igrač sa najmanje kaznenih poena. Ako više igrača deli najmanji rezultat, igraju nokaut dok ne ostane jedan pobednik.
 
 [center][font_size=40][b]Srećno![/b][/font_size][/center]"""
 
@@ -27,7 +27,7 @@ Di una palabra en voz alta y toca rápido la pantalla para pasar la bomba.
 El temporizador es oculto y aleatorio. Puede explotar enseguida o tardar varios turnos.
 
 [font_size=40][b]¿Quién gana?[/b][/font_size]
-Al final gana quien tenga menos penalizaciones.
+Al final gana quien tenga menos penalizaciones. Si varios empatan a menos puntos, juegan a eliminación hasta que quede un ganador.
 
 [center][font_size=40][b]¡A jugar![/b][/font_size][/center]"""
 
@@ -42,7 +42,7 @@ const RULES_TEXT_HI := """[font_size=36]एक स्क्रीन पर ख�
 टाइमर छुपा और रैंडम है। कभी तुरंत, कभी कई टर्न बाद।
 
 [font_size=40][b]कौन जीतेगा?[/b][/font_size]
-मैच के अंत में सबसे कम पेनल्टी वाला खिलाड़ी जीतता है।
+मैच के अंत में सबसे कम पेनल्टी वाला खिलाड़ी जीतता है। अगर कई खिलाड़ियों का स्कोर एक जैसा सबसे कम है, तो वे नॉकआउट खेलते हैं जब तक एक विजेता न रह जाए।
 
 [center][font_size=40][b]मज़े से खेलिए![/b][/font_size][/center]"""
 
@@ -57,7 +57,7 @@ Sag ein Wort laut und tippe kurz auf den Bildschirm, um die Bombe weiterzugeben.
 Der Timer ist versteckt und zufällig. Manchmal sofort, manchmal erst nach vielen Zügen.
 
 [font_size=40][b]Wer gewinnt?[/b][/font_size]
-Am Ende gewinnt, wer die wenigsten Strafpunkte hat.
+Am Ende gewinnt, wer die wenigsten Strafpunkte hat. Bei Gleichstand der Besten geht es im K.-o.-Modus weiter, bis ein Sieger bleibt.
 
 [center][font_size=40][b]Viel Spaß![/b][/font_size][/center]"""
 
@@ -75,7 +75,7 @@ Dis un mot à voix haute puis touche vite l'écran pour passer la bombe.
 Le minuteur est caché et aléatoire: parfois immédiat, parfois après plusieurs tours.
 
 [font_size=40][b]Qui gagne ?[/b][/font_size]
-Le joueur avec le moins de pénalités gagne.
+Le joueur avec le moins de pénalités gagne. En cas d'égalité pour la première place, les joueurs à égalité jouent à l'élimination jusqu'à un vainqueur.
 
 [center][font_size=40][b]Bonne partie ![/b][/font_size][/center]"""
 
@@ -93,7 +93,7 @@ Pronuncia una parola ad alta voce e tocca velocemente lo schermo per passare la 
 Il timer è nascosto e casuale: a volte subito, a volte dopo molti turni.
 
 [font_size=40][b]Chi vince?[/b][/font_size]
-Vince chi ha meno penalità.
+Vince chi ha meno penalità. Se più giocatori sono a pari punti in testa, continuano a eliminazione fino a un solo vincitore.
 
 [center][font_size=40][b]Buon divertimento![/b][/font_size][/center]"""
 
@@ -172,6 +172,9 @@ const _SR: Dictionary = {
 	"ONBOARDING_DONE_BODY": "Sada znaš pravila igre Tik-Tak-Bada-Bum. Okupi društvo i igraj!",
 	"TUTORIAL_PLAY_BODY": "Slog «%s» — %s.\nOdgovaraju reči: %s.\nNa primer: «%s».\n%s",
 	"TUTORIAL_EXPLOSION": "%s nije stigao/la da smisli reč — bomba je eksplodirala.",
+	"OVERTIME_TITLE": "Osnovno vreme je isteklo",
+	"OVERTIME_BODY": "Igru nastavljaju igrači sa jednako najmanje kaznenih poena. Ostali ispadaju.",
+	"PLAYER_ELIMINATED": "%s ispada iz igre",
 }
 
 const _ES: Dictionary = {
@@ -249,6 +252,9 @@ const _ES: Dictionary = {
 	"ONBOARDING_DONE_BODY": "Ahora conoces las reglas de Tic-Tac-Bada-Boum. ¡Reúne a tus amigos y juega!",
 	"TUTORIAL_PLAY_BODY": "Sílaba «%s» — %s.\nPalabras válidas: %s.\nPor ejemplo: «%s».\n%s",
 	"TUTORIAL_EXPLOSION": "%s se quedó sin tiempo para decir una palabra — la bomba explotó.",
+	"OVERTIME_TITLE": "Se acabó el tiempo reglamentario",
+	"OVERTIME_BODY": "Siguen los jugadores empatados con menos penalizaciones. El resto queda eliminado.",
+	"PLAYER_ELIMINATED": "%s queda eliminado",
 }
 
 const _HI: Dictionary = {
@@ -326,6 +332,9 @@ const _HI: Dictionary = {
 	"ONBOARDING_DONE_BODY": "अब आपको टिक-टैक-बादाबूम के नियम पता हैं। दोस्तों को बुलाइए और खेलिए!",
 	"TUTORIAL_PLAY_BODY": "सिलेबल «%s» — %s.\nमान्य शब्द: %s.\nउदाहरण: «%s».\n%s",
 	"TUTORIAL_EXPLOSION": "%s समय पर शब्द नहीं बोल पाया/पाई — बम फट गया।",
+	"OVERTIME_TITLE": "मुख्य समय समाप्त",
+	"OVERTIME_BODY": "सबसे कम पेनल्टी पर बराबरी वाले खिलाड़ी खेलते रहेंगे। बाकी बाहर।",
+	"PLAYER_ELIMINATED": "%s खेल से बाहर",
 }
 
 const _DE: Dictionary = {
@@ -403,6 +412,9 @@ const _DE: Dictionary = {
 	"ONBOARDING_DONE_BODY": "Jetzt kennst du die Regeln von Tic-Tac-Bada-Bumm. Viel Spaß mit Freunden!",
 	"TUTORIAL_PLAY_BODY": "Silbe «%s» — %s.\nPassende Wörter: %s.\nZum Beispiel: «%s».\n%s",
 	"TUTORIAL_EXPLOSION": "%s war zu langsam mit einem Wort — die Bombe ist explodiert.",
+	"OVERTIME_TITLE": "Die reguläre Zeit ist vorbei",
+	"OVERTIME_BODY": "Spieler mit den wenigsten Strafpunkten spielen weiter. Alle anderen scheiden aus.",
+	"PLAYER_ELIMINATED": "%s scheidet aus",
 }
 
 const _FR: Dictionary = {
@@ -480,6 +492,9 @@ const _FR: Dictionary = {
 	"ONBOARDING_DONE_BODY": "Vous connaissez maintenant les règles de Tic-Tac-Bada-Boum. Amusez-vous !",
 	"TUTORIAL_PLAY_BODY": "Syllabe «%s» — %s.\nMots valides: %s.\nPar exemple: «%s».\n%s",
 	"TUTORIAL_EXPLOSION": "%s n'a pas trouvé de mot à temps — la bombe a explosé.",
+	"OVERTIME_TITLE": "Temps réglementaire écoulé",
+	"OVERTIME_BODY": "Les joueurs à égalité avec le moins de pénalités continuent. Les autres sont éliminés.",
+	"PLAYER_ELIMINATED": "%s est éliminé",
 }
 
 const _IT: Dictionary = {
@@ -557,6 +572,9 @@ const _IT: Dictionary = {
 	"ONBOARDING_DONE_BODY": "Ora conosci le regole di Tic-Tac-Bada-Bomba. Invita gli amici e gioca!",
 	"TUTORIAL_PLAY_BODY": "Sillaba «%s» — %s.\nParole valide: %s.\nPer esempio: «%s».\n%s",
 	"TUTORIAL_EXPLOSION": "%s non ha trovato una parola in tempo — la bomba è esplosa.",
+	"OVERTIME_TITLE": "Tempo regolamentare scaduto",
+	"OVERTIME_BODY": "Continuano i giocatori in parità con meno penalità. Gli altri sono eliminati.",
+	"PLAYER_ELIMINATED": "%s è eliminato",
 }
 
 const SLIME_SR: Array[String] = [

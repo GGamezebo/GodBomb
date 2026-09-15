@@ -53,6 +53,7 @@ var _hold_edit_hint_showing: bool = false
 var _battle_mode: bool = false
 var _emergency_mode: bool = false
 var _emergency_selected_index: int = 0
+var _emergency_selectable: Array[bool] = []
 var listener: EventListener = EventListener.new()
 
 signal emergency_selection_changed(index: int, info: PlayerInfo)
@@ -178,7 +179,7 @@ func set_emergency_mode(enabled: bool, initial_index: int = 0) -> void:
 	if _player_icons.is_empty():
 		_emergency_selected_index = 0
 	else:
-		_emergency_selected_index = clampi(initial_index, 0, _player_icons.size() - 1)
+		_emergency_selected_index = _clamp_emergency_index(initial_index)
 	if enabled:
 		_set_remove_mode(false)
 	_apply_emergency_interaction_state()
@@ -191,10 +192,14 @@ func load_from_session_players(players: Array) -> void:
 	_clear_icons()
 	for player in players:
 		if player is GamePlayer:
+			_emergency_selectable.append(player.is_active)
 			_create_player_icon(player.info)
+	_apply_emergency_eliminated_visuals()
 	_schedule_position_update()
 	if _emergency_mode:
+		_emergency_selected_index = _clamp_emergency_index(_emergency_selected_index)
 		_apply_emergency_interaction_state()
+		_apply_emergency_eliminated_visuals()
 		_apply_emergency_selection_visuals()
 		_emit_emergency_selection()
 
@@ -394,6 +399,7 @@ func _clear_icons() -> void:
 	_chairs.clear()
 	_chair_rings.clear()
 	_order_badges.clear()
+	_emergency_selectable.clear()
 
 
 func _create_player_icon(info: PlayerInfo) -> PlayerIcon:
@@ -1251,7 +1257,7 @@ func _on_icon_emergency_selected(icon: PlayerIcon) -> void:
 	if not _emergency_mode:
 		return
 	var index := _player_icons.find(icon)
-	if index < 0:
+	if index < 0 or not _is_emergency_selectable(index):
 		return
 	_emergency_selected_index = index
 	_apply_emergency_selection_visuals()
@@ -1262,5 +1268,35 @@ func _on_icon_emergency_selected(icon: PlayerIcon) -> void:
 func _emit_emergency_selection() -> void:
 	if not _emergency_mode or _emergency_selected_index < 0 or _emergency_selected_index >= _player_icons.size():
 		return
+	if not _is_emergency_selectable(_emergency_selected_index):
+		return
 	var info := _player_icons[_emergency_selected_index].get_player_info()
 	emergency_selection_changed.emit(_emergency_selected_index, info)
+
+
+func _is_emergency_selectable(index: int) -> bool:
+	if index < 0 or index >= _emergency_selectable.size():
+		return true
+	return _emergency_selectable[index]
+
+
+func _clamp_emergency_index(index: int) -> int:
+	var clamped := clampi(index, 0, maxi(_player_icons.size() - 1, 0))
+	if _is_emergency_selectable(clamped):
+		return clamped
+	for i in _player_icons.size():
+		if _is_emergency_selectable(i):
+			return i
+	return clamped
+
+
+func _apply_emergency_eliminated_visuals() -> void:
+	var dim := Color(0.45, 0.45, 0.45, 0.5)
+	for i in _player_icons.size():
+		var selectable := _is_emergency_selectable(i)
+		_player_icons[i].modulate = Color.WHITE if selectable else dim
+		if i < _chairs.size():
+			_chairs[i].modulate = Color.WHITE if selectable else dim
+		_player_icons[i].mouse_filter = (
+			Control.MOUSE_FILTER_STOP if selectable else Control.MOUSE_FILTER_IGNORE
+		)
