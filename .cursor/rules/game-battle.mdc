@@ -8,7 +8,7 @@ alwaysApply: false
 
 **FSM:** choice → ready → countdown → play ⇄ **emergency** → explosion → ready|result. First card at countdown end if null. After boom: next_card→next_player→ready, or match end / overtime.
 
-**Overtime knockout:** deck empty after boom → unique min score = `result`. Tie on min → `enter_overtime()` (non-leaders `eliminated_at=0`), splash `OVERTIME_*`, roster button hidden, extra cards until one active. Each OT boom: +1 and out, splash `PLAYER_ELIMINATED`. Rank: score ASC, `eliminated_at` DESC (`GameSession.get_sorted_results`). Splash: `BattleSplashOverlay` via `ev_battle_splash`, hold `explosion` until tap/~3.5s. Tutorial skips OT.
+**Overtime knockout:** deck empty after boom → unique min score = `result`. Tie on min → `enter_overtime()` (non-leaders `eliminated_at=0`), splash `OVERTIME_*` with remaining/out leaderboard rows (`GameResultOverlay.build_rank_row`), roster button hidden, extra cards until one active. Each OT boom: +1 and out, splash `PLAYER_ELIMINATED`. Rank: score ASC, `eliminated_at` DESC. Splash: `BattleSplashOverlay` via `ev_battle_splash`, hold `explosion` until tap/~8s board or ~3.5s knockout. Tutorial skips OT.
 
 **UI init trap:** FSM starts in `initialize()` before child `_ready`. HUD + `game_input` MUST `_sync_to_current_state()` in `_ready`.
 

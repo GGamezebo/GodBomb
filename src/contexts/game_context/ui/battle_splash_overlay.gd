@@ -7,17 +7,31 @@ const DESIGN_SIZE := Vector2(1080.0, 1920.0)
 const CONTENT_WIDTH_MARGIN := 200.0
 const CONTENT_ANCHOR := Vector2(540.0, 930.0)
 const SHOW_DURATION := 3.5
+const BOARD_DURATION := 8.0
 const PLAYER_PILL_SCALE := 1.45
+const BOARD_TOP := 168.0
+const BOARD_BOTTOM := 120.0
 
 var _headline: Label
 var _body: Label
 var _player_strip: GamePlayerStrip
 var _pill_host: CenterContainer
+var _elimination_block: VBoxContainer
+var _board_block: VBoxContainer
+var _board_title: Label
+var _board_body: Label
+var _remaining_title: Label
+var _eliminated_title: Label
+var _remaining_list: VBoxContainer
+var _eliminated_list: VBoxContainer
+var _eliminated_section: VBoxContainer
+var _board_scroll: ScrollContainer
 var _content_col: VBoxContainer
 var _margin_host: MarginContainer
 var _position_host: Control
 var _token: int = 0
 var _closing: bool = false
+var _board_mode: bool = false
 
 
 func _ready() -> void:
@@ -54,14 +68,30 @@ func _build_ui() -> void:
 
 	_content_col = VBoxContainer.new()
 	_content_col.alignment = BoxContainer.ALIGNMENT_CENTER
-	_content_col.add_theme_constant_override("separation", 28)
+	_content_col.add_theme_constant_override("separation", 24)
 	_position_host.add_child(_content_col)
 
+	_elimination_block = VBoxContainer.new()
+	_elimination_block.alignment = BoxContainer.ALIGNMENT_CENTER
+	_elimination_block.add_theme_constant_override("separation", 28)
+	_content_col.add_child(_elimination_block)
+	_build_elimination_block(_elimination_block)
+
+	_board_block = VBoxContainer.new()
+	_board_block.visible = false
+	_board_block.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_board_block.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_board_block.add_theme_constant_override("separation", 18)
+	_content_col.add_child(_board_block)
+	_build_board_block(_board_block)
+
+
+func _build_elimination_block(host: VBoxContainer) -> void:
 	var headline_wrap := MarginContainer.new()
 	headline_wrap.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	headline_wrap.add_theme_constant_override("margin_left", 12)
 	headline_wrap.add_theme_constant_override("margin_right", 12)
-	_content_col.add_child(headline_wrap)
+	host.add_child(headline_wrap)
 
 	_headline = Label.new()
 	_headline.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -77,7 +107,7 @@ func _build_ui() -> void:
 	_pill_host = CenterContainer.new()
 	_pill_host.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	_pill_host.visible = false
-	_content_col.add_child(_pill_host)
+	host.add_child(_pill_host)
 
 	_player_strip = GamePlayerStrip.new()
 	_player_strip.set_visual_scale(PLAYER_PILL_SCALE)
@@ -87,7 +117,7 @@ func _build_ui() -> void:
 	body_wrap.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	body_wrap.add_theme_constant_override("margin_left", 16)
 	body_wrap.add_theme_constant_override("margin_right", 16)
-	_content_col.add_child(body_wrap)
+	host.add_child(body_wrap)
 
 	_body = Label.new()
 	_body.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -98,6 +128,68 @@ func _build_ui() -> void:
 	_body.add_theme_color_override("font_outline_color", Color(0.1, 0.06, 0.04, 0.82))
 	_body.add_theme_constant_override("outline_size", 4)
 	body_wrap.add_child(_body)
+
+
+func _build_board_block(host: VBoxContainer) -> void:
+	_board_title = Label.new()
+	_board_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_board_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_board_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_board_title.add_theme_font_size_override("font_size", 52)
+	_board_title.add_theme_color_override("font_color", Color(0.99, 0.96, 0.9, 1.0))
+	_board_title.add_theme_color_override("font_outline_color", Color(0.04, 0.03, 0.02, 0.88))
+	_board_title.add_theme_constant_override("outline_size", 7)
+	host.add_child(_board_title)
+
+	_board_body = Label.new()
+	_board_body.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_board_body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_board_body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_board_body.add_theme_font_size_override("font_size", 30)
+	_board_body.add_theme_color_override("font_color", Color(0.96, 0.9, 0.82, 1.0))
+	_board_body.add_theme_color_override("font_outline_color", Color(0.1, 0.06, 0.04, 0.82))
+	_board_body.add_theme_constant_override("outline_size", 4)
+	host.add_child(_board_body)
+
+	_board_scroll = ScrollContainer.new()
+	_board_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_board_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_board_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_board_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
+	host.add_child(_board_scroll)
+
+	var lists := VBoxContainer.new()
+	lists.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	lists.add_theme_constant_override("separation", 22)
+	_board_scroll.add_child(lists)
+
+	var remaining_section := VBoxContainer.new()
+	remaining_section.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	remaining_section.add_theme_constant_override("separation", 12)
+	lists.add_child(remaining_section)
+
+	_remaining_title = GameResultOverlay.build_section_title(LocaleService.text("OVERTIME_STILL_IN"))
+	_remaining_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	remaining_section.add_child(_remaining_title)
+
+	_remaining_list = VBoxContainer.new()
+	_remaining_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_remaining_list.add_theme_constant_override("separation", 14)
+	remaining_section.add_child(_remaining_list)
+
+	_eliminated_section = VBoxContainer.new()
+	_eliminated_section.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_eliminated_section.add_theme_constant_override("separation", 12)
+	lists.add_child(_eliminated_section)
+
+	_eliminated_title = GameResultOverlay.build_section_title(LocaleService.text("OVERTIME_OUT"))
+	_eliminated_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_eliminated_section.add_child(_eliminated_title)
+
+	_eliminated_list = VBoxContainer.new()
+	_eliminated_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_eliminated_list.add_theme_constant_override("separation", 14)
+	_eliminated_section.add_child(_eliminated_list)
 
 
 func _gui_input(event: InputEvent) -> void:
@@ -115,9 +207,10 @@ func _gui_input(event: InputEvent) -> void:
 
 
 func show_splash(title: String, body: String, player: GamePlayer = null) -> void:
-	_closing = false
-	_token += 1
-	var token := _token
+	_board_mode = false
+	_elimination_block.visible = true
+	_board_block.visible = false
+	_content_col.alignment = BoxContainer.ALIGNMENT_CENTER
 	_headline.text = title
 	_body.text = body
 	_body.visible = not body.is_empty()
@@ -127,6 +220,50 @@ func show_splash(title: String, body: String, player: GamePlayer = null) -> void
 		_pill_host.visible = true
 	else:
 		_pill_host.visible = false
+	_present(SHOW_DURATION)
+
+
+func show_overtime_board(
+	title: String,
+	body: String,
+	remaining: Array[GamePlayer],
+	eliminated: Array[GamePlayer]
+) -> void:
+	_board_mode = true
+	_elimination_block.visible = false
+	_board_block.visible = true
+	_content_col.alignment = BoxContainer.ALIGNMENT_BEGIN
+	_board_title.text = title
+	_board_body.text = body
+	_board_body.visible = not body.is_empty()
+	_remaining_title.text = LocaleService.text("OVERTIME_STILL_IN")
+	_eliminated_title.text = LocaleService.text("OVERTIME_OUT")
+	_fill_rank_list(_remaining_list, remaining, 1, true)
+	_fill_rank_list(_eliminated_list, eliminated, remaining.size() + 1, false)
+	_eliminated_section.visible = not eliminated.is_empty()
+	_present(BOARD_DURATION)
+
+
+func _fill_rank_list(
+	host: VBoxContainer,
+	players: Array[GamePlayer],
+	start_rank: int,
+	highlight: bool
+) -> void:
+	for child in host.get_children():
+		child.queue_free()
+	for i in players.size():
+		var row := GameResultOverlay.build_rank_row(start_rank + i, players[i], highlight, true)
+		row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		if not highlight:
+			row.modulate = Color(0.78, 0.78, 0.78, 1.0)
+		host.add_child(row)
+
+
+func _present(duration: float) -> void:
+	_closing = false
+	_token += 1
+	var token := _token
 	size = get_parent().size if get_parent() is Control else DESIGN_SIZE
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	visible = true
@@ -137,7 +274,7 @@ func show_splash(title: String, body: String, player: GamePlayer = null) -> void
 	tween.tween_property(self, "modulate:a", 1.0, 0.16).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
 	var tree := get_tree()
 	if tree:
-		tree.create_timer(SHOW_DURATION).timeout.connect(
+		tree.create_timer(duration).timeout.connect(
 			func() -> void:
 				if token == _token:
 					_finish(),
@@ -195,11 +332,38 @@ func _layout_content() -> void:
 	var content_width := _get_content_width()
 	_content_col.custom_minimum_size.x = content_width
 	_content_col.size.x = content_width
-	_content_col.reset_size()
-	var col_size := _content_col.get_combined_minimum_size()
-	col_size.x = content_width
-	_content_col.size = col_size
-	_content_col.position = Vector2(
-		(_position_host.size.x - content_width) * 0.5,
-		CONTENT_ANCHOR.y - col_size.y * 0.48
-	)
+	if _board_mode:
+		_margin_host.add_theme_constant_override("margin_top", int(BOARD_TOP))
+		_margin_host.add_theme_constant_override("margin_bottom", int(BOARD_BOTTOM))
+		var host_size := _position_host.size
+		_content_col.position = Vector2((host_size.x - content_width) * 0.5, 0.0)
+		_content_col.size = Vector2(content_width, host_size.y)
+		_content_col.custom_minimum_size = Vector2(content_width, host_size.y)
+		_fit_board_rows(content_width)
+	else:
+		_margin_host.add_theme_constant_override("margin_top", 0)
+		_margin_host.add_theme_constant_override("margin_bottom", 0)
+		_content_col.reset_size()
+		var col_size := _content_col.get_combined_minimum_size()
+		col_size.x = content_width
+		_content_col.size = col_size
+		_content_col.position = Vector2(
+			(_position_host.size.x - content_width) * 0.5,
+			CONTENT_ANCHOR.y - col_size.y * 0.48
+		)
+
+
+func _fit_board_rows(content_width: float) -> void:
+	if _board_scroll and _board_scroll.get_child_count() > 0:
+		var lists := _board_scroll.get_child(0) as Control
+		if lists:
+			lists.custom_minimum_size.x = content_width
+			lists.size.x = content_width
+	for host in [_remaining_list, _eliminated_list]:
+		if host == null:
+			continue
+		for child in host.get_children():
+			var row := child as Control
+			if row:
+				row.custom_minimum_size.x = content_width
+				row.size.x = content_width

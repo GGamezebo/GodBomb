@@ -409,6 +409,14 @@ func _on_battle_splash(kind: String, player: GamePlayer) -> void:
 	if kind == GameSession.SPLASH_OVERTIME:
 		title = LocaleService.text("OVERTIME_TITLE")
 		body = LocaleService.text("OVERTIME_BODY")
+		if game_manager and game_manager.session:
+			_splash_overlay.show_overtime_board(
+				title,
+				body,
+				game_manager.session.get_sorted_active(),
+				game_manager.session.get_sorted_eliminated()
+			)
+			return
 	else:
 		var player_name := ""
 		if player != null:

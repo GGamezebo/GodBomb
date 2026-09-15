@@ -100,7 +100,7 @@ func _build_ui() -> void:
 	winner_gap.size = winner_gap.custom_minimum_size
 	_root_layout.add_child(winner_gap)
 
-	_ranking_title = _build_section_title(LocaleService.text("RESULT_RANKING"))
+	_ranking_title = build_section_title(LocaleService.text("RESULT_RANKING"))
 	_ranking_title.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	_root_layout.add_child(_ranking_title)
 
@@ -212,18 +212,6 @@ func _build_winner_frame() -> PanelContainer:
 	return _winner_frame
 
 
-func _build_section_title(text: String) -> Label:
-	var label := Label.new()
-	label.text = text
-	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	label.add_theme_font_size_override("font_size", 34)
-	label.add_theme_color_override("font_color", Color(0.96, 0.88, 0.78, 0.92))
-	label.add_theme_color_override("font_outline_color", Color(0.05, 0.03, 0.02, 0.45))
-	label.add_theme_constant_override("outline_size", 2)
-	return label
-
-
 static func _winner_background_color(preset_id: int) -> Color:
 	return SlimeColors.get_color(preset_id).darkened(0.32)
 
@@ -291,11 +279,32 @@ func _clear_rank_rows() -> void:
 
 
 func _build_rank_row(rank: int, player: GamePlayer, is_winner: bool) -> PanelContainer:
+	return build_rank_row(rank, player, is_winner, false)
+
+
+static func build_section_title(text: String) -> Label:
+	var label := Label.new()
+	label.text = text
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.add_theme_font_size_override("font_size", 34)
+	label.add_theme_color_override("font_color", Color(0.96, 0.88, 0.78, 0.92))
+	label.add_theme_color_override("font_outline_color", Color(0.05, 0.03, 0.02, 0.45))
+	label.add_theme_constant_override("outline_size", 2)
+	return label
+
+
+static func build_rank_row(
+	rank: int,
+	player: GamePlayer,
+	highlight: bool,
+	visible_now: bool = false
+) -> PanelContainer:
 	var row_panel := PanelContainer.new()
 	row_panel.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(1.0, 0.99, 0.97, 0.34 if is_winner else 0.28)
-	style.border_color = Color(0.88, 0.62, 0.38, 0.55) if is_winner else Color(1.0, 1.0, 1.0, 0.22)
+	style.bg_color = Color(1.0, 0.99, 0.97, 0.34 if highlight else 0.28)
+	style.border_color = Color(0.88, 0.62, 0.38, 0.55) if highlight else Color(1.0, 1.0, 1.0, 0.22)
 	style.set_border_width_all(2)
 	style.set_corner_radius_all(28)
 	style.shadow_color = Color(0.05, 0.03, 0.02, 0.16)
@@ -317,7 +326,7 @@ func _build_rank_row(rank: int, player: GamePlayer, is_winner: bool) -> PanelCon
 	var rank_badge := PanelContainer.new()
 	rank_badge.custom_minimum_size = Vector2(56.0, 56.0)
 	var badge_style := StyleBoxFlat.new()
-	badge_style.bg_color = Color(0.88, 0.62, 0.38, 0.92 if is_winner else 0.82)
+	badge_style.bg_color = Color(0.88, 0.62, 0.38, 0.92 if highlight else 0.82)
 	badge_style.set_corner_radius_all(28)
 	rank_badge.add_theme_stylebox_override("panel", badge_style)
 	var badge_center := CenterContainer.new()
@@ -359,7 +368,7 @@ func _build_rank_row(rank: int, player: GamePlayer, is_winner: bool) -> PanelCon
 	score_label.add_theme_color_override("font_color", Color(0.96, 0.9, 0.82, 0.92))
 	row.add_child(score_label)
 
-	row_panel.modulate.a = 0.0
+	row_panel.modulate.a = 1.0 if visible_now else 0.0
 	return row_panel
 
 

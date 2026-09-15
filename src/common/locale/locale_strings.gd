@@ -156,6 +156,8 @@ const _RU: Dictionary = {
 	"TUTORIAL_EXPLOSION": "%s не успел(а) придумать слово — бомба взорвалась.",
 	"OVERTIME_TITLE": "Основное время истекло",
 	"OVERTIME_BODY": "Игру продолжают игроки с одинаковым наименьшим числом штрафов. Остальные выбывают.",
+	"OVERTIME_STILL_IN": "ОСТАЮТСЯ",
+	"OVERTIME_OUT": "ВЫБЫЛИ",
 	"PLAYER_ELIMINATED": "%s выбывает из игры",
 }
 
@@ -238,6 +240,8 @@ const _EN: Dictionary = {
 	"TUTORIAL_EXPLOSION": "%s ran out of time — the bomb exploded.",
 	"OVERTIME_TITLE": "Regulation time is over",
 	"OVERTIME_BODY": "Players tied for the fewest penalties continue. Everyone else is out.",
+	"OVERTIME_STILL_IN": "STILL IN",
+	"OVERTIME_OUT": "OUT",
 	"PLAYER_ELIMINATED": "%s is out of the game",
 }
 

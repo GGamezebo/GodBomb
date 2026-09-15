@@ -363,6 +363,22 @@ func get_sorted_results() -> Array[GamePlayer]:
 	return result
 
 
+func get_sorted_active() -> Array[GamePlayer]:
+	var result: Array[GamePlayer] = []
+	for player in get_sorted_results():
+		if player.is_active:
+			result.append(player)
+	return result
+
+
+func get_sorted_eliminated() -> Array[GamePlayer]:
+	var result: Array[GamePlayer] = []
+	for player in get_sorted_results():
+		if not player.is_active:
+			result.append(player)
+	return result
+
+
 func _rank_eliminated_at(player: GamePlayer) -> int:
 	if player.eliminated_at < 0:
 		return _STILL_IN

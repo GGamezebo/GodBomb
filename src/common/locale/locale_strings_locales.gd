@@ -174,6 +174,8 @@ const _SR: Dictionary = {
 	"TUTORIAL_EXPLOSION": "%s nije stigao/la da smisli reč — bomba je eksplodirala.",
 	"OVERTIME_TITLE": "Osnovno vreme je isteklo",
 	"OVERTIME_BODY": "Igru nastavljaju igrači sa jednako najmanje kaznenih poena. Ostali ispadaju.",
+	"OVERTIME_STILL_IN": "OSTAJU",
+	"OVERTIME_OUT": "ISPALI",
 	"PLAYER_ELIMINATED": "%s ispada iz igre",
 }
 
@@ -254,6 +256,8 @@ const _ES: Dictionary = {
 	"TUTORIAL_EXPLOSION": "%s se quedó sin tiempo para decir una palabra — la bomba explotó.",
 	"OVERTIME_TITLE": "Se acabó el tiempo reglamentario",
 	"OVERTIME_BODY": "Siguen los jugadores empatados con menos penalizaciones. El resto queda eliminado.",
+	"OVERTIME_STILL_IN": "SIGUEN",
+	"OVERTIME_OUT": "ELIMINADOS",
 	"PLAYER_ELIMINATED": "%s queda eliminado",
 }
 
@@ -334,6 +338,8 @@ const _HI: Dictionary = {
 	"TUTORIAL_EXPLOSION": "%s समय पर शब्द नहीं बोल पाया/पाई — बम फट गया।",
 	"OVERTIME_TITLE": "मुख्य समय समाप्त",
 	"OVERTIME_BODY": "सबसे कम पेनल्टी पर बराबरी वाले खिलाड़ी खेलते रहेंगे। बाकी बाहर।",
+	"OVERTIME_STILL_IN": "अभी खेल में",
+	"OVERTIME_OUT": "बाहर",
 	"PLAYER_ELIMINATED": "%s खेल से बाहर",
 }
 
@@ -414,6 +420,8 @@ const _DE: Dictionary = {
 	"TUTORIAL_EXPLOSION": "%s war zu langsam mit einem Wort — die Bombe ist explodiert.",
 	"OVERTIME_TITLE": "Die reguläre Zeit ist vorbei",
 	"OVERTIME_BODY": "Spieler mit den wenigsten Strafpunkten spielen weiter. Alle anderen scheiden aus.",
+	"OVERTIME_STILL_IN": "NOCH DABEI",
+	"OVERTIME_OUT": "AUSGESCHIEDEN",
 	"PLAYER_ELIMINATED": "%s scheidet aus",
 }
 
@@ -494,6 +502,8 @@ const _FR: Dictionary = {
 	"TUTORIAL_EXPLOSION": "%s n'a pas trouvé de mot à temps — la bombe a explosé.",
 	"OVERTIME_TITLE": "Temps réglementaire écoulé",
 	"OVERTIME_BODY": "Les joueurs à égalité avec le moins de pénalités continuent. Les autres sont éliminés.",
+	"OVERTIME_STILL_IN": "ENCORE EN JEU",
+	"OVERTIME_OUT": "ÉLIMINÉS",
 	"PLAYER_ELIMINATED": "%s est éliminé",
 }
 
@@ -574,6 +584,8 @@ const _IT: Dictionary = {
 	"TUTORIAL_EXPLOSION": "%s non ha trovato una parola in tempo — la bomba è esplosa.",
 	"OVERTIME_TITLE": "Tempo regolamentare scaduto",
 	"OVERTIME_BODY": "Continuano i giocatori in parità con meno penalità. Gli altri sono eliminati.",
+	"OVERTIME_STILL_IN": "ANCORA IN GIOCO",
+	"OVERTIME_OUT": "ELIMINATI",
 	"PLAYER_ELIMINATED": "%s è eliminato",
 }
 
