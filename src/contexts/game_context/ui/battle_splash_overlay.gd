@@ -6,11 +6,12 @@ signal finished
 const DESIGN_SIZE := Vector2(1080.0, 1920.0)
 const CONTENT_WIDTH_MARGIN := 200.0
 const CONTENT_ANCHOR := Vector2(540.0, 930.0)
-const SHOW_DURATION := 3.5
-const BOARD_DURATION := 8.0
 const PLAYER_PILL_SCALE := 1.45
 const BOARD_TOP := 168.0
-const BOARD_BOTTOM := 120.0
+const BOARD_BOTTOM := 232.0
+const CONTINUE_BUTTON_SIZE := Vector2(660.0, 180.0)
+const CONTINUE_BOTTOM_MARGIN := 72.0
+const START_ACTIVE_TEXTURE := "res://assets/party_kitchen/buttons/start_active.svg"
 
 var _headline: Label
 var _body: Label
@@ -32,6 +33,8 @@ var _position_host: Control
 var _token: int = 0
 var _closing: bool = false
 var _board_mode: bool = false
+var _continue_host: Control
+var _continue_button: StartActionButton
 
 
 func _ready() -> void:
@@ -84,6 +87,7 @@ func _build_ui() -> void:
 	_board_block.add_theme_constant_override("separation", 18)
 	_content_col.add_child(_board_block)
 	_build_board_block(_board_block)
+	_build_continue_button()
 
 
 func _build_elimination_block(host: VBoxContainer) -> void:
@@ -192,18 +196,44 @@ func _build_board_block(host: VBoxContainer) -> void:
 	_eliminated_section.add_child(_eliminated_list)
 
 
-func _gui_input(event: InputEvent) -> void:
-	if not visible or _closing:
-		return
-	var tapped := false
-	if event is InputEventScreenTouch:
-		tapped = (event as InputEventScreenTouch).pressed
-	elif event is InputEventMouseButton:
-		var mouse := event as InputEventMouseButton
-		tapped = mouse.pressed and mouse.button_index == MOUSE_BUTTON_LEFT
-	if tapped:
-		accept_event()
-		_finish()
+func _build_continue_button() -> void:
+	_continue_host = Control.new()
+	_continue_host.custom_minimum_size = CONTINUE_BUTTON_SIZE
+	_continue_host.size = CONTINUE_BUTTON_SIZE
+	_continue_host.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_continue_host.z_index = 4
+	add_child(_continue_host)
+
+	_continue_button = StartActionButton.new()
+	_continue_button.name = "ContinueButton"
+	_continue_button.custom_minimum_size = CONTINUE_BUTTON_SIZE
+	_continue_button.size = CONTINUE_BUTTON_SIZE
+	_continue_button.texture_normal = load(START_ACTIVE_TEXTURE) as Texture2D
+	_continue_button.ignore_texture_size = true
+	_continue_button.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
+	_continue_button.clip_contents = false
+	_continue_button.mouse_filter = Control.MOUSE_FILTER_STOP
+	_continue_button.enable_pulse = true
+	_continue_button.pressed.connect(_on_continue_pressed)
+	UiSounds.bind_button(_continue_button, &"confirm")
+	_continue_host.add_child(_continue_button)
+
+	var continue_label := Label.new()
+	continue_label.name = "ContinueLabel"
+	continue_label.text = LocaleService.text("EMERGENCY_CONTINUE")
+	continue_label.theme_type_variation = &"Hero"
+	continue_label.add_theme_font_size_override("font_size", 72)
+	continue_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	continue_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	continue_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_continue_button.add_child(continue_label)
+	_continue_button.action_text = LocaleService.text("EMERGENCY_CONTINUE")
+	_continue_button.set_pulse_active(false)
+	call_deferred("_layout_continue_button")
+
+
+func _on_continue_pressed() -> void:
+	_finish()
 
 
 func show_splash(title: String, body: String, player: GamePlayer = null) -> void:
@@ -220,7 +250,7 @@ func show_splash(title: String, body: String, player: GamePlayer = null) -> void
 		_pill_host.visible = true
 	else:
 		_pill_host.visible = false
-	_present(SHOW_DURATION)
+	_present()
 
 
 func show_overtime_board(
@@ -241,7 +271,7 @@ func show_overtime_board(
 	_fill_rank_list(_remaining_list, remaining, 1, true)
 	_fill_rank_list(_eliminated_list, eliminated, remaining.size() + 1, false)
 	_eliminated_section.visible = not eliminated.is_empty()
-	_present(BOARD_DURATION)
+	_present()
 
 
 func _fill_rank_list(
@@ -260,31 +290,28 @@ func _fill_rank_list(
 		host.add_child(row)
 
 
-func _present(duration: float) -> void:
+func _present() -> void:
 	_closing = false
 	_token += 1
-	var token := _token
 	size = get_parent().size if get_parent() is Control else DESIGN_SIZE
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	visible = true
 	modulate.a = 0.0
+	if _continue_button:
+		_continue_button.action_text = LocaleService.text("EMERGENCY_CONTINUE")
+		_continue_button.set_pulse_active(true)
+		_continue_button.call_deferred("refresh_label_layout")
 	_layout_content()
 	call_deferred("_layout_content")
 	var tween := create_tween()
 	tween.tween_property(self, "modulate:a", 1.0, 0.16).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
-	var tree := get_tree()
-	if tree:
-		tree.create_timer(duration).timeout.connect(
-			func() -> void:
-				if token == _token:
-					_finish(),
-			CONNECT_ONE_SHOT
-		)
 
 
 func hide_overlay() -> void:
 	_token += 1
 	_closing = false
+	if _continue_button:
+		_continue_button.set_pulse_active(false)
 	visible = false
 	modulate.a = 0.0
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -300,6 +327,8 @@ func _finish() -> void:
 	_closing = true
 	_token += 1
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if _continue_button:
+		_continue_button.set_pulse_active(false)
 	var tween := create_tween()
 	tween.tween_property(self, "modulate:a", 0.0, 0.14).set_trans(Tween.TRANS_SINE)
 	tween.tween_callback(_emit_finished)
@@ -342,7 +371,7 @@ func _layout_content() -> void:
 		_fit_board_rows(content_width)
 	else:
 		_margin_host.add_theme_constant_override("margin_top", 0)
-		_margin_host.add_theme_constant_override("margin_bottom", 0)
+		_margin_host.add_theme_constant_override("margin_bottom", int(BOARD_BOTTOM))
 		_content_col.reset_size()
 		var col_size := _content_col.get_combined_minimum_size()
 		col_size.x = content_width
@@ -351,6 +380,21 @@ func _layout_content() -> void:
 			(_position_host.size.x - content_width) * 0.5,
 			CONTENT_ANCHOR.y - col_size.y * 0.48
 		)
+	_layout_continue_button()
+
+
+func _layout_continue_button() -> void:
+	if _continue_host == null:
+		return
+	var host_size := size if size.x > 0.0 else DESIGN_SIZE
+	_continue_host.size = CONTINUE_BUTTON_SIZE
+	_continue_host.position = Vector2(
+		(host_size.x - CONTINUE_BUTTON_SIZE.x) * 0.5,
+		host_size.y - CONTINUE_BUTTON_SIZE.y - CONTINUE_BOTTOM_MARGIN
+	)
+	if _continue_button:
+		_continue_button.size = CONTINUE_BUTTON_SIZE
+		_continue_button.call_deferred("refresh_label_layout")
 
 
 func _fit_board_rows(content_width: float) -> void:

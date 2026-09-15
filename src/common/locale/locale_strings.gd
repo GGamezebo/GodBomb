@@ -15,7 +15,7 @@ const RULES_TEXT_RU := """[font_size=36]Весёлая словесная игр
 [font_size=40][b]Когда бум?[/b][/font_size]
 Каждый раз по-своему: таймер случайный. Может рвануть сразу, а может дать много кругов. Перед взрывом бомба предупреждает.
 
-Между раундами мелькает полоска — сколько партии ещё осталось.
+Между раундами видно, сколько минут ещё осталось до конца игры.
 
 [font_size=40][b]Кто победил?[/b][/font_size]
 В конце — таблица результатов. Меньше штрафов — выше место. Если у нескольких игроков одинаковый минимум, основное время заканчивается и они играют на вылет: остальные выбывают, пока не останется один победитель. Кто продержался дольше при равных штрафах — выше в рейтинге.
@@ -53,7 +53,7 @@ First, a lottery picks who goes first. Then «Ready?», countdown — and the ro
 [font_size=40][b]When does it boom?[/b][/font_size]
 Every time is different: the timer is random. It may blow up right away or give you many turns. The bomb warns you before exploding.
 
-Between rounds a bar flashes — how much of the match is left.
+Between rounds you see how many minutes are left until the end.
 
 [font_size=40][b]Who wins?[/b][/font_size]
 At the end — a scoreboard. Fewer penalties — higher rank. If several players share the lowest score, regulation ends and they play knockout: everyone else is out until one winner remains. Among equal scores, whoever lasted longer ranks higher.
@@ -129,7 +129,8 @@ const _RU: Dictionary = {
 	"RESULT_TO_MENU": "В МЕНЮ",
 	"EXPLOSION_BOOM": "БУМ!",
 	"ACTION_HINT_TAP": "Нажми экран — передай бомбу",
-	"TIME_PROGRESS_LABEL": "До конца партии",
+	"TIME_PROGRESS_LABEL": "До конца игры",
+	"TIME_PROGRESS_MINUTES": "%d мин",
 	"HUD_LOTTERY": "Жребий — кто ходит первым?",
 	"HUD_READY": "Готовы?",
 	"HUD_START_ROUND": "Начать раунд",
@@ -213,7 +214,8 @@ const _EN: Dictionary = {
 	"RESULT_TO_MENU": "TO MENU",
 	"EXPLOSION_BOOM": "BOOM!",
 	"ACTION_HINT_TAP": "Tap the screen — pass the bomb",
-	"TIME_PROGRESS_LABEL": "Match time left",
+	"TIME_PROGRESS_LABEL": "Until the end",
+	"TIME_PROGRESS_MINUTES": "%d min",
 	"HUD_LOTTERY": "Lottery — who goes first?",
 	"HUD_READY": "Ready?",
 	"HUD_START_ROUND": "Start round",

@@ -11,10 +11,12 @@ var _paused: bool = false
 var _account: PDataAccount = null
 var _awaiting_splash: bool = false
 var _pending_post_explosion_event: String = ""
+var _debug_clock_label: Label = null
 
 
 func _ready() -> void:
 	_collect_states()
+	_setup_editor_clock_overlay()
 	set_process(_session_ready)
 
 
@@ -127,6 +129,7 @@ func _start_fsm() -> void:
 
 
 func _process(delta: float) -> void:
+	_update_editor_clock_overlay()
 	if not _session_ready or fsm == null or _paused:
 		return
 
@@ -255,6 +258,7 @@ func _process_player_choice(delta: float) -> void:
 
 func _process_countdown(delta: float) -> void:
 	session.advance_time(delta)
+	session.advance_match_clock(delta)
 	session.tick_countdown()
 	if session.state_time >= session.game_config.countdown_time:
 		session.reset_bomb()
@@ -265,6 +269,7 @@ func _process_countdown(delta: float) -> void:
 
 
 func _process_play(delta: float) -> void:
+	session.advance_match_clock(delta)
 	if session.update_bomb(delta):
 		fsm.add_event(FSMGameEvents.EXPLODE)
 
@@ -285,19 +290,22 @@ func _on_explosion_finished() -> void:
 	if session.is_overtime:
 		_finish_overtime_explosion()
 		return
+	if session.is_regulation_time_up():
+		if session.has_unique_leader():
+			fsm.add_event(FSMGameEvents.MATCH_END)
+			return
+		session.enter_overtime()
+		session.ensure_overtime_card()
+		session.next_player()
+		session.reset_round()
+		_queue_post_explosion(FSMGameEvents.EXPLOSION_DONE, GameSession.SPLASH_OVERTIME, null)
+		return
 	if session.next_card():
 		session.next_player()
 		session.reset_round()
 		fsm.add_event(FSMGameEvents.EXPLOSION_DONE)
 		return
-	if session.has_unique_leader():
-		fsm.add_event(FSMGameEvents.MATCH_END)
-		return
-	session.enter_overtime()
-	session.ensure_overtime_card()
-	session.next_player()
-	session.reset_round()
-	_queue_post_explosion(FSMGameEvents.EXPLOSION_DONE, GameSession.SPLASH_OVERTIME, null)
+	fsm.add_event(FSMGameEvents.MATCH_END)
 
 
 func _finish_tutorial_explosion() -> void:
@@ -377,3 +385,35 @@ func _deferred_tutorial_scripted_explosion() -> void:
 func _on_state_changed(from_state_name: String, to_state_name: String) -> void:
 	if game_events:
 		game_events.ev_game_state_changed.emit(from_state_name, to_state_name)
+	_update_editor_clock_overlay()
+
+
+func _setup_editor_clock_overlay() -> void:
+	if not OS.has_feature("editor"):
+		return
+	if _debug_clock_label:
+		return
+	var layer := CanvasLayer.new()
+	layer.layer = 128
+	add_child(layer)
+	_debug_clock_label = Label.new()
+	_debug_clock_label.position = Vector2(12, 12)
+	_debug_clock_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_debug_clock_label.add_theme_font_size_override("font_size", 18)
+	_debug_clock_label.add_theme_color_override("font_color", Color(0.75, 1.0, 0.55, 1.0))
+	_debug_clock_label.add_theme_color_override("font_outline_color", Color(0.02, 0.04, 0.02, 0.9))
+	_debug_clock_label.add_theme_constant_override("outline_size", 4)
+	layer.add_child(_debug_clock_label)
+	set_process(true)
+
+
+func _update_editor_clock_overlay() -> void:
+	if _debug_clock_label == null:
+		return
+	if not _session_ready or fsm == null:
+		_debug_clock_label.text = "clock -- / --\nWAIT\nend: session not ready"
+		return
+	_debug_clock_label.text = session.get_match_clock_debug_text(
+		fsm.get_current_state_name(),
+		_paused
+	)

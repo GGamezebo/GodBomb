@@ -6,16 +6,13 @@ const FADE_IN := 0.34
 const FADE_OUT := 0.28
 const BANNER_WIDTH := TableHintBanner.TABLE_HINT_WIDTH
 const BANNER_HEIGHT := TableHintBanner.TABLE_HINT_HEIGHT
-const BAR_HEIGHT := 22.0
 
 const TEXT_COLOR := Color(0.99, 0.96, 0.9, 1.0)
 const TEXT_OUTLINE := Color(0.1, 0.06, 0.04, 0.82)
-const PROGRESS_BG := Color(0.1, 0.08, 0.06, 0.55)
-const PROGRESS_FILL := Color(0.45, 0.78, 0.98, 0.92)
-const PROGRESS_BORDER := Color(0.72, 0.42, 0.2, 0.72)
+const TIME_COLOR := Color(0.55, 0.86, 1.0, 1.0)
 
 var _label: Label
-var _progress_bar: ProgressBar
+var _time_label: Label
 var _fade_tween: Tween
 var _layout_anchor := Vector2.ZERO
 var _layout_bounds := Rect2()
@@ -43,47 +40,30 @@ func _build_content() -> void:
 	add_child(margin)
 
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 18)
+	row.add_theme_constant_override("separation", 22)
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
 	margin.add_child(row)
 
 	_label = Label.new()
 	_label.text = LocaleService.text("TIME_PROGRESS_LABEL")
 	_label.theme_type_variation = &"Hero"
-	_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	_label.add_theme_font_size_override("font_size", 30)
+	_label.add_theme_font_size_override("font_size", 32)
 	_label.add_theme_color_override("font_color", TEXT_COLOR)
 	_label.add_theme_color_override("font_outline_color", TEXT_OUTLINE)
 	_label.add_theme_constant_override("outline_size", 3)
 	row.add_child(_label)
 
-	_progress_bar = ProgressBar.new()
-	_progress_bar.custom_minimum_size = Vector2(420.0, BAR_HEIGHT)
-	_progress_bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_progress_bar.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	_progress_bar.show_percentage = false
-	_progress_bar.min_value = 0.0
-	_progress_bar.max_value = 100.0
-	_apply_bar_style()
-	row.add_child(_progress_bar)
-
-
-func _apply_bar_style() -> void:
-	var bg := StyleBoxFlat.new()
-	bg.bg_color = PROGRESS_BG
-	bg.border_color = PROGRESS_BORDER
-	bg.set_border_width_all(2)
-	bg.set_corner_radius_all(10)
-	bg.content_margin_left = 3.0
-	bg.content_margin_top = 3.0
-	bg.content_margin_right = 3.0
-	bg.content_margin_bottom = 3.0
-	var fill := StyleBoxFlat.new()
-	fill.bg_color = PROGRESS_FILL
-	fill.set_corner_radius_all(6)
-	_progress_bar.add_theme_stylebox_override("background", bg)
-	_progress_bar.add_theme_stylebox_override("fill", fill)
+	_time_label = Label.new()
+	_time_label.theme_type_variation = &"Hero"
+	_time_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	_time_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_time_label.add_theme_font_size_override("font_size", 40)
+	_time_label.add_theme_color_override("font_color", TIME_COLOR)
+	_time_label.add_theme_color_override("font_outline_color", TEXT_OUTLINE)
+	_time_label.add_theme_constant_override("outline_size", 3)
+	row.add_child(_time_label)
 
 
 func fit_layout(anchor: Vector2, max_width: float = BANNER_WIDTH, bounds: Rect2 = Rect2()) -> void:
@@ -122,9 +102,10 @@ func _lock_banner_size() -> void:
 	size = banner_size
 
 
-func show_progress(remaining_ratio: float, animate: bool = true) -> void:
+func show_remaining(minutes: int, animate: bool = true) -> void:
 	_kill_fade_tween()
-	_progress_bar.value = clampf(remaining_ratio, 0.0, 1.0) * 100.0
+	_label.text = LocaleService.text("TIME_PROGRESS_LABEL")
+	_time_label.text = LocaleService.textf("TIME_PROGRESS_MINUTES", [maxi(minutes, 0)])
 	if _layout_ready:
 		_lock_banner_size()
 

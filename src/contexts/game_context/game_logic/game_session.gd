@@ -27,6 +27,8 @@ var is_tutorial: bool = false
 var is_overtime: bool = false
 var _deck_game_time_minutes: int = -1
 var _knockout_seq: int = 0
+var match_limit_seconds: float = 0.0
+var match_elapsed_seconds: float = 0.0
 
 
 func setup(p_config: GameConfig, p_events: GameEvents, account: PDataAccount) -> void:
@@ -44,6 +46,7 @@ func setup(p_config: GameConfig, p_events: GameEvents, account: PDataAccount) ->
 	rebuild_card_deck(account.get_game_time_minutes())
 	is_overtime = false
 	_knockout_seq = 0
+	match_elapsed_seconds = 0.0
 	current_player_index = randi() % maxi(players.size(), 1)
 	max_rand_player_choices = 40 + randi() % maxi(players.size(), 1)
 	_emit_current_player()
@@ -124,36 +127,45 @@ func rebuild_card_deck(game_time_minutes: int) -> void:
 		return
 	cards.clear()
 	current_card = null
-	_build_card_deck(game_time_minutes)
-	_deck_game_time_minutes = game_time_minutes
+	match_cards_total = 0
+	_set_match_limit_minutes(game_time_minutes)
+	_fill_cards()
 
 
 func ensure_card_deck_for_game_time(game_time_minutes: int) -> void:
 	if is_tutorial or is_overtime:
 		return
-	if game_time_minutes == _deck_game_time_minutes and not cards.is_empty():
+	_set_match_limit_minutes(game_time_minutes)
+	if cards.is_empty() and current_card == null:
+		_fill_cards()
+
+
+func _set_match_limit_minutes(game_time_minutes: int) -> void:
+	_deck_game_time_minutes = game_time_minutes
+	match_limit_seconds = float(maxi(game_time_minutes, 0)) * 60.0
+
+
+func _fill_cards() -> void:
+	if game_config == null:
 		return
-	rebuild_card_deck(game_time_minutes)
-
-
-func _build_card_deck(game_time_minutes: int) -> void:
 	var card_strings: Array[String] = []
 	for syllable in game_config.cards:
 		card_strings.append(syllable)
+	if card_strings.is_empty():
+		return
 	card_strings.shuffle()
 
 	var avg_bomb_time := (game_config.max_bomb_alive_time - game_config.min_bomb_alive_time) / 2.0
-	var card_numbers := int((game_time_minutes * 60) / avg_bomb_time)
+	if avg_bomb_time <= 0.0:
+		avg_bomb_time = 30.0
+	var minutes := maxi(_deck_game_time_minutes, 1)
+	var card_numbers := int((minutes * 60) / avg_bomb_time)
 	card_numbers = clampi(card_numbers, 1, card_strings.size())
 
-	var deck: Array[String] = card_strings.slice(0, card_numbers)
-	var length := randi() % deck.size()
-	if length == 0:
-		length = 1
-
-	for i in length:
-		cards.append(GameCard.new(deck[i], WordCondition.random()))
-	match_cards_total = cards.size()
+	for i in card_numbers:
+		cards.append(GameCard.new(card_strings[i], WordCondition.random()))
+	if match_cards_total <= 0:
+		match_cards_total = cards.size()
 
 
 func apply_tutorial_deck(entries: Array) -> void:
@@ -270,7 +282,11 @@ func update_explosion(delta: float) -> bool:
 
 func next_card() -> bool:
 	if cards.is_empty():
-		return false
+		if is_tutorial:
+			return false
+		_fill_cards()
+		if cards.is_empty():
+			return false
 	current_card = cards.pop_front()
 	if game_events:
 		game_events.ev_card_changed.emit(current_card)
@@ -347,9 +363,68 @@ func get_rounds_remaining() -> int:
 
 
 func get_match_remaining_ratio() -> float:
-	if match_cards_total <= 0:
+	if match_limit_seconds <= 0.0:
 		return 1.0
-	return float(get_rounds_remaining()) / float(match_cards_total)
+	return clampf(get_match_remaining_seconds() / match_limit_seconds, 0.0, 1.0)
+
+
+func get_match_remaining_seconds() -> float:
+	return maxf(0.0, match_limit_seconds - match_elapsed_seconds)
+
+
+func get_match_remaining_minutes() -> int:
+	var remaining := get_match_remaining_seconds()
+	if remaining <= 0.0:
+		return 0
+	return maxi(1, int(ceil(remaining / 60.0)))
+
+
+func is_regulation_time_up() -> bool:
+	return not is_tutorial and match_limit_seconds > 0.0 and match_elapsed_seconds >= match_limit_seconds
+
+
+func advance_match_clock(delta: float) -> void:
+	if is_tutorial or is_overtime:
+		return
+	match_elapsed_seconds += maxf(delta, 0.0)
+
+
+func get_match_clock_debug_text(state_name: String, paused: bool) -> String:
+	var counting := (
+		not paused
+		and not is_overtime
+		and not is_tutorial
+		and (state_name == FSMGameStates.COUNTDOWN or state_name == FSMGameStates.PLAY)
+	)
+	var end_line := ""
+	if is_tutorial:
+		end_line = "end: tutorial deck"
+	elif is_overtime:
+		end_line = "end: overtime knockout (1 left)"
+	elif is_regulation_time_up():
+		if has_unique_leader():
+			end_line = "end: time up → after boom RESULT (unique)"
+		else:
+			end_line = "end: time up → after boom OVERTIME (tie)"
+	else:
+		end_line = "end: after boom CONTINUE (%.1fs left)" % get_match_remaining_seconds()
+	var count_line := "COUNTING" if counting else "WAIT %s%s" % [
+		state_name,
+		" paused" if paused else "",
+	]
+	return "clock %s / %s\n%s\n%s" % [
+		_format_clock(match_elapsed_seconds),
+		_format_clock(match_limit_seconds),
+		count_line,
+		end_line,
+	]
+
+
+func _format_clock(seconds: float) -> String:
+	var total := maxf(seconds, 0.0)
+	var minutes := int(total) / 60
+	var secs := total - float(minutes * 60)
+	return "%02d:%04.1f" % [minutes, secs]
 
 
 func get_sorted_results() -> Array[GamePlayer]:

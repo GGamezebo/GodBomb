@@ -7,7 +7,7 @@ alwaysApply: true
 
 Party hot-potato, слоги. Godot **4.7** GDScript, 1080×1920 portrait, mobile renderer. Entry: `main.tscn` → `MainContext`.
 
-**Цикл:** 2–12 игроков, слог+условие, передача бомбы, скрытый таймер, взрыв = +1 штраф, победа = min score. Колода кончилась: уникальный лидер → result; ничья по минимуму → овертайм на вылет.
+**Цикл:** 2–12 игроков, слог+условие, передача бомбы, скрытый таймер, взрыв = +1 штраф, победа = min score. Основное время = countdown+play до `game_time_minutes`; истекло: уникальный лидер → result, ничья → овертайм на вылет.
 
 **FSM:** `player_choice` → `ready_to_start` → `countdown` → `play` → `explosion` → … → `result`
 

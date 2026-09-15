@@ -330,9 +330,9 @@ func _show_ready_to_start(from_state: String = "") -> void:
 func _should_show_time_progress() -> bool:
 	if game_manager == null or game_manager.session == null:
 		return false
-	if game_manager.session.is_overtime:
+	if game_manager.session.is_overtime or game_manager.session.is_tutorial:
 		return false
-	return game_manager.session.match_cards_total > 1
+	return game_manager.session.match_limit_seconds > 0.0
 
 
 func _show_between_rounds_progress() -> void:
@@ -341,8 +341,8 @@ func _show_between_rounds_progress() -> void:
 	if _time_progress_banner == null:
 		_show_hint(LocaleService.text("HUD_START_ROUND_HINT"))
 		return
-	var ratio := game_manager.session.get_match_remaining_ratio()
-	_time_progress_banner.show_progress(ratio)
+	var minutes := game_manager.session.get_match_remaining_minutes()
+	_time_progress_banner.show_remaining(minutes)
 	_time_progress_token += 1
 	var token := _time_progress_token
 	get_tree().create_timer(GameTimeProgressBanner.SHOW_DURATION).timeout.connect(

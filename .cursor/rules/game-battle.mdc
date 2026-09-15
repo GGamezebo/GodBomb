@@ -8,7 +8,11 @@ alwaysApply: false
 
 **FSM:** choice → ready → countdown → play ⇄ **emergency** → explosion → ready|result. First card at countdown end if null. After boom: next_card→next_player→ready, or match end / overtime.
 
-**Overtime knockout:** deck empty after boom → unique min score = `result`. Tie on min → `enter_overtime()` (non-leaders `eliminated_at=0`), splash `OVERTIME_*` with remaining/out leaderboard rows (`GameResultOverlay.build_rank_row`), roster button hidden, extra cards until one active. Each OT boom: +1 and out, splash `PLAYER_ELIMINATED`. Rank: score ASC, `eliminated_at` DESC. Splash: `BattleSplashOverlay` via `ev_battle_splash`, hold `explosion` until tap/~8s board or ~3.5s knockout. Tutorial skips OT.
+**Overtime knockout:** regulation clock up after boom → unique min = `result`. Tie on min → `enter_overtime()`, splash `OVERTIME_*`. Roster hidden. Each OT boom: +1 and out. Splash until **Continue**. Tutorial skips OT.
+
+**Match clock:** `match_elapsed_seconds` only in **countdown** + **play** (not ready/explosion/emergency/pause/roster). Limit = `game_time_minutes * 60`. Roster resync does not reset clock. After boom: time up → result or overtime; else next card. Editor (`OS.has_feature("editor")`): top-left debug clock on GameManager CanvasLayer.
+
+**Time left banner:** between rounds `GameTimeProgressBanner` — «до конца игры» + remaining minutes from clock. Hidden in overtime.
 
 **UI init trap:** FSM starts in `initialize()` before child `_ready`. HUD + `game_input` MUST `_sync_to_current_state()` in `_ready`.
 
@@ -32,4 +36,4 @@ State UI: choice/ready/countdown/play share dial layout · ready=«Готовы?
 
 **Core:** `game_manager.gd` `game_session.gd` `game_sound.gd` `word_condition.gd`
 
-**Match length:** deck size from `account.game_time_minutes` via `GameSession.rebuild_card_deck()` · refreshed on `setup_session`, `start_round`, and `ev_game_time_changed`. OT does not rebuild the deck.
+**Match length:** clock from `account.game_time_minutes`; deck refills as needed. OT does not rebuild the deck. Roster add/remove does not reset the clock.
