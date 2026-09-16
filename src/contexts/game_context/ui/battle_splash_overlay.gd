@@ -1,16 +1,14 @@
 class_name BattleSplashOverlay
-extends PanelContainer
+extends Control
 
 signal finished
 
 const DESIGN_SIZE := Vector2(1080.0, 1920.0)
 const CONTENT_WIDTH_MARGIN := 200.0
-const CONTENT_ANCHOR := Vector2(540.0, 930.0)
 const PLAYER_PILL_SCALE := 1.45
-const BOARD_TOP := 168.0
-const BOARD_BOTTOM := 232.0
 const CONTINUE_BUTTON_SIZE := Vector2(660.0, 180.0)
-const CONTINUE_BOTTOM_MARGIN := 72.0
+const TOP_MARGIN := 188.0
+const BUTTON_BOTTOM_MARGIN := 212.0
 const START_ACTIVE_TEXTURE := "res://assets/party_kitchen/buttons/start_active.svg"
 
 var _headline: Label
@@ -29,7 +27,6 @@ var _eliminated_section: VBoxContainer
 var _board_scroll: ScrollContainer
 var _content_col: VBoxContainer
 var _margin_host: MarginContainer
-var _position_host: Control
 var _token: int = 0
 var _closing: bool = false
 var _board_mode: bool = false
@@ -43,39 +40,35 @@ func _ready() -> void:
 	modulate.a = 0.0
 	z_index = 12
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	size = DESIGN_SIZE
 	_build_ui()
 	resized.connect(_layout_content)
 	call_deferred("_layout_content")
 
 
 func _build_ui() -> void:
-	var backdrop := StyleBoxFlat.new()
-	backdrop.bg_color = Color(0.08, 0.03, 0.01, 0.88)
-	add_theme_stylebox_override("panel", backdrop)
-
-	var stack := Control.new()
-	stack.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	stack.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(stack)
+	var backdrop := ColorRect.new()
+	backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	backdrop.color = Color(0.08, 0.03, 0.01, 0.88)
+	add_child(backdrop)
 
 	_margin_host = MarginContainer.new()
 	_margin_host.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_margin_host.add_theme_constant_override("margin_top", int(TOP_MARGIN))
+	_margin_host.add_theme_constant_override("margin_bottom", int(BUTTON_BOTTOM_MARGIN))
 	_margin_host.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	stack.add_child(_margin_host)
-
-	_position_host = Control.new()
-	_position_host.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	_position_host.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_margin_host.add_child(_position_host)
+	add_child(_margin_host)
 
 	_content_col = VBoxContainer.new()
-	_content_col.alignment = BoxContainer.ALIGNMENT_CENTER
+	_content_col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_content_col.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_content_col.add_theme_constant_override("separation", 24)
-	_position_host.add_child(_content_col)
+	_margin_host.add_child(_content_col)
 
 	_elimination_block = VBoxContainer.new()
 	_elimination_block.alignment = BoxContainer.ALIGNMENT_CENTER
+	_elimination_block.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_elimination_block.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_elimination_block.add_theme_constant_override("separation", 28)
 	_content_col.add_child(_elimination_block)
 	_build_elimination_block(_elimination_block)
@@ -87,7 +80,12 @@ func _build_ui() -> void:
 	_board_block.add_theme_constant_override("separation", 18)
 	_content_col.add_child(_board_block)
 	_build_board_block(_board_block)
-	_build_continue_button()
+
+	var button_host := CenterContainer.new()
+	button_host.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	button_host.size_flags_vertical = Control.SIZE_SHRINK_END
+	_content_col.add_child(button_host)
+	_build_continue_button(button_host)
 
 
 func _build_elimination_block(host: VBoxContainer) -> void:
@@ -196,13 +194,12 @@ func _build_board_block(host: VBoxContainer) -> void:
 	_eliminated_section.add_child(_eliminated_list)
 
 
-func _build_continue_button() -> void:
+func _build_continue_button(button_host: CenterContainer) -> void:
 	_continue_host = Control.new()
 	_continue_host.custom_minimum_size = CONTINUE_BUTTON_SIZE
 	_continue_host.size = CONTINUE_BUTTON_SIZE
 	_continue_host.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_continue_host.z_index = 4
-	add_child(_continue_host)
+	button_host.add_child(_continue_host)
 
 	_continue_button = StartActionButton.new()
 	_continue_button.name = "ContinueButton"
@@ -220,16 +217,30 @@ func _build_continue_button() -> void:
 
 	var continue_label := Label.new()
 	continue_label.name = "ContinueLabel"
-	continue_label.text = LocaleService.text("EMERGENCY_CONTINUE")
 	continue_label.theme_type_variation = &"Hero"
 	continue_label.add_theme_font_size_override("font_size", 72)
 	continue_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	continue_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	continue_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_continue_button.add_child(continue_label)
-	_continue_button.action_text = LocaleService.text("EMERGENCY_CONTINUE")
+	_apply_continue_label()
 	_continue_button.set_pulse_active(false)
-	call_deferred("_layout_continue_button")
+	call_deferred("_refresh_continue_button_layout")
+
+
+func _apply_continue_label() -> void:
+	if _continue_button == null:
+		return
+	var text := LocaleService.text("EMERGENCY_CONTINUE")
+	_continue_button.action_text = text
+	var label := _continue_button.get_node_or_null("ContinueLabel") as Label
+	if label:
+		label.text = text
+
+
+func _refresh_continue_button_layout() -> void:
+	if _continue_button:
+		_continue_button.refresh_label_layout()
 
 
 func _on_continue_pressed() -> void:
@@ -240,7 +251,6 @@ func show_splash(title: String, body: String, player: GamePlayer = null) -> void
 	_board_mode = false
 	_elimination_block.visible = true
 	_board_block.visible = false
-	_content_col.alignment = BoxContainer.ALIGNMENT_CENTER
 	_headline.text = title
 	_body.text = body
 	_body.visible = not body.is_empty()
@@ -262,7 +272,6 @@ func show_overtime_board(
 	_board_mode = true
 	_elimination_block.visible = false
 	_board_block.visible = true
-	_content_col.alignment = BoxContainer.ALIGNMENT_BEGIN
 	_board_title.text = title
 	_board_body.text = body
 	_board_body.visible = not body.is_empty()
@@ -293,14 +302,12 @@ func _fill_rank_list(
 func _present() -> void:
 	_closing = false
 	_token += 1
-	size = get_parent().size if get_parent() is Control else DESIGN_SIZE
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	visible = true
 	modulate.a = 0.0
+	_apply_continue_label()
 	if _continue_button:
-		_continue_button.action_text = LocaleService.text("EMERGENCY_CONTINUE")
 		_continue_button.set_pulse_active(true)
-		_continue_button.call_deferred("refresh_label_layout")
 	_layout_content()
 	call_deferred("_layout_content")
 	var tween := create_tween()
@@ -342,59 +349,24 @@ func _emit_finished() -> void:
 
 
 func _get_side_margin() -> int:
-	var half_margin := CONTENT_WIDTH_MARGIN * 0.5
-	var min_side := 72.0
-	var proportional := size.x * 0.1
-	return int(round(maxf(half_margin, maxf(min_side, proportional))))
+	return int(round(CONTENT_WIDTH_MARGIN * 0.5))
 
 
 func _get_content_width() -> float:
-	return maxf(size.x - float(_get_side_margin()) * 2.0, 280.0)
+	return maxf(size.x - CONTENT_WIDTH_MARGIN, DESIGN_SIZE.x - CONTENT_WIDTH_MARGIN)
 
 
 func _layout_content() -> void:
-	if not _content_col or not _position_host or not _margin_host:
+	if not _content_col or not _margin_host:
 		return
 	var side_margin := _get_side_margin()
 	_margin_host.add_theme_constant_override("margin_left", side_margin)
 	_margin_host.add_theme_constant_override("margin_right", side_margin)
-	var content_width := _get_content_width()
-	_content_col.custom_minimum_size.x = content_width
-	_content_col.size.x = content_width
+	_margin_host.add_theme_constant_override("margin_top", int(TOP_MARGIN))
+	_margin_host.add_theme_constant_override("margin_bottom", int(BUTTON_BOTTOM_MARGIN))
 	if _board_mode:
-		_margin_host.add_theme_constant_override("margin_top", int(BOARD_TOP))
-		_margin_host.add_theme_constant_override("margin_bottom", int(BOARD_BOTTOM))
-		var host_size := _position_host.size
-		_content_col.position = Vector2((host_size.x - content_width) * 0.5, 0.0)
-		_content_col.size = Vector2(content_width, host_size.y)
-		_content_col.custom_minimum_size = Vector2(content_width, host_size.y)
-		_fit_board_rows(content_width)
-	else:
-		_margin_host.add_theme_constant_override("margin_top", 0)
-		_margin_host.add_theme_constant_override("margin_bottom", int(BOARD_BOTTOM))
-		_content_col.reset_size()
-		var col_size := _content_col.get_combined_minimum_size()
-		col_size.x = content_width
-		_content_col.size = col_size
-		_content_col.position = Vector2(
-			(_position_host.size.x - content_width) * 0.5,
-			CONTENT_ANCHOR.y - col_size.y * 0.48
-		)
-	_layout_continue_button()
-
-
-func _layout_continue_button() -> void:
-	if _continue_host == null:
-		return
-	var host_size := size if size.x > 0.0 else DESIGN_SIZE
-	_continue_host.size = CONTINUE_BUTTON_SIZE
-	_continue_host.position = Vector2(
-		(host_size.x - CONTINUE_BUTTON_SIZE.x) * 0.5,
-		host_size.y - CONTINUE_BUTTON_SIZE.y - CONTINUE_BOTTOM_MARGIN
-	)
-	if _continue_button:
-		_continue_button.size = CONTINUE_BUTTON_SIZE
-		_continue_button.call_deferred("refresh_label_layout")
+		_fit_board_rows(_get_content_width())
+	_refresh_continue_button_layout()
 
 
 func _fit_board_rows(content_width: float) -> void:
