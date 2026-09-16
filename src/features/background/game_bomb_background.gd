@@ -158,10 +158,10 @@ func _apply_state(state: String) -> void:
 			_set_fire_sparks(false)
 
 
-func _set_bomb_visible(visible: bool) -> void:
+func _set_bomb_visible(bomb_visible: bool) -> void:
 	for part in _bomb_visual_parts():
-		part.visible = visible
-		if visible:
+		part.visible = bomb_visible
+		if bomb_visible:
 			part.modulate = Color.WHITE
 
 

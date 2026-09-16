@@ -94,7 +94,6 @@ static func _build_message_bbcode(title: String, font_size: int) -> String:
 
 static func _build_pattern_bbcode(syllable: String, condition: int, hi_size: int, dim_size: int) -> String:
 	var hi := "[font_size=%d][color=#FFFFFF]%s[/color][/font_size]" % [hi_size, syllable]
-	var dash := _dash_bbcode(dim_size)
 	var side := _side_ellipsis_bbcode(dim_size)
 	if uses_exclusion_rules():
 		match condition:

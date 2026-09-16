@@ -18,11 +18,25 @@ func _ready() -> void:
 	visible = false
 	modulate.a = 0.0
 	z_index = 9
-	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	size = DESIGN_SIZE
 	_build_ui()
-	resized.connect(_layout_content)
+	resized.connect(_on_overlay_resized)
+	call_deferred("_sync_to_parent_bounds")
 	call_deferred("_layout_content")
+
+
+func _on_overlay_resized() -> void:
+	_sync_to_parent_bounds()
+	_layout_content()
+
+
+func _sync_to_parent_bounds() -> void:
+	set_anchors_preset(Control.PRESET_TOP_LEFT)
+	position = Vector2.ZERO
+	var bounds := DESIGN_SIZE
+	if get_parent() is Control:
+		bounds = (get_parent() as Control).size
+	if bounds.x > 0.0 and bounds.y > 0.0:
+		size = bounds
 
 
 func _build_ui() -> void:
@@ -116,7 +130,7 @@ func _layout_content() -> void:
 func show_for_player(player: GamePlayer) -> void:
 	_player_strip.set_visual_scale(EXPLOSION_PILL_SCALE)
 	_player_strip.set_player(player)
-	size = get_parent().size if get_parent() is Control else DESIGN_SIZE
+	_sync_to_parent_bounds()
 	_layout_content()
 	visible = true
 	modulate.a = 0.0
@@ -144,6 +158,7 @@ func _start_reveal_animation() -> void:
 
 
 func relayout() -> void:
+	_sync_to_parent_bounds()
 	_layout_content()
 
 

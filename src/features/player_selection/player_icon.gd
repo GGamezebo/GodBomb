@@ -223,9 +223,9 @@ func _compute_max_plate_width() -> float:
 
 func _fit_name_font_size(max_plate_width: float) -> int:
 	var available_text_width := maxf(max_plate_width - NAME_PLATE_PAD_X * 2.0, 24.0)
-	for size in range(NAME_FONT_MAX, NAME_FONT_MIN - 1, -1):
-		if _measure_name_width(size) <= available_text_width:
-			return size
+	for font_size in range(NAME_FONT_MAX, NAME_FONT_MIN - 1, -1):
+		if _measure_name_width(font_size) <= available_text_width:
+			return font_size
 	return NAME_FONT_MIN
 
 
@@ -252,7 +252,6 @@ func apply_fixed_layout() -> void:
 	custom_minimum_size = ICON_SIZE
 	size = ICON_SIZE
 	if slime_rect:
-		slime_rect.layout_mode = 0
 		slime_rect.set_anchors_preset(Control.PRESET_TOP_LEFT)
 		slime_rect.position = SLIME_POSITION
 		slime_rect.size = SLIME_SIZE

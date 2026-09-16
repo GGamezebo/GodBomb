@@ -83,7 +83,7 @@ func try_start_first_launch() -> void:
 	start(false)
 
 
-func start(replay: bool = true, skip_rules_step: bool = false) -> void:
+func start(_replay: bool = true, skip_rules_step: bool = false) -> void:
 	if _active:
 		return
 	_cache_roster()

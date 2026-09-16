@@ -14,15 +14,17 @@ func _ready() -> void:
 	add_child(_glow)
 	move_child(_glow, 0)
 	resized.connect(_layout_glow)
-	_layout_glow()
+	call_deferred("_layout_glow")
 	set_glow_active(false)
 
 
 func _layout_glow() -> void:
 	if not _glow:
 		return
-	_glow.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_glow.size = size
+	_glow.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	_glow.position = Vector2.ZERO
+	if size.x > 0.0 and size.y > 0.0:
+		_glow.size = size
 
 
 func set_glow_active(active: bool) -> void:

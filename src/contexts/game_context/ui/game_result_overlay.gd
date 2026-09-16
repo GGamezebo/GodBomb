@@ -73,7 +73,6 @@ func _build_ui() -> void:
 	add_child(_winner_bg)
 
 	_celebration = ResultCelebrationLayer.new()
-	_celebration.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(_celebration)
 
 	var content_host := MarginContainer.new()

@@ -26,14 +26,16 @@ func _ready() -> void:
 	mouse_exited.connect(_on_mouse_exited)
 	button_down.connect(_on_button_down)
 	button_up.connect(_on_button_up)
-	_layout_glow()
+	call_deferred("_layout_glow")
 
 
 func _layout_glow() -> void:
 	if not _glow:
 		return
-	_glow.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_glow.size = size
+	_glow.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	_glow.position = Vector2.ZERO
+	if size.x > 0.0 and size.y > 0.0:
+		_glow.size = size
 	_glow.glow_tint = glow_tint
 	_glow.alert_glow = alert_glow
 

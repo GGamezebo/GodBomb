@@ -116,9 +116,9 @@ func _sync_bomb_art_layout() -> void:
 		return
 	var scale_factor := layout_host.get_cover_scale()
 	var scaled_size := MenuBombLayout.DESIGN_SIZE * scale_factor
-	var offset := (layout_host.size - scaled_size) * 0.5
+	var art_offset := (layout_host.size - scaled_size) * 0.5
 	bomb_art.scale = Vector2.ONE * scale_factor
-	bomb_art.position = offset
+	bomb_art.position = art_offset
 	bomb_art.size = MenuBombLayout.DESIGN_SIZE
 
 

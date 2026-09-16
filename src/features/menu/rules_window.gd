@@ -4,7 +4,6 @@ extends Control
 signal onboarding_continue_pressed
 signal tutorial_requested
 
-const ModalScroll = preload("res://src/common/ui/modal_scroll.gd")
 @export var rules_scroll: ScrollContainer
 @export var rules_text: RichTextLabel
 @export var close_button: StartActionButton

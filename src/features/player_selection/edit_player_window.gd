@@ -317,13 +317,13 @@ func _on_name_changed(_text: String) -> void:
 	_sync_confirm_buttons()
 
 
-func _set_name_field(player_name: String, grab_focus: bool) -> void:
+func _set_name_field(player_name: String, should_grab_focus: bool) -> void:
 	if not name_edit:
 		return
 	var safe_name := PlayerInfo.sanitize_name(player_name)
 	name_edit.text = safe_name
 	name_edit.caret_column = safe_name.length()
-	if grab_focus:
+	if should_grab_focus:
 		name_edit.grab_focus()
 	else:
 		name_edit.release_focus()

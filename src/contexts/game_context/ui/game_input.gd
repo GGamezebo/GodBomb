@@ -49,10 +49,10 @@ func _on_game_state_changed(_from_state: String, to_state: String) -> void:
 		_reset_gesture_state()
 	if not start_round_button:
 		return
-	var ready := to_state == FSMGameStates.READY_TO_START
-	start_round_button.visible = ready
+	var show_start_round := to_state == FSMGameStates.READY_TO_START
+	start_round_button.visible = show_start_round
 	if start_round_button is StartActionButton:
-		(start_round_button as StartActionButton).set_pulse_active(ready)
+		(start_round_button as StartActionButton).set_pulse_active(show_start_round)
 
 
 func _sync_to_current_state() -> void:
@@ -114,27 +114,27 @@ func _handle_play_input(event: InputEvent) -> void:
 			_on_finger_moved(MOUSE_TOUCH_INDEX, motion.position)
 
 
-func _on_finger_pressed(index: int, position: Vector2) -> void:
-	if _is_pass_blocked_at(position):
+func _on_finger_pressed(index: int, screen_pos: Vector2) -> void:
+	if _is_pass_blocked_at(screen_pos):
 		return
 	if _active_touches.is_empty():
 		_begin_gesture()
-	var finger := {"start": position, "end": position}
+	var finger := {"start": screen_pos, "end": screen_pos}
 	_active_touches[index] = finger
 	_gesture_fingers[index] = finger
 
 
-func _on_finger_moved(index: int, position: Vector2) -> void:
+func _on_finger_moved(index: int, screen_pos: Vector2) -> void:
 	if not _active_touches.has(index):
 		return
-	_active_touches[index]["end"] = position
-	_gesture_fingers[index]["end"] = position
+	_active_touches[index]["end"] = screen_pos
+	_gesture_fingers[index]["end"] = screen_pos
 
 
-func _on_finger_released(index: int, position: Vector2) -> void:
+func _on_finger_released(index: int, screen_pos: Vector2) -> void:
 	if not _active_touches.has(index):
 		return
-	_on_finger_moved(index, position)
+	_on_finger_moved(index, screen_pos)
 	_active_touches.erase(index)
 	if _active_touches.is_empty():
 		_finalize_gesture()
@@ -170,11 +170,11 @@ func _apply_gesture_result() -> void:
 		game_events.ev_touch_next_player.emit(_gesture_touch_centroid())
 
 
-func _is_pass_blocked_at(position: Vector2) -> bool:
-	if game_battle_chrome and game_battle_chrome.is_pass_blocked_at(position):
+func _is_pass_blocked_at(screen_pos: Vector2) -> bool:
+	if game_battle_chrome and game_battle_chrome.is_pass_blocked_at(screen_pos):
 		return true
 	if start_round_button and start_round_button.visible:
-		return start_round_button.get_global_rect().has_point(position)
+		return start_round_button.get_global_rect().has_point(screen_pos)
 	return false
 
 

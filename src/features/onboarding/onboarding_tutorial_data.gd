@@ -244,10 +244,10 @@ static func rounds() -> Array[Dictionary]:
 
 static func deck_entries() -> Array:
 	var entries: Array = []
-	for round in rounds():
+	for round_def in rounds():
 		entries.append({
-			"syllable": round["syllable"],
-			"condition": round["condition"],
+			"syllable": round_def["syllable"],
+			"condition": round_def["condition"],
 		})
 	return entries
 
@@ -275,9 +275,9 @@ static func explode_player_index(round_index: int) -> int:
 static func round_for_card(card: GameCard) -> Dictionary:
 	if card == null:
 		return rounds()[0]
-	for round in rounds():
-		if round["syllable"] == card.word and int(round["condition"]) == card.condition:
-			return round
+	for round_def in rounds():
+		if round_def["syllable"] == card.word and int(round_def["condition"]) == card.condition:
+			return round_def
 	return rounds()[0]
 
 
@@ -286,26 +286,26 @@ static func round_index_for_card(card: GameCard) -> int:
 		return 0
 	var all := rounds()
 	for i in all.size():
-		var round: Dictionary = all[i]
-		if round["syllable"] == card.word and int(round["condition"]) == card.condition:
+		var round_def: Dictionary = all[i]
+		if round_def["syllable"] == card.word and int(round_def["condition"]) == card.condition:
 			return i
 	return 0
 
 
 static func play_step_body_for_index(round_index: int) -> String:
-	var round := round_at(round_index)
-	return play_step_body(GameCard.new(str(round["syllable"]), int(round["condition"])))
+	var round_def := round_at(round_index)
+	return play_step_body(GameCard.new(str(round_def["syllable"]), int(round_def["condition"])))
 
 
 static func play_step_body(card: GameCard) -> String:
-	var round := round_for_card(card)
-	var condition := WordCondition.get_label(int(round["condition"]))
+	var round_def := round_for_card(card)
+	var condition := WordCondition.get_label(int(round_def["condition"]))
 	return LocaleService.text("TUTORIAL_PLAY_BODY") % [
-		round["syllable"],
+		round_def["syllable"],
 		condition,
-		round["examples"],
-		round["word_hint"],
-		round["pass_hint"],
+		round_def["examples"],
+		round_def["word_hint"],
+		round_def["pass_hint"],
 	]
 
 

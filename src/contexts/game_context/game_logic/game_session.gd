@@ -422,7 +422,7 @@ func get_match_clock_debug_text(state_name: String, paused: bool) -> String:
 
 func _format_clock(seconds: float) -> String:
 	var total := maxf(seconds, 0.0)
-	var minutes := int(total) / 60
+	var minutes := int(total / 60.0)
 	var secs := total - float(minutes * 60)
 	return "%02d:%04.1f" % [minutes, secs]
 

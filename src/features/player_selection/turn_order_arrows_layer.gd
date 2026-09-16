@@ -36,15 +36,15 @@ func _ready() -> void:
 func update_state(
 	table_size: Vector2,
 	can_start: bool,
-	show: bool,
+	show_arrows: bool,
 	center_button_radius: float = 72.0
 ) -> void:
 	_table_size = table_size
 	_center_button_radius = center_button_radius
 	_alpha_scale = 1.0 if can_start else 0.85
 	_pulse_boost = 1.0
-	_show_arrows = show
-	visible = show
+	_show_arrows = show_arrows
+	visible = show_arrows
 	queue_redraw()
 
 

@@ -74,7 +74,6 @@ func refresh_label_layout() -> void:
 		if child is not Label:
 			continue
 		var label := child as Label
-		label.layout_mode = 0
 		label.set_anchors_preset(Control.PRESET_TOP_LEFT)
 		label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -118,8 +117,8 @@ func _apply_enabled_look(active: bool) -> void:
 
 
 func _find_action_label() -> Label:
-	for name in ["ActionLabel", "StartLabel", "DoneLabel", "ContinueLabel"]:
-		var label := get_node_or_null(name) as Label
+	for label_name in ["ActionLabel", "StartLabel", "DoneLabel", "ContinueLabel"]:
+		var label := get_node_or_null(label_name) as Label
 		if label:
 			return label
 	for child in get_children():
@@ -142,10 +141,10 @@ static func viewport_cover_scale(viewport_size: Vector2) -> float:
 
 
 func apply_scaled_action_size(viewport_size: Vector2, use_design_font: bool = false) -> void:
-	var scale := viewport_cover_scale(viewport_size)
-	custom_minimum_size = Vector2(0.0, DESIGN_ACTION_SIZE.y * scale)
+	var cover_scale := viewport_cover_scale(viewport_size)
+	custom_minimum_size = Vector2(0.0, DESIGN_ACTION_SIZE.y * cover_scale)
 	var label := _find_action_label()
 	if label:
 		var font_size := DESIGN_FONT_SIZE if use_design_font else MODAL_FONT_SIZE
-		label.add_theme_font_size_override("font_size", maxi(32, int(round(font_size * scale))))
+		label.add_theme_font_size_override("font_size", maxi(32, int(round(font_size * cover_scale))))
 	call_deferred("refresh_label_layout")

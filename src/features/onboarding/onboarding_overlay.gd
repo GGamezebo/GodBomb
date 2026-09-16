@@ -195,15 +195,15 @@ func _apply_start_style_button_layout(
 ) -> void:
 	if button == null:
 		return
-	var scale := StartActionButton.viewport_cover_scale(viewport_size)
-	var button_size := StartActionButton.DESIGN_ACTION_SIZE * scale * size_scale
+	var cover_scale := StartActionButton.viewport_cover_scale(viewport_size)
+	var button_size := StartActionButton.DESIGN_ACTION_SIZE * cover_scale * size_scale
 	button.custom_minimum_size = button_size
 	button.size = button_size
 	var label := button.get_node_or_null("StartLabel") as Label
 	if label:
 		label.add_theme_font_size_override(
 			"font_size",
-			maxi(32, int(round(StartActionButton.DESIGN_FONT_SIZE * scale * size_scale)))
+			maxi(32, int(round(StartActionButton.DESIGN_FONT_SIZE * cover_scale * size_scale)))
 		)
 	button.refresh_label_layout()
 	button.set_pulse_active(button.visible and not button.disabled)
@@ -362,19 +362,19 @@ func clear_spotlight() -> void:
 	_layout_dim()
 
 
-func set_continue_visible(show: bool, label: String = "") -> void:
+func set_continue_visible(continue_visible: bool, label: String = "") -> void:
 	_continue_button.action_text = label if not label.is_empty() else LocaleService.text("ONBOARDING_GOT_IT")
-	_continue_button.visible = show
-	if show:
+	_continue_button.visible = continue_visible
+	if continue_visible:
 		_skip_button.visible = false
 	else:
 		_skip_button.action_text = LocaleService.text("ONBOARDING_SKIP")
 	call_deferred("_layout_bottom_panel")
 
 
-func set_bottom_action(label: String, visible: bool = true) -> void:
+func set_bottom_action(label: String, action_visible: bool = true) -> void:
 	_skip_button.action_text = label
-	_skip_button.visible = visible
+	_skip_button.visible = action_visible
 	_continue_button.visible = false
 	call_deferred("_layout_bottom_panel")
 
@@ -383,9 +383,9 @@ func _layout_bottom_panel() -> void:
 	if not is_inside_tree():
 		return
 	var viewport := get_viewport().get_visible_rect()
-	var scale := StartActionButton.viewport_cover_scale(viewport.size)
-	var side := int(SIDE_MARGIN * scale)
-	var bottom := int(BOTTOM_MARGIN * scale)
+	var cover_scale := StartActionButton.viewport_cover_scale(viewport.size)
+	var side := int(SIDE_MARGIN * cover_scale)
+	var bottom := int(BOTTOM_MARGIN * cover_scale)
 	_bottom_margin.add_theme_constant_override("margin_left", side)
 	_bottom_margin.add_theme_constant_override("margin_right", side)
 	_bottom_margin.add_theme_constant_override("margin_bottom", bottom)
@@ -397,10 +397,10 @@ func _layout_bottom_panel() -> void:
 	var text_width := maxi(int(viewport.size.x) - side * 2 - 48, 120)
 	_body.custom_minimum_size = Vector2(text_width, 0.0)
 	_body.size.x = text_width
-	call_deferred("_finish_bottom_panel_layout", viewport, side)
+	call_deferred("_finish_bottom_panel_layout", viewport)
 
 
-func _finish_bottom_panel_layout(viewport: Rect2, side: int) -> void:
+func _finish_bottom_panel_layout(viewport: Rect2) -> void:
 	if not visible:
 		return
 	var max_dock_h := viewport.size.y * 0.42

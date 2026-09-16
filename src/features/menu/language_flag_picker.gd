@@ -11,7 +11,6 @@ const GRID_COLUMNS := 4
 const ANIM_SEC := 0.22
 const GLOW_COLOR := Color(0.98, 0.72, 0.38, 0.95)
 const FALLBACK_WIDTH := 920.0
-const UiTouchTargets = preload("res://src/common/ui/ui_touch_targets.gd")
 
 var _center: CenterContainer
 var _grid: GridContainer

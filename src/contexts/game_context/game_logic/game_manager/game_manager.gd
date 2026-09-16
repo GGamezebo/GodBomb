@@ -76,7 +76,9 @@ func _collect_states() -> void:
 func _start_fsm() -> void:
 	for state in states:
 		if state.state_name.is_empty():
-			state.state_name = state.get_state()
+			var state_script := state.get_script() as GDScript
+			if state_script:
+				state.state_name = state_script.call_static("get_state")
 		state.initialize(self)
 
 	fsm = FSM.new({

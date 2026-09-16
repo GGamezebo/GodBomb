@@ -8,8 +8,17 @@ var _active := false
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	size = DESIGN_SIZE
+	call_deferred("_fill_parent_bounds")
+
+
+func _fill_parent_bounds() -> void:
+	var parent_ctrl := get_parent() as Control
+	if parent_ctrl == null:
+		return
+	set_anchors_preset(Control.PRESET_TOP_LEFT)
+	position = Vector2.ZERO
+	if parent_ctrl.size.x > 0.0 and parent_ctrl.size.y > 0.0:
+		size = parent_ctrl.size
 
 
 func start() -> void:
@@ -35,33 +44,33 @@ func stop() -> void:
 		child.queue_free()
 
 
-func _spawn_burst(origin: Vector2, scale: float) -> void:
+func _spawn_burst(origin: Vector2, burst_scale: float) -> void:
 	var host := Node2D.new()
 	host.position = origin
 	add_child(host)
-	for spec in _burst_specs(scale):
+	for spec in _burst_specs(burst_scale):
 		host.add_child(_create_burst_particles(spec))
 	get_tree().create_timer(1.4).timeout.connect(host.queue_free)
 
 
-func _burst_specs(scale: float) -> Array[Dictionary]:
+func _burst_specs(burst_scale: float) -> Array[Dictionary]:
 	return [
 		{
-			"amount": int(72 * scale),
+			"amount": int(72 * burst_scale),
 			"lifetime": 0.95,
-			"velocity_min": 180.0 * scale,
-			"velocity_max": 420.0 * scale,
-			"scale_min": 2.4 * scale,
-			"scale_max": 6.5 * scale,
+			"velocity_min": 180.0 * burst_scale,
+			"velocity_max": 420.0 * burst_scale,
+			"scale_min": 2.4 * burst_scale,
+			"scale_max": 6.5 * burst_scale,
 			"gradient": _make_burst_gradient(),
 		},
 		{
-			"amount": int(48 * scale),
+			"amount": int(48 * burst_scale),
 			"lifetime": 1.1,
-			"velocity_min": 120.0 * scale,
-			"velocity_max": 280.0 * scale,
-			"scale_min": 4.0 * scale,
-			"scale_max": 9.0 * scale,
+			"velocity_min": 120.0 * burst_scale,
+			"velocity_max": 280.0 * burst_scale,
+			"scale_min": 4.0 * burst_scale,
+			"scale_max": 9.0 * burst_scale,
 			"gradient": _make_soft_glow_gradient(),
 		},
 	]

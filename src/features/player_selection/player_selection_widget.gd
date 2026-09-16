@@ -502,8 +502,8 @@ func _center_button_radius() -> float:
 	var button_radius := 72.0
 	if add_player_button:
 		var half := add_player_button.size * 0.5
-		var scale := maxf(add_player_button.scale.x, add_player_button.scale.y)
-		button_radius = maxf(half.x, half.y) * scale
+		var uniform_scale := maxf(add_player_button.scale.x, add_player_button.scale.y)
+		button_radius = maxf(half.x, half.y) * uniform_scale
 	return button_radius
 
 
@@ -744,10 +744,10 @@ func _update_add_button() -> void:
 
 
 func _update_start_button() -> void:
+	var count := _player_icons.size()
 	if _battle_mode:
 		_refresh_turn_order()
 		if start_button:
-			var count := _player_icons.size()
 			var can_done := count >= _min_players_required()
 			start_button.visible = true
 			start_button.disabled = not can_done
@@ -773,7 +773,6 @@ func _update_start_button() -> void:
 	if not start_button:
 		return
 	var min_players := game_config.min_players if game_config else 2
-	var count := _player_icons.size()
 	start_button.disabled = count < min_players
 	_update_start_button_animation(count >= min_players)
 	_refresh_turn_order()

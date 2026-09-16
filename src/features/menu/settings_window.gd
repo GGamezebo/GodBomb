@@ -23,8 +23,6 @@ extends Control
 @export var game_config: GameConfig
 
 const SLIDER_GRABBER_INSET := 26.0
-const UiTouchTargets = preload("res://src/common/ui/ui_touch_targets.gd")
-const ModalScroll = preload("res://src/common/ui/modal_scroll.gd")
 
 var _awaiting_reset_confirm: bool = false
 var _syncing_account: bool = false

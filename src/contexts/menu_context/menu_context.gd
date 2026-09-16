@@ -107,7 +107,7 @@ func _on_music_pressed() -> void:
 	var audio := _get_audio_controller()
 	if not audio or not account:
 		return
-	var enabled := audio.toggle_music()
+	audio.toggle_music()
 	_update_music_button_icon()
 	_save_account()
 
