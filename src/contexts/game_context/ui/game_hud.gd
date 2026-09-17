@@ -38,7 +38,6 @@ func _ready() -> void:
 		listener.add(game_events.ev_current_player_changed, _on_current_player_changed)
 		listener.add(game_events.ev_countdown_tick_changed, _on_countdown_tick)
 		listener.add(game_events.ev_card_changed, _on_card_changed)
-		listener.add(game_events.ev_touch_next_player, _on_turn_passed)
 		listener.add(game_events.ev_battle_splash, _on_battle_splash)
 	call_deferred("_sync_to_current_state")
 
@@ -274,11 +273,6 @@ func _on_card_changed(card: GameCard) -> void:
 		_syllable_card.set_card(card)
 	if _current_state == FSMGameStates.PLAY:
 		_show_play_hint()
-
-
-func _on_turn_passed(_touch_position: Vector2 = Vector2.ZERO) -> void:
-	if _syllable_card:
-		_syllable_card.pulse_next_turn()
 
 
 func _show_hint(text: String) -> void:

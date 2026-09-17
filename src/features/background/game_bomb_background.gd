@@ -4,6 +4,10 @@ extends Control
 const DESIGN_SIZE := Vector2(1080.0, 1920.0)
 const TINT_TWEEN := 0.35
 const NEUTRAL_BG := Color(0.06, 0.05, 0.04, 1.0)
+const PASS_PULSE_SCALE := 1.04
+const PASS_PULSE_UP_SEC := 0.08
+const PASS_PULSE_DOWN_SEC := 0.14
+const PASS_PULSE_PIVOT := Vector2(540.0, 928.0)
 
 signal layout_applied
 
@@ -18,6 +22,7 @@ signal layout_applied
 
 var listener: EventListener = EventListener.new()
 var _tween: Tween
+var _pass_tween: Tween
 var _tint_tween: Tween
 var _alert_active: bool = false
 var _content_base_pos: Vector2 = Vector2.ZERO
@@ -49,13 +54,16 @@ func _ready() -> void:
 		listener.add(game_events.ev_game_state_changed, _on_game_state_changed)
 		listener.add(game_events.ev_alert, _on_alert)
 		listener.add(game_events.ev_current_player_changed, _on_current_player_changed)
+		listener.add(game_events.ev_touch_next_player, _on_touch_next_player)
 	call_deferred("_apply_layout")
 
 
 func _exit_tree() -> void:
 	listener.deinit()
 	_kill_tween()
+	_kill_pass_tween()
 	_kill_tint_tween()
+	_reset_pass_pivots()
 
 
 func get_hint_marker_design_position() -> Vector2:
@@ -108,6 +116,91 @@ func _on_game_state_changed(_from_state: String, to_state: String) -> void:
 
 func _on_alert() -> void:
 	_alert_active = true
+
+
+func _on_touch_next_player(_touch_position: Vector2 = Vector2.ZERO) -> void:
+	pulse_pass()
+
+
+func pulse_pass() -> void:
+	if scaled_content == null and bomb_art == null and dial_glass == null:
+		return
+	_kill_pass_tween()
+	var cover := get_cover_scale()
+	var normal_cover := Vector2.ONE * cover
+	var punch_cover := normal_cover * PASS_PULSE_SCALE
+	if scaled_content:
+		scaled_content.pivot_offset = PASS_PULSE_PIVOT
+	if bomb_art:
+		bomb_art.pivot_offset = PASS_PULSE_PIVOT
+	var glass := dial_glass as Control
+	if glass:
+		glass.pivot_offset = glass.size * 0.5
+
+	_pass_tween = create_tween()
+	var started := false
+	if scaled_content:
+		_pass_tween.tween_property(
+			scaled_content, "scale", punch_cover, PASS_PULSE_UP_SEC
+		).set_trans(Tween.TRANS_SINE)
+		started = true
+	if bomb_art:
+		if started:
+			_pass_tween.parallel().tween_property(
+				bomb_art, "scale", punch_cover, PASS_PULSE_UP_SEC
+			).set_trans(Tween.TRANS_SINE)
+		else:
+			_pass_tween.tween_property(
+				bomb_art, "scale", punch_cover, PASS_PULSE_UP_SEC
+			).set_trans(Tween.TRANS_SINE)
+			started = true
+	if glass:
+		if started:
+			_pass_tween.parallel().tween_property(
+				glass, "scale", Vector2.ONE * PASS_PULSE_SCALE, PASS_PULSE_UP_SEC
+			).set_trans(Tween.TRANS_SINE)
+		else:
+			_pass_tween.tween_property(
+				glass, "scale", Vector2.ONE * PASS_PULSE_SCALE, PASS_PULSE_UP_SEC
+			).set_trans(Tween.TRANS_SINE)
+			started = true
+
+	started = false
+	if scaled_content:
+		_pass_tween.tween_property(
+			scaled_content, "scale", normal_cover, PASS_PULSE_DOWN_SEC
+		).set_trans(Tween.TRANS_SINE)
+		started = true
+	if bomb_art:
+		if started:
+			_pass_tween.parallel().tween_property(
+				bomb_art, "scale", normal_cover, PASS_PULSE_DOWN_SEC
+			).set_trans(Tween.TRANS_SINE)
+		else:
+			_pass_tween.tween_property(
+				bomb_art, "scale", normal_cover, PASS_PULSE_DOWN_SEC
+			).set_trans(Tween.TRANS_SINE)
+			started = true
+	if glass:
+		if started:
+			_pass_tween.parallel().tween_property(
+				glass, "scale", Vector2.ONE, PASS_PULSE_DOWN_SEC
+			).set_trans(Tween.TRANS_SINE)
+		else:
+			_pass_tween.tween_property(
+				glass, "scale", Vector2.ONE, PASS_PULSE_DOWN_SEC
+			).set_trans(Tween.TRANS_SINE)
+	_pass_tween.tween_callback(_reset_pass_pivots)
+
+
+func _reset_pass_pivots() -> void:
+	if scaled_content:
+		scaled_content.pivot_offset = Vector2.ZERO
+	if bomb_art:
+		bomb_art.pivot_offset = Vector2.ZERO
+	if dial_glass is Control:
+		(dial_glass as Control).pivot_offset = Vector2.ZERO
+		(dial_glass as Control).scale = Vector2.ONE
 
 
 func _slime_to_background(slime_color: Color) -> Color:
@@ -205,6 +298,8 @@ func _play_comes_flash() -> void:
 
 func _play_explosion() -> void:
 	_kill_tween()
+	_kill_pass_tween()
+	_reset_pass_pivots()
 	_kill_tint_tween()
 	var rebound_tint := _base_tint
 	if player_color_bg:
@@ -250,6 +345,12 @@ func _kill_tween() -> void:
 	if _tween:
 		_tween.kill()
 		_tween = null
+
+
+func _kill_pass_tween() -> void:
+	if _pass_tween:
+		_pass_tween.kill()
+		_pass_tween = null
 
 
 func _kill_tint_tween() -> void:

@@ -24,7 +24,7 @@ State UI: choice/ready/countdown/play share dial layout · ready=«Готовы?
 
 **Input** (`game_input.gd`): `mouse_filter=IGNORE`. PLAY: multi-touch pass — next only when **all** fingers up within **0.3s**; hold longer = invalid · tap→next + sparks. **Emergency** button (PLAY only) → `EMERGENCY` state, pause game+audio, overlay to re-pick current player · continue → `try_add_bonus_bomb_time()`. RESULT→`GameResultOverlay` «В МЕНЮ» button (10s reveal, haptics, no tap-skip).
 
-**Pass sparks:** `pass_bomb_spark_layer.gd` on `ScaledContent` — radial additive fire burst at touch (one-shot CPUParticles2D).
+**Pass sparks:** `pass_bomb_spark_layer.gd` on `ScaledContent` — radial additive fire burst at touch (one-shot CPUParticles2D). Pass also pulses whole bomb (`GameBombBackground.pulse_pass`) — art + dial glass + ScaledContent (lamps/syllable/player pill), same timing as old syllable-only bump.
 
 **Emergency:** `BattleEmergencyOverlay` + `EmergencyState` · `PlayerSelectionWidget.set_emergency_mode()` · `GameBattleChrome/EmergencyButton` · icon `icon_emergency.svg`.
 

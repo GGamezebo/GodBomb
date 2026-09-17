@@ -48,10 +48,3 @@ func set_message(title: String) -> void:
 	if not is_inside_tree():
 		await ready
 	_main_label.text = WordCondition.get_message_display_bbcode(title, MAIN_TEXT_MAX_WIDTH)
-
-
-func pulse_next_turn() -> void:
-	pivot_offset = size * 0.5
-	var tween := create_tween()
-	tween.tween_property(self, "scale", Vector2(1.04, 1.04), 0.08).set_trans(Tween.TRANS_SINE)
-	tween.tween_property(self, "scale", Vector2.ONE, 0.14).set_trans(Tween.TRANS_SINE)
