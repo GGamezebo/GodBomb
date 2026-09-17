@@ -19,3 +19,5 @@ alwaysApply: false
 **F6:** `@export` дефолты в `.tscn`, тяжёлая логика в `initialize()`, не в `_ready()` контекста до add_child.
 
 **Editor window:** play from editor uses 360×640 (`window_width/height_override` + `MainContext._apply_editor_window_size`). Viewport stays 1080×1920, stretch `canvas_items`.
+
+**Ship weight:** textures VRAM-compressed (ETC2/ASTC mobile, S3TC web); concept art under `assets/reference/` is `.gdignore`d. See `project.mdc` + `tools/optimize_build_assets.py`.

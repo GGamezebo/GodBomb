@@ -43,7 +43,10 @@ def _pick_rule(rel_path: str, width: int, height: int) -> tuple[tuple[int, int],
         return (DESIGN_W, DESIGN_H), "menu_background"
 
     if normalized.startswith("textures/background/") or normalized.endswith("/background.png"):
-        return (DESIGN_W, DESIGN_H), "game_background"
+        target = _scale_to_max(width, height, 1024)
+        if target == (width, height):
+            return None
+        return target, "game_background"
 
     if normalized.endswith("/bp.png") and height >= 1500:
         return (DESIGN_W, DESIGN_H), "bp_background"

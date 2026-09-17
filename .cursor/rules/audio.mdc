@@ -10,16 +10,18 @@ alwaysApply: false
 
 ## Menu music
 
-`GameAudioController` → `music_player` on `MusicPlayer` (`background.mp3`, ~120s seamless loop, procedural).  
-Regen: `python tools/generate_menu_music.py` · `set_in_battle(false)` + `music_enabled` → loop.
+`GameAudioController` → `music_player` on `MusicPlayer` (`background.mp3`, ~120s seamless loop, procedural, **mono ~64kbps**).  
+Regen: `python tools/generate_menu_music.py` · then `python tools/optimize_build_assets.py` · `set_in_battle(false)` + `music_enabled` → loop.
 
 ## Gameplay SFX — `GameSound` (`game_sound.gd`)
 
-- `Countdown.wav` — roulette + countdown ticks
+- `Countdown.wav` — roulette + countdown ticks (import: mono + ADPCM)
 - `ui_confirm.wav` — tap pass (`ev_touch_next_player`) · `FastTick.mp3` / `SlowTick.mp3` — bomb alert (random)
-- `game_sound.mp3` — loop in **PLAY** (paused in **EMERGENCY**)
-- `win.mp3` — loop in **RESULT**
+- `game_sound.mp3` — loop in **PLAY** (paused in **EMERGENCY**) — keep **mono ~64kbps**
+- `win.mp3` — loop in **RESULT** — **mono ~80kbps**
 - `Explosion.mp3` — взрыв
+
+**Weight:** do not re-export music at 192–320kbps stereo. Use `tools/optimize_build_assets.py` after replacing tracks.
 
 ## UI SFX — `UiSounds` (`core/systems/audio/ui_sounds.gd`)
 
