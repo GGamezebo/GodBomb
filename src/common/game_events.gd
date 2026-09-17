@@ -9,3 +9,4 @@ extends Resource
 @warning_ignore("unused_signal") signal ev_touch_next_player(touch_position: Vector2)
 @warning_ignore("unused_signal") signal ev_card_changed(card: GameCard)
 @warning_ignore("unused_signal") signal ev_battle_splash(kind: String, player: GamePlayer)
+@warning_ignore("unused_signal") signal ev_table_center_mode_changed(enabled: bool)

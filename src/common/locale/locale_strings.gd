@@ -28,6 +28,8 @@ const RULES_TEXT_RU := """[font_size=36]Весёлая словесная игр
 [font_size=40][b]Если накосячили[/b][/font_size]
 Неверное слово или ложное нажатие? Аварийная кнопка в бою — выберите, кто переигрывает ход. Состав можно поправить через кнопку со списком игроков.
 
+Кнопка «телефон в центре» — положите смартфон на стол: текст на экране сам поворачивается к текущему игроку, телефон крутить не нужно.
+
 
 [font_size=24][color=#ffffff18]————————————————[/color][/font_size]
 
@@ -65,6 +67,8 @@ In settings — match length, which sets the number of rounds.
 
 [font_size=40][b]Made a mistake?[/b][/font_size]
 Wrong word or accidental tap? The emergency button in battle — pick who replays the turn. Adjust the roster via the player list button.
+
+The «phone in the center» button — leave the phone flat on the table: on-screen text turns toward the current player, so nobody needs to spin the phone.
 
 
 [font_size=24][color=#ffffff18]————————————————[/color][/font_size]
@@ -129,12 +133,14 @@ const _RU: Dictionary = {
 	"RESULT_TO_MENU": "В МЕНЮ",
 	"EXPLOSION_BOOM": "БУМ!",
 	"ACTION_HINT_TAP": "Нажми экран — передай бомбу",
+	"ACTION_HINT_TAP_TABLE": "Нажми экран — ход следующего",
 	"TIME_PROGRESS_LABEL": "До конца игры",
 	"TIME_PROGRESS_MINUTES": "%d мин",
 	"HUD_LOTTERY": "Жребий — кто ходит первым?",
 	"HUD_READY": "Готовы?",
 	"HUD_START_ROUND": "Начать раунд",
 	"HUD_START_ROUND_HINT": "Нажми «Начать раунд»",
+	"HUD_TABLE_CENTER_HINT": "Положите телефон в центр стола",
 	"ONBOARDING_SKIP": "Пропустить",
 	"ONBOARDING_GOT_IT": "Понятно",
 	"ONBOARDING_ADD_TITLE": "Соберите команду",
@@ -214,12 +220,14 @@ const _EN: Dictionary = {
 	"RESULT_TO_MENU": "TO MENU",
 	"EXPLOSION_BOOM": "BOOM!",
 	"ACTION_HINT_TAP": "Tap the screen — pass the bomb",
+	"ACTION_HINT_TAP_TABLE": "Tap the screen — next player's turn",
 	"TIME_PROGRESS_LABEL": "Until the end",
 	"TIME_PROGRESS_MINUTES": "%d min",
 	"HUD_LOTTERY": "Lottery — who goes first?",
 	"HUD_READY": "Ready?",
 	"HUD_START_ROUND": "Start round",
 	"HUD_START_ROUND_HINT": "Tap «Start round»",
+	"HUD_TABLE_CENTER_HINT": "Place the phone in the center of the table",
 	"ONBOARDING_SKIP": "Skip",
 	"ONBOARDING_GOT_IT": "Got it",
 	"ONBOARDING_ADD_TITLE": "Build your team",

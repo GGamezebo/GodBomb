@@ -41,7 +41,10 @@ func initialize(data: Dictionary) -> void:
 	if battle_chrome:
 		battle_chrome.game_manager = game_manager
 		battle_chrome.game_events = game_events
-		battle_chrome.configure(data)
+		var chrome_data := data.duplicate()
+		if account and not chrome_data.has("account"):
+			chrome_data["account"] = account
+		battle_chrome.configure(chrome_data)
 	var onboarding: OnboardingController = data.get("onboarding_controller")
 	if onboarding:
 		onboarding.bind_game(self)

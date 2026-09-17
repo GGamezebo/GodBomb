@@ -2,6 +2,8 @@ class_name GameBattleChrome
 extends Control
 
 const PLAYERS_ACTIVE_MODULATE := Color(1.12, 1.08, 0.94, 1.0)
+const ICON_FIXED_PHONE := preload("res://assets/party_kitchen/buttons/icon_fixed_phone.svg")
+const ICON_PASS_PHONE := preload("res://assets/party_kitchen/buttons/icon_pass_phone.svg")
 
 @export var main_events: MainEvents
 @export var menu_events: MenuEvents
@@ -12,6 +14,7 @@ const PLAYERS_ACTIVE_MODULATE := Color(1.12, 1.08, 0.94, 1.0)
 @export var top_bar: Control
 @export var exit_button: TextureButton
 @export var players_button: TextureButton
+@export var fixed_phone_button: TextureButton
 @export var emergency_button: TextureButton
 @export var player_lobby_overlay: BattlePlayerLobbyOverlay
 @export var emergency_overlay: BattleEmergencyOverlay
@@ -21,6 +24,7 @@ var listener: EventListener = EventListener.new()
 var _players_overlay_open: bool = false
 var _exit_dialog_open: bool = false
 var _pending_configure_data: Dictionary = {}
+var _account: PDataAccount = null
 
 
 func _ready() -> void:
@@ -31,6 +35,9 @@ func _ready() -> void:
 		exit_button.pressed.connect(_on_exit_pressed)
 	if players_button:
 		players_button.pressed.connect(_on_players_pressed)
+	if fixed_phone_button:
+		fixed_phone_button.pressed.connect(_on_fixed_phone_pressed)
+		UiSounds.bind_button(fixed_phone_button, &"toggle")
 	if emergency_button:
 		emergency_button.button_down.connect(_on_emergency_pressed)
 		emergency_button.visible = false
@@ -63,6 +70,13 @@ func configure(data: Dictionary) -> void:
 
 
 func _apply_configure() -> void:
+	var session_account: PDataAccount = _pending_configure_data.get("account")
+	if session_account:
+		_account = session_account
+	elif player_lobby_overlay and player_lobby_overlay.account:
+		_account = player_lobby_overlay.account
+	_sync_fixed_phone_button()
+	_emit_table_center_mode(false)
 	if player_lobby_overlay:
 		player_lobby_overlay.game_manager = game_manager
 		player_lobby_overlay.game_config = game_config
@@ -98,6 +112,9 @@ func _set_top_bar_mode(state: String, bar_visible: bool) -> void:
 	if players_button:
 		var overtime := game_manager != null and game_manager.session != null and game_manager.session.is_overtime
 		players_button.visible = bar_visible and state == FSMGameStates.READY_TO_START and not overtime
+	if fixed_phone_button:
+		fixed_phone_button.visible = bar_visible and state == FSMGameStates.READY_TO_START
+		_sync_fixed_phone_button()
 	if emergency_button:
 		emergency_button.visible = bar_visible and state == FSMGameStates.PLAY
 	if not bar_visible or state != FSMGameStates.READY_TO_START:
@@ -175,6 +192,43 @@ func _on_players_pressed() -> void:
 	_set_players_overlay(not _players_overlay_open)
 
 
+func _on_fixed_phone_pressed() -> void:
+	if _account == null:
+		return
+	var enabled := not _account.get_table_center_mode()
+	_account.set_table_center_mode(enabled)
+	_sync_fixed_phone_button()
+	_persist_account_only()
+	_emit_table_center_mode(true)
+	if game_hud and game_hud.has_method("show_table_center_hint"):
+		if enabled:
+			game_hud.show_table_center_hint()
+		elif game_hud.has_method("show_ready_hint"):
+			game_hud.show_ready_hint()
+
+
+func _persist_account_only() -> void:
+	var controller := get_tree().get_first_node_in_group(PersistentDataController.PERSISTENCE_GROUP)
+	if controller and controller.has_method("save_account"):
+		controller.save_account()
+
+
+func _sync_fixed_phone_button() -> void:
+	if not fixed_phone_button:
+		return
+	var enabled := _account != null and _account.get_table_center_mode()
+	fixed_phone_button.texture_normal = ICON_FIXED_PHONE if enabled else ICON_PASS_PHONE
+	fixed_phone_button.modulate = Color.WHITE
+
+
+func _emit_table_center_mode(animate: bool) -> void:
+	var enabled := _account != null and _account.get_table_center_mode()
+	if game_events:
+		game_events.ev_table_center_mode_changed.emit(enabled)
+	if game_hud and game_hud.has_method("set_table_center_mode"):
+		game_hud.set_table_center_mode(enabled, animate)
+
+
 func _set_players_overlay(open: bool) -> void:
 	if open == _players_overlay_open:
 		return
@@ -205,3 +259,7 @@ func _on_player_lobby_closed() -> void:
 func _save_account() -> void:
 	if player_lobby_overlay:
 		player_lobby_overlay.save_account()
+	else:
+		var controller := get_tree().get_first_node_in_group(PersistentDataController.PERSISTENCE_GROUP)
+		if controller and controller.has_method("save_account"):
+			controller.save_account()

@@ -19,6 +19,7 @@ var _hint_banner: TableHintBanner
 var _time_progress_banner: GameTimeProgressBanner
 var _action_hints: GameActionHints
 var _battle_layer: Control
+var _dial_facing_layer: Control
 var _countdown_label: Label
 var _explosion_overlay: GameExplosionOverlay
 var _splash_overlay: BattleSplashOverlay
@@ -26,6 +27,9 @@ var _result_overlay: GameResultOverlay
 var _current_state: String = ""
 var _last_choice_player_index: int = -1
 var _time_progress_token: int = 0
+var _table_center_mode: bool = false
+var _facing_rotation: float = 0.0
+var _facing_tween: Tween
 
 
 func _ready() -> void:
@@ -39,11 +43,16 @@ func _ready() -> void:
 		listener.add(game_events.ev_countdown_tick_changed, _on_countdown_tick)
 		listener.add(game_events.ev_card_changed, _on_card_changed)
 		listener.add(game_events.ev_battle_splash, _on_battle_splash)
+		listener.add(game_events.ev_table_center_mode_changed, _on_table_center_mode_changed)
 	call_deferred("_sync_to_current_state")
+	call_deferred("_setup_dial_facing_layer")
 
 
 func _exit_tree() -> void:
 	listener.deinit()
+	if _facing_tween:
+		_facing_tween.kill()
+		_facing_tween = null
 
 
 func _find_bomb_layout() -> GameBombBackground:
@@ -89,6 +98,7 @@ func _get_hint_bounds() -> Rect2:
 func _reposition_battle_ui() -> void:
 	var design_root := _get_design_root()
 	var word_center := _get_round_word_center()
+	_layout_dial_facing_layer()
 	if _player_strip:
 		GamePlayerStrip.place_on_dial(_player_strip, word_center, TABLE_CENTER)
 	if _syllable_card:
@@ -115,6 +125,7 @@ func _reposition_battle_ui() -> void:
 	if _splash_overlay and _splash_overlay.visible:
 		_splash_overlay.size = design_root.size
 		_splash_overlay.relayout()
+	_apply_facing_rotation(_facing_rotation)
 
 
 func _build_ui() -> void:
@@ -128,11 +139,32 @@ func _build_ui() -> void:
 	_battle_layer.z_index = 2
 	design_root.add_child(_battle_layer)
 
+	_dial_facing_layer = Control.new()
+	_dial_facing_layer.name = "DialFacingLayer"
+	_dial_facing_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_dial_facing_layer.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	_dial_facing_layer.size = DESIGN_SIZE
+	_dial_facing_layer.pivot_offset = DisplayFacing.dial_center()
+	_dial_facing_layer.z_index = 3
+	design_root.add_child(_dial_facing_layer)
+
 	_player_strip = GamePlayerStrip.new()
-	_battle_layer.add_child(_player_strip)
+	_dial_facing_layer.add_child(_player_strip)
 
 	_syllable_card = GameSyllableCard.new()
-	_battle_layer.add_child(_syllable_card)
+	_dial_facing_layer.add_child(_syllable_card)
+
+	_countdown_label = Label.new()
+	_countdown_label.custom_minimum_size = Vector2(440, 440)
+	_countdown_label.size = Vector2(440, 440)
+	_countdown_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_countdown_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_countdown_label.add_theme_font_size_override("font_size", 140)
+	_countdown_label.add_theme_color_override("font_color", Color.WHITE)
+	_countdown_label.add_theme_color_override("font_outline_color", Color(0.04, 0.03, 0.02, 0.85))
+	_countdown_label.add_theme_constant_override("outline_size", 10)
+	_countdown_label.z_index = 1
+	_dial_facing_layer.add_child(_countdown_label)
 
 	_hint_banner = TableHintBanner.new()
 	_hint_banner.z_index = 5
@@ -147,21 +179,22 @@ func _build_ui() -> void:
 	_action_hints.z_index = 4
 	_battle_layer.add_child(_action_hints)
 
-	_countdown_label = Label.new()
-	_countdown_label.custom_minimum_size = Vector2(440, 440)
-	_countdown_label.size = Vector2(440, 440)
-	_countdown_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_countdown_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	_countdown_label.add_theme_font_size_override("font_size", 140)
-	_countdown_label.add_theme_color_override("font_color", Color.WHITE)
-	_countdown_label.add_theme_color_override("font_outline_color", Color(0.04, 0.03, 0.02, 0.85))
-	_countdown_label.add_theme_constant_override("outline_size", 10)
-	_countdown_label.z_index = 3
-	design_root.add_child(_countdown_label)
-
 	_build_explosion_overlay(design_root)
 	_build_splash_overlay(design_root)
 	_build_result_overlay()
+
+
+func _layout_dial_facing_layer() -> void:
+	if _dial_facing_layer == null:
+		return
+	_dial_facing_layer.position = Vector2.ZERO
+	_dial_facing_layer.size = DESIGN_SIZE
+	_dial_facing_layer.pivot_offset = DisplayFacing.dial_center()
+
+
+func _setup_dial_facing_layer() -> void:
+	_layout_dial_facing_layer()
+	_refresh_facing(false)
 
 
 func _build_explosion_overlay(design_root: Control) -> void:
@@ -193,11 +226,82 @@ func set_lobby_overlay_active(active: bool) -> void:
 
 func sync_from_session() -> void:
 	_sync_to_current_state()
+	_refresh_facing(true)
+
+
+func set_table_center_mode(enabled: bool, animate: bool = true) -> void:
+	_table_center_mode = enabled
+	if _action_hints:
+		_action_hints.set_table_center_mode(enabled)
+	_refresh_facing(animate)
+
+
+func show_table_center_hint() -> void:
+	if _current_state == FSMGameStates.READY_TO_START:
+		_show_hint(LocaleService.text("HUD_TABLE_CENTER_HINT"))
+
+
+func show_ready_hint() -> void:
+	if _current_state == FSMGameStates.READY_TO_START:
+		_show_hint(LocaleService.text("HUD_START_ROUND_HINT"))
+
+
+func _on_table_center_mode_changed(enabled: bool) -> void:
+	set_table_center_mode(enabled, true)
+
+
+func _target_facing_rotation() -> float:
+	if not _table_center_mode or game_manager == null or game_manager.session == null:
+		return 0.0
+	var player := game_manager.session.get_current_player()
+	if player == null:
+		return 0.0
+	return DisplayFacing.rotation_for_seat(player.index, game_manager.session.players.size())
+
+
+func _refresh_facing(animate: bool) -> void:
+	var target := _target_facing_rotation()
+	if not animate:
+		if _facing_tween:
+			_facing_tween.kill()
+			_facing_tween = null
+		_apply_facing_rotation(target)
+		return
+	_tween_facing_to(target)
+
+
+func _tween_facing_to(target: float) -> void:
+	var end := _facing_rotation + DisplayFacing.shortest_delta(_facing_rotation, target)
+	if is_equal_approx(end, _facing_rotation):
+		_apply_facing_rotation(target)
+		return
+	if _facing_tween:
+		_facing_tween.kill()
+	var duration := (
+		DisplayFacing.TWEEN_DURATION_CHOICE
+		if _current_state == FSMGameStates.PLAYER_CHOICE
+		else DisplayFacing.TWEEN_DURATION
+	)
+	_facing_tween = create_tween()
+	_facing_tween.tween_method(_apply_facing_rotation, _facing_rotation, end, duration).set_trans(
+		Tween.TRANS_CUBIC
+	).set_ease(Tween.EASE_IN_OUT)
+	_facing_tween.tween_callback(func() -> void: _facing_rotation = target)
+
+
+func _apply_facing_rotation(rotation_rad: float) -> void:
+	_facing_rotation = rotation_rad
+	if _dial_facing_layer == null:
+		return
+	_layout_dial_facing_layer()
+	_dial_facing_layer.rotation = rotation_rad
 
 
 func _hide_all() -> void:
 	if _battle_layer:
 		_battle_layer.visible = false
+	if _dial_facing_layer:
+		_dial_facing_layer.visible = false
 	if _hint_banner:
 		_hint_banner.hide_message(false)
 	if _time_progress_banner:
@@ -248,6 +352,7 @@ func _on_game_state_changed(from_state: String, to_state: String) -> void:
 			_show_explosion()
 		FSMGameStates.RESULT:
 			_show_result()
+	_refresh_facing(to_state != FSMGameStates.PLAYER_CHOICE)
 
 
 func _on_current_player_changed(player: GamePlayer) -> void:
@@ -257,12 +362,14 @@ func _on_current_player_changed(player: GamePlayer) -> void:
 	if _current_state == FSMGameStates.PLAYER_CHOICE and player.index != _last_choice_player_index:
 		_last_choice_player_index = player.index
 		_player_strip.pulse_choice_tick()
+	_refresh_facing(true)
 
 
 func _on_countdown_tick(seconds_left: int) -> void:
 	if _countdown_label:
 		_countdown_label.text = str(seconds_left)
 		_countdown_label.visible = true
+		_countdown_label.pivot_offset = _countdown_label.size * 0.5
 		var tween := create_tween()
 		tween.tween_property(_countdown_label, "scale", Vector2(1.12, 1.12), 0.08)
 		tween.tween_property(_countdown_label, "scale", Vector2.ONE, 0.12)
@@ -297,6 +404,8 @@ func _sync_current_player() -> void:
 
 func _show_player_choice() -> void:
 	_battle_layer.visible = true
+	if _dial_facing_layer:
+		_dial_facing_layer.visible = true
 	_player_strip.visible = true
 	_last_choice_player_index = -1
 	if _syllable_card:
@@ -309,6 +418,8 @@ func _show_player_choice() -> void:
 
 func _show_ready_to_start(from_state: String = "") -> void:
 	_battle_layer.visible = true
+	if _dial_facing_layer:
+		_dial_facing_layer.visible = true
 	_player_strip.visible = true
 	if _syllable_card:
 		_syllable_card.visible = true
@@ -360,6 +471,8 @@ func _cancel_time_progress_timer() -> void:
 
 func _show_countdown() -> void:
 	_battle_layer.visible = true
+	if _dial_facing_layer:
+		_dial_facing_layer.visible = true
 	_player_strip.visible = true
 	if _syllable_card:
 		_syllable_card.visible = false
@@ -371,9 +484,12 @@ func _show_countdown() -> void:
 
 func _show_play() -> void:
 	_battle_layer.visible = true
+	if _dial_facing_layer:
+		_dial_facing_layer.visible = true
 	_player_strip.visible = true
 	if _action_hints:
 		_action_hints.visible = true
+		_action_hints.set_table_center_mode(_table_center_mode)
 	if _syllable_card:
 		_syllable_card.visible = true
 	_sync_current_player()

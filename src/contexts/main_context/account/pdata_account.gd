@@ -13,6 +13,7 @@ const DEFAULT_GAME_TIME_MINUTES := 5
 const DEFAULT_MUSIC_ENABLED := true
 const DEFAULT_HAPTICS_ENABLED := true
 const DEFAULT_HAPTICS_STRENGTH := 1.0
+const DEFAULT_TABLE_CENTER_MODE := false
 
 
 static func default_recent_names(locale: String = "ru") -> Array[String]:
@@ -241,6 +242,15 @@ func set_haptics_strength(linear: float) -> void:
 	emit_changed()
 
 
+func get_table_center_mode() -> bool:
+	return bool(data.get("table_center_mode", DEFAULT_TABLE_CENTER_MODE))
+
+
+func set_table_center_mode(enabled: bool) -> void:
+	data["table_center_mode"] = enabled
+	emit_changed()
+
+
 func reset_progress() -> void:
 	data["players"] = []
 	data["games_played"] = 0
@@ -253,6 +263,7 @@ func reset_progress() -> void:
 	data["sfx_volume"] = DEFAULT_SFX_VOLUME
 	data["haptics_enabled"] = DEFAULT_HAPTICS_ENABLED
 	data["haptics_strength"] = DEFAULT_HAPTICS_STRENGTH
+	data["table_center_mode"] = DEFAULT_TABLE_CENTER_MODE
 	emit_changed()
 
 

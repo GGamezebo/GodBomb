@@ -1,8 +1,8 @@
 [gd_resource type="Theme" format=3 uid="uid://bxmy5sgjf61c7"]
 
-[ext_resource type="Texture2D" uid="uid://7hpwp1e12l4m" path="res://assets/ui/theme/checkbox_unchecked.svg" id="tex_cb_off"]
-[ext_resource type="Texture2D" uid="uid://blhoc5nmrdd78" path="res://assets/ui/theme/checkbox_checked.svg" id="tex_cb_on"]
-[ext_resource type="Texture2D" uid="uid://bdroe6vmbd0hw" path="res://assets/ui/theme/slider_grabber.svg" id="tex_grabber"]
+[ext_resource type="Texture2D" uid="uid://cair3hrqkt48o" path="res://assets/ui/theme/checkbox_unchecked.svg" id="tex_cb_off"]
+[ext_resource type="Texture2D" uid="uid://byyskym4b525t" path="res://assets/ui/theme/checkbox_checked.svg" id="tex_cb_on"]
+[ext_resource type="Texture2D" uid="uid://bxl8owl7kdalt" path="res://assets/ui/theme/slider_grabber.svg" id="tex_grabber"]
 
 [sub_resource type="SystemFont" id="Font_bold"]
 font_names = PackedStringArray("Fredoka", "Nunito", "Rubik", "Roboto", "Noto Sans", "Segoe UI", "Arial")

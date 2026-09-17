@@ -18,7 +18,7 @@ alwaysApply: false
 
 **Layout:** dial@`RoundWord` · player pill on lower dial · `TableHintBanner`@`PlayerName` · pass hint y≈1410 (`GameActionHints`).
 
-**HUD:** SyllableCard — fitted single-line center text · hints via `TableHintBanner` · PlayerStrip on dial.
+**HUD:** SyllableCard — fitted single-line center text · hints via `TableHintBanner` · PlayerStrip on dial · **table-center mode** (`table_center_mode`): TopBar toggle `FixedPhoneButton` (`icon_fixed_phone` / `icon_pass_phone`) · only dial content (syllable + name + countdown) rotates as one group around dial center via `DialFacingLayer` / `DisplayFacing` · hints/buttons stay fixed.
 
 State UI: choice/ready/countdown/play share dial layout · ready=«Готовы?»+StartRoundButton · play=full HUD.
 

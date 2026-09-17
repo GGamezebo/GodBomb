@@ -38,6 +38,14 @@ func _ready() -> void:
 	add_child(_ripple)
 
 
+func set_table_center_mode(enabled: bool) -> void:
+	if _tap_label == null:
+		return
+	_tap_label.text = LocaleService.text(
+		"ACTION_HINT_TAP_TABLE" if enabled else "ACTION_HINT_TAP"
+	)
+
+
 func _exit_tree() -> void:
 	listener.deinit()
 

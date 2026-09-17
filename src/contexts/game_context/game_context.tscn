@@ -42,6 +42,8 @@
 [ext_resource type="Texture2D" uid="uid://dhcclubtdmtpd" path="res://assets/party_kitchen/buttons/icon_emergency.svg" id="42"]
 [ext_resource type="AudioStream" uid="uid://x5qdrvhmg2g" path="res://assets/audio/music/win.mp3" id="43"]
 [ext_resource type="Script" uid="uid://4aa3vactq0xy" path="res://src/features/menu/bomb_top_bar_button.gd" id="44"]
+[ext_resource type="Texture2D" path="res://assets/party_kitchen/buttons/icon_fixed_phone.svg" id="45"]
+[ext_resource type="Texture2D" path="res://assets/party_kitchen/buttons/icon_pass_phone.svg" id="46"]
 
 [node name="GameContext" type="Control" unique_id=1610270397 node_paths=PackedStringArray("game_manager", "battle_chrome")]
 layout_mode = 3
@@ -173,7 +175,7 @@ mouse_filter = 2
 script = ExtResource("29")
 game_events = ExtResource("15")
 
-[node name="GameBattleChrome" type="Control" parent="UI/BackgroundBomb/ScaledContent" unique_id=1260246590 node_paths=PackedStringArray("top_bar", "exit_button", "players_button", "emergency_button", "player_lobby_overlay", "emergency_overlay", "exit_confirm_dialog")]
+[node name="GameBattleChrome" type="Control" parent="UI/BackgroundBomb/ScaledContent" unique_id=1260246590 node_paths=PackedStringArray("game_hud", "top_bar", "exit_button", "players_button", "fixed_phone_button", "emergency_button", "player_lobby_overlay", "emergency_overlay", "exit_confirm_dialog")]
 anchors_preset = 0
 offset_right = 1080.0
 offset_bottom = 1920.0
@@ -182,10 +184,12 @@ script = ExtResource("34")
 main_events = ExtResource("14")
 menu_events = ExtResource("31")
 game_events = ExtResource("15")
+game_hud = NodePath("../../../HUD")
 game_config = ExtResource("12")
 top_bar = NodePath("TopBar")
 exit_button = NodePath("TopBar/ExitButton")
 players_button = NodePath("TopBar/PlayersButton")
+fixed_phone_button = NodePath("TopBar/FixedPhoneButton")
 emergency_button = NodePath("TopBar/EmergencyButton")
 player_lobby_overlay = NodePath("../../../../BattlePlayerLobbyOverlay")
 emergency_overlay = NodePath("../../../../BattleEmergencyOverlay")
@@ -213,6 +217,14 @@ script = ExtResource("44")
 custom_minimum_size = Vector2(168, 168)
 layout_mode = 2
 texture_normal = ExtResource("33")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("44")
+
+[node name="FixedPhoneButton" type="TextureButton" parent="UI/BackgroundBomb/ScaledContent/GameBattleChrome/TopBar" unique_id=659171120]
+custom_minimum_size = Vector2(168, 168)
+layout_mode = 2
+texture_normal = ExtResource("46")
 ignore_texture_size = true
 stretch_mode = 5
 script = ExtResource("44")
