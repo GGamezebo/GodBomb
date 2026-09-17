@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://bff3xhmdudpjx" path="res://src/features/menu/pill_action_button.tscn" id="2"]
 [ext_resource type="PackedScene" path="res://src/features/menu/language_flag_picker.tscn" id="3"]
 
-[node name="SettingsWindow" type="Control" unique_id=2113593075 node_paths=PackedStringArray("language_picker", "language_name_label", "settings_scroll", "game_time_slider", "game_time_label", "music_check", "music_slider", "music_value_label", "sfx_slider", "sfx_value_label", "haptics_check", "haptics_slider", "haptics_value_label", "reset_button", "close_button")]
+[node name="SettingsWindow" type="Control" unique_id=2113593075 node_paths=PackedStringArray("language_picker", "language_name_label", "settings_scroll", "game_time_slider", "game_time_label", "difficulty_slider", "difficulty_label", "music_check", "music_slider", "music_value_label", "sfx_slider", "sfx_value_label", "haptics_check", "haptics_slider", "haptics_value_label", "reset_button", "close_button")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -17,6 +17,8 @@ language_name_label = NodePath("Panel/Margin/VBox/Scroll/ContentGutter/Content/L
 settings_scroll = NodePath("Panel/Margin/VBox/Scroll")
 game_time_slider = NodePath("Panel/Margin/VBox/Scroll/ContentGutter/Content/GameTimeSection/GameTimeRow/GameTimeSlider")
 game_time_label = NodePath("Panel/Margin/VBox/Scroll/ContentGutter/Content/GameTimeSection/GameTimeLabel")
+difficulty_slider = NodePath("Panel/Margin/VBox/Scroll/ContentGutter/Content/DifficultySection/DifficultyRow/DifficultySlider")
+difficulty_label = NodePath("Panel/Margin/VBox/Scroll/ContentGutter/Content/DifficultySection/DifficultyLabel")
 music_check = NodePath("Panel/Margin/VBox/Scroll/ContentGutter/Content/MusicCheck")
 music_slider = NodePath("Panel/Margin/VBox/Scroll/ContentGutter/Content/MusicSection/MusicRow/MusicSlider")
 music_value_label = NodePath("Panel/Margin/VBox/Scroll/ContentGutter/Content/MusicSection/MusicRow/MusicValueLabel")
@@ -123,6 +125,33 @@ grow_vertical = 2
 min_value = 1.0
 max_value = 30.0
 value = 5.0
+
+[node name="DifficultySection" type="VBoxContainer" parent="Panel/Margin/VBox/Scroll/ContentGutter/Content" unique_id=428763997]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="DifficultyLabel" type="Label" parent="Panel/Margin/VBox/Scroll/ContentGutter/Content/DifficultySection" unique_id=1401038743]
+layout_mode = 2
+theme_type_variation = &"ModalLabel"
+text = "Сложность: Средняя"
+
+[node name="DifficultyRow" type="Control" parent="Panel/Margin/VBox/Scroll/ContentGutter/Content/DifficultySection" unique_id=492329547]
+custom_minimum_size = Vector2(0, 96)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="DifficultySlider" type="HSlider" parent="Panel/Margin/VBox/Scroll/ContentGutter/Content/DifficultySection/DifficultyRow" unique_id=1017049149]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 26.0
+offset_right = -26.0
+grow_horizontal = 2
+grow_vertical = 2
+max_value = 2.0
+step = 1.0
+value = 1.0
 
 [node name="MusicCheck" type="CheckBox" parent="Panel/Margin/VBox/Scroll/ContentGutter/Content" unique_id=1077537578]
 custom_minimum_size = Vector2(0, 72)

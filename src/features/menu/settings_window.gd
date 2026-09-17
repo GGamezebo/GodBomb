@@ -9,6 +9,8 @@ extends Control
 @export var language_name_label: Label
 @export var game_time_slider: HSlider
 @export var game_time_label: Label
+@export var difficulty_slider: HSlider
+@export var difficulty_label: Label
 @export var music_check: CheckBox
 @export var music_slider: HSlider
 @export var music_value_label: Label
@@ -38,6 +40,9 @@ func _ready() -> void:
 	if game_time_slider:
 		game_time_slider.value_changed.connect(_on_game_time_changed)
 		UiSounds.bind_slider(game_time_slider, 1.0)
+	if difficulty_slider:
+		difficulty_slider.value_changed.connect(_on_difficulty_changed)
+		UiSounds.bind_slider(difficulty_slider, 1.0)
 	if music_check:
 		music_check.toggled.connect(_on_music_toggled)
 		UiSounds.bind_checkbox(music_check)
@@ -110,6 +115,8 @@ func _refresh_static_labels() -> void:
 		reset_button.text = LocaleService.text("SETTINGS_RESET")
 	if game_time_slider:
 		_update_game_time_label(int(game_time_slider.value))
+	if difficulty_slider:
+		_update_difficulty_label(int(difficulty_slider.value))
 
 
 func _sync_language_picker() -> void:
@@ -154,7 +161,7 @@ func _configure_scroll() -> void:
 
 
 func _configure_touch_sliders() -> void:
-	for slider: HSlider in [game_time_slider, music_slider, sfx_slider, haptics_slider]:
+	for slider: HSlider in [game_time_slider, difficulty_slider, music_slider, sfx_slider, haptics_slider]:
 		UiTouchTargets.configure_slider(slider, SLIDER_GRABBER_INSET)
 
 
@@ -205,6 +212,12 @@ func _sync_from_account() -> void:
 		game_time_slider.max_value = 30
 		game_time_slider.value = account.get_game_time_minutes()
 		_update_game_time_label(int(game_time_slider.value))
+	if difficulty_slider:
+		difficulty_slider.min_value = GameDecks.DIFFICULTY_EASY
+		difficulty_slider.max_value = GameDecks.DIFFICULTY_HARD
+		difficulty_slider.step = 1.0
+		difficulty_slider.value = account.get_difficulty()
+		_update_difficulty_label(account.get_difficulty())
 	if music_check:
 		music_check.button_pressed = account.get_music_enabled()
 	if music_slider:
@@ -231,6 +244,19 @@ func _on_game_time_changed(value: float) -> void:
 	_update_game_time_label(minutes)
 	if menu_events:
 		menu_events.ev_game_time_changed.emit(minutes)
+	_save_account()
+
+
+func _on_difficulty_changed(value: float) -> void:
+	if _syncing_account or not account:
+		return
+	var level := GameDecks.normalize_difficulty(int(value))
+	account.set_difficulty(level)
+	_update_difficulty_label(level)
+	if game_config:
+		LocaleService.apply_cards_to(game_config)
+	if menu_events:
+		menu_events.ev_difficulty_changed.emit(level)
 	_save_account()
 
 
@@ -296,6 +322,9 @@ func _on_reset_pressed() -> void:
 	_sync_from_account()
 	if menu_events:
 		menu_events.ev_game_time_changed.emit(account.get_game_time_minutes())
+		menu_events.ev_difficulty_changed.emit(account.get_difficulty())
+	if game_config:
+		LocaleService.apply_cards_to(game_config)
 	var audio := _get_audio_controller()
 	if audio:
 		audio.set_music_enabled(account.get_music_enabled())
@@ -309,6 +338,20 @@ func _on_reset_pressed() -> void:
 func _update_game_time_label(minutes: int) -> void:
 	if game_time_label:
 		game_time_label.text = LocaleService.text("SETTINGS_GAME_TIME") % minutes
+
+
+func _update_difficulty_label(level: int) -> void:
+	if difficulty_label == null:
+		return
+	var key := "SETTINGS_DIFFICULTY_MEDIUM"
+	match GameDecks.normalize_difficulty(level):
+		GameDecks.DIFFICULTY_EASY:
+			key = "SETTINGS_DIFFICULTY_EASY"
+		GameDecks.DIFFICULTY_HARD:
+			key = "SETTINGS_DIFFICULTY_HARD"
+		_:
+			key = "SETTINGS_DIFFICULTY_MEDIUM"
+	difficulty_label.text = LocaleService.text("SETTINGS_DIFFICULTY") % LocaleService.text(key)
 
 
 func _update_music_label(linear: float) -> void:

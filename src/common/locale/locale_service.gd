@@ -64,4 +64,7 @@ func get_rules_text() -> String:
 func apply_cards_to(config: GameConfig) -> void:
 	if config == null:
 		return
-	config.cards = GameDecks.get_cards(_locale)
+	var difficulty := GameDecks.DEFAULT_DIFFICULTY
+	if _account:
+		difficulty = _account.get_difficulty()
+	config.cards = GameDecks.get_cards(_locale, difficulty)

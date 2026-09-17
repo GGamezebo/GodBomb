@@ -251,6 +251,15 @@ func set_table_center_mode(enabled: bool) -> void:
 	emit_changed()
 
 
+func get_difficulty() -> int:
+	return GameDecks.normalize_difficulty(data.get("difficulty", GameDecks.DEFAULT_DIFFICULTY))
+
+
+func set_difficulty(level: int) -> void:
+	data["difficulty"] = GameDecks.normalize_difficulty(level)
+	emit_changed()
+
+
 func reset_progress() -> void:
 	data["players"] = []
 	data["games_played"] = 0
@@ -264,6 +273,7 @@ func reset_progress() -> void:
 	data["haptics_enabled"] = DEFAULT_HAPTICS_ENABLED
 	data["haptics_strength"] = DEFAULT_HAPTICS_STRENGTH
 	data["table_center_mode"] = DEFAULT_TABLE_CENTER_MODE
+	data["difficulty"] = GameDecks.DEFAULT_DIFFICULTY
 	emit_changed()
 
 
