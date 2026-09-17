@@ -2,26 +2,68 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
   <defs>
     <linearGradient id="bezel" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#5a4838"/>
-      <stop offset="50%" stop-color="#3a2e24"/>
-      <stop offset="100%" stop-color="#221a14"/>
+      <stop offset="0%" stop-color="#6a5644"/>
+      <stop offset="38%" stop-color="#3f3228"/>
+      <stop offset="100%" stop-color="#1a1410"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f0b878"/>
+      <stop offset="45%" stop-color="#c47a3a"/>
+      <stop offset="100%" stop-color="#6e3c18"/>
     </linearGradient>
     <linearGradient id="well" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#2a221c"/>
-      <stop offset="100%" stop-color="#120e0b"/>
+      <stop offset="0%" stop-color="#2e241c"/>
+      <stop offset="100%" stop-color="#0c0907"/>
     </linearGradient>
-    <radialGradient id="alert" cx="50%" cy="42%" r="58%">
-      <stop offset="0%" stop-color="#ff6a58"/>
-      <stop offset="55%" stop-color="#d43028"/>
-      <stop offset="100%" stop-color="#8a1810"/>
+    <radialGradient id="alert" cx="42%" cy="34%" r="68%">
+      <stop offset="0%" stop-color="#ff8a72"/>
+      <stop offset="38%" stop-color="#ef3c2c"/>
+      <stop offset="72%" stop-color="#b01814"/>
+      <stop offset="100%" stop-color="#5c0c0a"/>
+    </radialGradient>
+    <linearGradient id="alertEdge" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffc4b0"/>
+      <stop offset="55%" stop-color="#e85840"/>
+      <stop offset="100%" stop-color="#7a1810"/>
+    </linearGradient>
+    <linearGradient id="mark" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fffaf4"/>
+      <stop offset="100%" stop-color="#e8c8a8"/>
+    </linearGradient>
+    <radialGradient id="innerGlow" cx="50%" cy="42%" r="55%">
+      <stop offset="0%" stop-color="#ff6048" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#ff6048" stop-opacity="0"/>
     </radialGradient>
   </defs>
-  <ellipse cx="60" cy="68" rx="50" ry="11" fill="#000000" opacity="0.32"/>
-  <ellipse cx="60" cy="58" rx="54" ry="50" fill="url(#bezel)" stroke="#6b4a2a" stroke-width="4"/>
-  <ellipse cx="60" cy="56" rx="44" ry="40" fill="url(#well)" stroke="#8a5a32" stroke-width="2"/>
-  <circle cx="60" cy="54" r="28" fill="url(#alert)" stroke="#ff9a88" stroke-width="2" opacity="0.95"/>
-  <rect x="55" y="34" width="10" height="30" rx="5" fill="#fff4ea"/>
-  <circle cx="60" cy="74" r="6.5" fill="#fff4ea"/>
-  <path d="M24 88 L36 88 L32 96 L28 96 Z" fill="#c47a3a" opacity="0.7"/>
-  <path d="M84 88 L96 88 L92 96 L88 96 Z" fill="#c47a3a" opacity="0.7"/>
+  <!-- ground shadow -->
+  <ellipse cx="60" cy="72" rx="52" ry="13" fill="#000000" opacity="0.42"/>
+  <!-- outer metal bezel -->
+  <ellipse cx="60" cy="58" rx="54" ry="50" fill="url(#bezel)" stroke="url(#rim)" stroke-width="5"/>
+  <!-- bezel top lip highlight -->
+  <ellipse cx="60" cy="42" rx="40" ry="16" fill="#ffffff" opacity="0.08"/>
+  <!-- recessed well -->
+  <ellipse cx="60" cy="57" rx="43" ry="39" fill="url(#well)" stroke="#9a6234" stroke-width="2.2"/>
+  <ellipse cx="60" cy="57" rx="40" ry="36" fill="url(#innerGlow)"/>
+  <!-- raised alert gem -->
+  <ellipse cx="60" cy="58" rx="29" ry="28" fill="#000000" opacity="0.35"/>
+  <circle cx="60" cy="53" r="28" fill="url(#alert)" stroke="url(#alertEdge)" stroke-width="2.6"/>
+  <!-- gem speculars -->
+  <ellipse cx="50" cy="40" rx="14" ry="8" fill="#ffffff" opacity="0.34"/>
+  <ellipse cx="46" cy="38" rx="5" ry="2.4" fill="#ffffff" opacity="0.55"/>
+  <path d="M72 62 Q78 53 74 46" fill="none" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" opacity="0.22"/>
+  <!-- bottom gem shade -->
+  <ellipse cx="60" cy="68" rx="20" ry="8" fill="#4a0808" opacity="0.35"/>
+  <!-- exclamation -->
+  <rect x="54.5" y="33" width="11" height="28" rx="5.5" fill="url(#mark)"/>
+  <rect x="56.5" y="35" width="4" height="10" rx="2" fill="#ffffff" opacity="0.35"/>
+  <circle cx="60" cy="72" r="6.8" fill="url(#mark)"/>
+  <circle cx="58.5" cy="70.2" r="2.2" fill="#ffffff" opacity="0.4"/>
+  <!-- copper rivets -->
+  <circle cx="28" cy="40" r="3.2" fill="#8a7058" stroke="#3a2e24" stroke-width="1"/>
+  <circle cx="92" cy="40" r="3.2" fill="#8a7058" stroke="#3a2e24" stroke-width="1"/>
+  <circle cx="28" cy="76" r="3.2" fill="#6a5848" stroke="#2a2218" stroke-width="1"/>
+  <circle cx="92" cy="76" r="3.2" fill="#6a5848" stroke="#2a2218" stroke-width="1"/>
+  <!-- hazard feet -->
+  <path d="M22 90 L36 90 L31 98 L27 98 Z" fill="#d4883c" opacity="0.85"/>
+  <path d="M84 90 L98 90 L93 98 L89 98 Z" fill="#d4883c" opacity="0.85"/>
 </svg>

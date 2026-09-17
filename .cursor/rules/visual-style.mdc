@@ -19,7 +19,7 @@ alwaysApply: false
 - Фон сцены: тёмно-красный
 - Циферблат: тёмное стекло, искры; shader — `bomb_dial_glass.gdshader`
 - Баннеры подсказок: тёмная плашка, медно-оранжевая рамка — `TableHintBanner`
-- Кнопки: металл + медная окантовка — `start_active.svg`, `icon_*.svg`, `BombTopBarButton` (мягкое медное свечение)
+- Кнопки: металл + медная окантовка — `start_active.svg`, `icon_*.svg`, `BombTopBarButton` (мягкое медное свечение; Emergency `alert_glow` — объёмный SVG + мягкая аура/редкий блик)
 - Иконки: одна `assets/icon.png` везде. Android: **Gradle build** (`gradle_build/use_gradle_build=true`, шаблон `android/build/`) — иначе `splash_screen/background_color` не попадает в APK и вспышка белого на старте. `icon_adaptive_bg.png` — чёрный слой adaptive. Генерация: `tools/generate_app_icons.ps1`
 - Модальные CTA: `ModalButton` / `Button` в `god_bomb_ui.theme.tres` — как СТАРТ
 
