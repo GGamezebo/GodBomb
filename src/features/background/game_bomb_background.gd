@@ -7,7 +7,6 @@ const NEUTRAL_BG := Color(0.06, 0.05, 0.04, 1.0)
 const PASS_PULSE_SCALE := 1.04
 const PASS_PULSE_UP_SEC := 0.08
 const PASS_PULSE_DOWN_SEC := 0.14
-const PASS_PULSE_PIVOT := Vector2(540.0, 928.0)
 
 signal layout_applied
 
@@ -63,7 +62,7 @@ func _exit_tree() -> void:
 	_kill_tween()
 	_kill_pass_tween()
 	_kill_tint_tween()
-	_reset_pass_pivots()
+	_reset_pass_layout()
 
 
 func get_hint_marker_design_position() -> Vector2:
@@ -127,31 +126,56 @@ func pulse_pass() -> void:
 		return
 	_kill_pass_tween()
 	var cover := get_cover_scale()
-	var normal_cover := Vector2.ONE * cover
-	var punch_cover := normal_cover * PASS_PULSE_SCALE
+	var offset := (size - DESIGN_SIZE * cover) * 0.5
+	var dial := DisplayFacing.dial_center()
+	var normal_scale := Vector2.ONE * cover
+	var punch_scale := normal_scale * PASS_PULSE_SCALE
+	# Keep dial fixed without pivot_offset (TextureRect+pivot drifts on device).
+	var normal_pos := offset
+	var punch_pos := offset + dial * cover * (1.0 - PASS_PULSE_SCALE)
 	if scaled_content:
-		scaled_content.pivot_offset = PASS_PULSE_PIVOT
+		scaled_content.pivot_offset = Vector2.ZERO
+		scaled_content.position = normal_pos
+		scaled_content.scale = normal_scale
 	if bomb_art:
-		bomb_art.pivot_offset = PASS_PULSE_PIVOT
+		bomb_art.pivot_offset = Vector2.ZERO
+		bomb_art.position = normal_pos
+		bomb_art.scale = normal_scale
 	var glass := dial_glass as Control
+	var glass_normal_pos := Vector2.ZERO
+	var glass_punch_pos := Vector2.ZERO
 	if glass:
-		glass.pivot_offset = glass.size * 0.5
+		glass.pivot_offset = Vector2.ZERO
+		glass.scale = Vector2.ONE
+		glass_normal_pos = offset + BombDialLayout.GLASS_DESIGN_POSITION * cover
+		var glass_center := glass_normal_pos + glass.size * 0.5
+		glass_punch_pos = glass_center - glass.size * 0.5 * PASS_PULSE_SCALE
+		glass.position = glass_normal_pos
 
 	_pass_tween = create_tween()
 	var started := false
 	if scaled_content:
 		_pass_tween.tween_property(
-			scaled_content, "scale", punch_cover, PASS_PULSE_UP_SEC
+			scaled_content, "scale", punch_scale, PASS_PULSE_UP_SEC
+		).set_trans(Tween.TRANS_SINE)
+		_pass_tween.parallel().tween_property(
+			scaled_content, "position", punch_pos, PASS_PULSE_UP_SEC
 		).set_trans(Tween.TRANS_SINE)
 		started = true
 	if bomb_art:
 		if started:
 			_pass_tween.parallel().tween_property(
-				bomb_art, "scale", punch_cover, PASS_PULSE_UP_SEC
+				bomb_art, "scale", punch_scale, PASS_PULSE_UP_SEC
+			).set_trans(Tween.TRANS_SINE)
+			_pass_tween.parallel().tween_property(
+				bomb_art, "position", punch_pos, PASS_PULSE_UP_SEC
 			).set_trans(Tween.TRANS_SINE)
 		else:
 			_pass_tween.tween_property(
-				bomb_art, "scale", punch_cover, PASS_PULSE_UP_SEC
+				bomb_art, "scale", punch_scale, PASS_PULSE_UP_SEC
+			).set_trans(Tween.TRANS_SINE)
+			_pass_tween.parallel().tween_property(
+				bomb_art, "position", punch_pos, PASS_PULSE_UP_SEC
 			).set_trans(Tween.TRANS_SINE)
 			started = true
 	if glass:
@@ -159,26 +183,41 @@ func pulse_pass() -> void:
 			_pass_tween.parallel().tween_property(
 				glass, "scale", Vector2.ONE * PASS_PULSE_SCALE, PASS_PULSE_UP_SEC
 			).set_trans(Tween.TRANS_SINE)
+			_pass_tween.parallel().tween_property(
+				glass, "position", glass_punch_pos, PASS_PULSE_UP_SEC
+			).set_trans(Tween.TRANS_SINE)
 		else:
 			_pass_tween.tween_property(
 				glass, "scale", Vector2.ONE * PASS_PULSE_SCALE, PASS_PULSE_UP_SEC
+			).set_trans(Tween.TRANS_SINE)
+			_pass_tween.parallel().tween_property(
+				glass, "position", glass_punch_pos, PASS_PULSE_UP_SEC
 			).set_trans(Tween.TRANS_SINE)
 			started = true
 
 	started = false
 	if scaled_content:
 		_pass_tween.tween_property(
-			scaled_content, "scale", normal_cover, PASS_PULSE_DOWN_SEC
+			scaled_content, "scale", normal_scale, PASS_PULSE_DOWN_SEC
+		).set_trans(Tween.TRANS_SINE)
+		_pass_tween.parallel().tween_property(
+			scaled_content, "position", normal_pos, PASS_PULSE_DOWN_SEC
 		).set_trans(Tween.TRANS_SINE)
 		started = true
 	if bomb_art:
 		if started:
 			_pass_tween.parallel().tween_property(
-				bomb_art, "scale", normal_cover, PASS_PULSE_DOWN_SEC
+				bomb_art, "scale", normal_scale, PASS_PULSE_DOWN_SEC
+			).set_trans(Tween.TRANS_SINE)
+			_pass_tween.parallel().tween_property(
+				bomb_art, "position", normal_pos, PASS_PULSE_DOWN_SEC
 			).set_trans(Tween.TRANS_SINE)
 		else:
 			_pass_tween.tween_property(
-				bomb_art, "scale", normal_cover, PASS_PULSE_DOWN_SEC
+				bomb_art, "scale", normal_scale, PASS_PULSE_DOWN_SEC
+			).set_trans(Tween.TRANS_SINE)
+			_pass_tween.parallel().tween_property(
+				bomb_art, "position", normal_pos, PASS_PULSE_DOWN_SEC
 			).set_trans(Tween.TRANS_SINE)
 			started = true
 	if glass:
@@ -186,21 +225,27 @@ func pulse_pass() -> void:
 			_pass_tween.parallel().tween_property(
 				glass, "scale", Vector2.ONE, PASS_PULSE_DOWN_SEC
 			).set_trans(Tween.TRANS_SINE)
+			_pass_tween.parallel().tween_property(
+				glass, "position", glass_normal_pos, PASS_PULSE_DOWN_SEC
+			).set_trans(Tween.TRANS_SINE)
 		else:
 			_pass_tween.tween_property(
 				glass, "scale", Vector2.ONE, PASS_PULSE_DOWN_SEC
 			).set_trans(Tween.TRANS_SINE)
-	_pass_tween.tween_callback(_reset_pass_pivots)
+			_pass_tween.parallel().tween_property(
+				glass, "position", glass_normal_pos, PASS_PULSE_DOWN_SEC
+			).set_trans(Tween.TRANS_SINE)
+	_pass_tween.tween_callback(_reset_pass_layout)
 
 
-func _reset_pass_pivots() -> void:
+func _reset_pass_layout() -> void:
 	if scaled_content:
 		scaled_content.pivot_offset = Vector2.ZERO
 	if bomb_art:
 		bomb_art.pivot_offset = Vector2.ZERO
 	if dial_glass is Control:
 		(dial_glass as Control).pivot_offset = Vector2.ZERO
-		(dial_glass as Control).scale = Vector2.ONE
+	_apply_layout()
 
 
 func _slime_to_background(slime_color: Color) -> Color:
@@ -299,7 +344,7 @@ func _play_comes_flash() -> void:
 func _play_explosion() -> void:
 	_kill_tween()
 	_kill_pass_tween()
-	_reset_pass_pivots()
+	_reset_pass_layout()
 	_kill_tint_tween()
 	var rebound_tint := _base_tint
 	if player_color_bg:
