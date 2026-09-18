@@ -5,7 +5,7 @@ const SHOW_DURATION := 5
 const FADE_IN := 0.34
 const FADE_OUT := 0.28
 const BANNER_WIDTH := TableHintBanner.TABLE_HINT_WIDTH
-const BANNER_HEIGHT := TableHintBanner.TABLE_HINT_HEIGHT
+const BANNER_HEIGHT := 128.0
 
 const TEXT_COLOR := Color(0.99, 0.96, 0.9, 1.0)
 const TEXT_OUTLINE := Color(0.1, 0.06, 0.04, 0.82)
@@ -13,6 +13,7 @@ const TIME_COLOR := Color(0.55, 0.86, 1.0, 1.0)
 
 var _label: Label
 var _time_label: Label
+var _rounds_label: Label
 var _fade_tween: Tween
 var _layout_anchor := Vector2.ZERO
 var _layout_bounds := Rect2()
@@ -39,17 +40,22 @@ func _build_content() -> void:
 	margin.add_theme_constant_override("margin_bottom", TableHintBanner.PANEL_MARGIN_V)
 	add_child(margin)
 
+	var col := VBoxContainer.new()
+	col.add_theme_constant_override("separation", 2)
+	col.alignment = BoxContainer.ALIGNMENT_CENTER
+	margin.add_child(col)
+
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 22)
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
-	margin.add_child(row)
+	col.add_child(row)
 
 	_label = Label.new()
 	_label.text = LocaleService.text("TIME_PROGRESS_LABEL")
 	_label.theme_type_variation = &"Hero"
 	_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	_label.add_theme_font_size_override("font_size", 32)
+	_label.add_theme_font_size_override("font_size", 28)
 	_label.add_theme_color_override("font_color", TEXT_COLOR)
 	_label.add_theme_color_override("font_outline_color", TEXT_OUTLINE)
 	_label.add_theme_constant_override("outline_size", 3)
@@ -59,11 +65,22 @@ func _build_content() -> void:
 	_time_label.theme_type_variation = &"Hero"
 	_time_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	_time_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	_time_label.add_theme_font_size_override("font_size", 40)
+	_time_label.add_theme_font_size_override("font_size", 36)
 	_time_label.add_theme_color_override("font_color", TIME_COLOR)
 	_time_label.add_theme_color_override("font_outline_color", TEXT_OUTLINE)
 	_time_label.add_theme_constant_override("outline_size", 3)
 	row.add_child(_time_label)
+
+	_rounds_label = Label.new()
+	_rounds_label.theme_type_variation = &"Hero"
+	_rounds_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_rounds_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_rounds_label.add_theme_font_size_override("font_size", 24)
+	_rounds_label.add_theme_color_override("font_color", Color(0.92, 0.78, 0.55, 1.0))
+	_rounds_label.add_theme_color_override("font_outline_color", TEXT_OUTLINE)
+	_rounds_label.add_theme_constant_override("outline_size", 2)
+	_rounds_label.visible = false
+	col.add_child(_rounds_label)
 
 
 func fit_layout(anchor: Vector2, max_width: float = BANNER_WIDTH, bounds: Rect2 = Rect2()) -> void:
@@ -102,10 +119,16 @@ func _lock_banner_size() -> void:
 	size = banner_size
 
 
-func show_remaining(minutes: int, animate: bool = true) -> void:
+func show_remaining(minutes: int, estimated_rounds: int = 0, animate: bool = true) -> void:
 	_kill_fade_tween()
 	_label.text = LocaleService.text("TIME_PROGRESS_LABEL")
 	_time_label.text = LocaleService.textf("TIME_PROGRESS_MINUTES", [maxi(minutes, 0)])
+	if _rounds_label:
+		if estimated_rounds > 0:
+			_rounds_label.text = LocaleService.textf("TIME_PROGRESS_ROUNDS", [estimated_rounds])
+			_rounds_label.visible = true
+		else:
+			_rounds_label.visible = false
 	if _layout_ready:
 		_lock_banner_size()
 

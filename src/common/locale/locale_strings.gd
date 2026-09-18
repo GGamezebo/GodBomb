@@ -26,7 +26,8 @@ const RULES_TEXT_RU := """[font_size=36]Весёлая словесная игр
 [font_size=40][b]Если накосячили[/b][/font_size]
 Неверное слово или ложное нажатие? Аварийная кнопка в бою — выберите, кто переигрывает ход. Состав можно поправить через кнопку со списком игроков.
 
-Кнопка «телефон в центре» — положите смартфон на стол: текст на экране сам поворачивается к текущему игроку, телефон крутить не нужно.
+[font_size=40][b]Телефон в центре[/b][/font_size]
+Для компании 6–12 человек: включите режим «телефон в центре» и положите смартфон на стол. Текст сам поворачивается к текущему игроку — крутить телефон не нужно.
 
 
 [font_size=24][color=#ffffff18]————————————————[/color][/font_size]
@@ -64,7 +65,8 @@ In settings — match length, which sets the number of rounds.
 [font_size=40][b]Made a mistake?[/b][/font_size]
 Wrong word or accidental tap? The emergency button in battle — pick who replays the turn. Adjust the roster via the player list button.
 
-The «phone in the center» button — leave the phone flat on the table: on-screen text turns toward the current player, so nobody needs to spin the phone.
+[font_size=40][b]Phone in the center[/b][/font_size]
+For a table of 6–12: turn on «phone in the center» and leave the phone flat. On-screen text turns toward the current player — nobody spins the device.
 
 
 [font_size=24][color=#ffffff18]————————————————[/color][/font_size]
@@ -87,6 +89,9 @@ const _RU: Dictionary = {
 	"SETTINGS_DIFFICULTY_EASY": "Лёгкая",
 	"SETTINGS_DIFFICULTY_MEDIUM": "Средняя",
 	"SETTINGS_DIFFICULTY_HARD": "Сложная",
+	"SETTINGS_DIFFICULTY_HINT": "Меняет колоду: длина слогов и жёсткость условий",
+	"TIME_PROGRESS_ROUNDS": "ещё ~%d раундов",
+	"EMERGENCY_FIRST_HINT": "1) Выберите, кто переигрывает ход.\n2) «Продолжить» — партия идёт дальше.",
 	"SETTINGS_MUSIC_MENU": "Музыка в меню",
 	"SETTINGS_MUSIC_VOLUME": "Громкость музыки",
 	"SETTINGS_SFX_VOLUME": "Громкость звуков",
@@ -150,7 +155,7 @@ const _RU: Dictionary = {
 	"ONBOARDING_SWAP_TITLE": "Рассадка",
 	"ONBOARDING_SWAP_BODY": "Перетащите одного слайма на другого — поменяетесь местами. Порядок на экране = порядок вокруг стола.",
 	"ONBOARDING_START_TITLE": "В бой!",
-	"ONBOARDING_START_BODY": "Когда все готовы — нажмите «СТАРТ». Покажем бой на практике — три коротких раунда.",
+	"ONBOARDING_START_BODY": "Когда все готовы — «СТАРТ». Для большой компании потом включите «телефон в центре» на столе.",
 	"ONBOARDING_CHOICE_TITLE": "Жребий",
 	"ONBOARDING_CHOICE_BODY": "Сейчас циферблат выберет, кто ходит первым. Следите за подсветкой игрока.",
 	"ONBOARDING_READY_TITLE": "Старт раунда",
@@ -158,7 +163,7 @@ const _RU: Dictionary = {
 	"ONBOARDING_PLAY_TITLE": "Ваш ход",
 	"ONBOARDING_TIME_UP_TITLE": "Время вышло",
 	"ONBOARDING_DONE_TITLE": "Обучение пройдено!",
-	"ONBOARDING_DONE_BODY": "Теперь вы знаете правила Тик-Так-Бадабум. Соберите друзей и играйте!",
+	"ONBOARDING_DONE_BODY": "Правила ясны. Для 6–12 человек: режим «телефон в центре» — экран сам поворачивается к ходящему. Соберите друзей!",
 	"TUTORIAL_PLAY_BODY": "Слог «%s» — %s.\nПодойдут слова: %s.\nНапример: «%s».\n%s",
 	"TUTORIAL_EXPLOSION": "%s не успел(а) придумать слово — бомба взорвалась.",
 	"OVERTIME_TITLE": "Основное время истекло",
@@ -178,6 +183,9 @@ const _EN: Dictionary = {
 	"SETTINGS_DIFFICULTY_EASY": "Easy",
 	"SETTINGS_DIFFICULTY_MEDIUM": "Medium",
 	"SETTINGS_DIFFICULTY_HARD": "Hard",
+	"SETTINGS_DIFFICULTY_HINT": "Changes the deck: syllable length and rule hardness",
+	"TIME_PROGRESS_ROUNDS": "~%d rounds",
+	"EMERGENCY_FIRST_HINT": "1) Pick who replays the turn.\n2) Tap Continue — the match goes on.",
 	"SETTINGS_MUSIC_MENU": "Menu music",
 	"SETTINGS_MUSIC_VOLUME": "Music volume",
 	"SETTINGS_SFX_VOLUME": "Sound volume",
@@ -241,7 +249,7 @@ const _EN: Dictionary = {
 	"ONBOARDING_SWAP_TITLE": "Seating",
 	"ONBOARDING_SWAP_BODY": "Drag one slime onto another to swap seats. Screen order = order around the table.",
 	"ONBOARDING_START_TITLE": "Into battle!",
-	"ONBOARDING_START_BODY": "When everyone is ready — tap «START». We'll show a short battle — three quick rounds.",
+	"ONBOARDING_START_BODY": "When everyone is ready — tap START. For a big table, turn on «phone in the center» later.",
 	"ONBOARDING_CHOICE_TITLE": "Lottery",
 	"ONBOARDING_CHOICE_BODY": "The dial will pick who goes first. Watch the highlighted player.",
 	"ONBOARDING_READY_TITLE": "Start round",
@@ -249,7 +257,7 @@ const _EN: Dictionary = {
 	"ONBOARDING_PLAY_TITLE": "Your turn",
 	"ONBOARDING_TIME_UP_TITLE": "Time's up",
 	"ONBOARDING_DONE_TITLE": "Tutorial complete!",
-	"ONBOARDING_DONE_BODY": "Now you know the rules of Tic-Tac-Bada-Boom. Gather friends and play!",
+	"ONBOARDING_DONE_BODY": "You know the rules. For 6–12 players: «phone in the center» turns the dial toward whoever's up. Gather friends!",
 	"TUTORIAL_PLAY_BODY": "Syllable «%s» — %s.\nWords like: %s.\nFor example: «%s».\n%s",
 	"TUTORIAL_EXPLOSION": "%s ran out of time — the bomb exploded.",
 	"OVERTIME_TITLE": "Regulation time is over",

@@ -6,9 +6,12 @@ const DIFFICULTY_MEDIUM := 1
 const DIFFICULTY_HARD := 2
 const DEFAULT_DIFFICULTY := DIFFICULTY_MEDIUM
 
-## Restriction flags: "B" = hard at word start, "E" = hard at word end, "BE" = both.
-## Standard locales (BEGIN/END/ANYWHERE): forbid Type.BEGIN if B, Type.END if E.
-## Exclusion locales FR/IT (NOT_BEGIN / NOT_END): B forbids Type.END, E forbids Type.BEGIN.
+## Restriction flags mark positions where a party realistically cannot find a word.
+## Standard locales (BEGIN / ANYWHERE / END):
+##   "B" = never at word start -> drops BEGIN · "E" = never at word end -> drops END · "BE" = both.
+## Exclusion locales FR/IT (NOT_BEGIN / ANYWHERE / NOT_END) are far more forgiving,
+## so B/E do not apply there. They use:
+##   "S" = only ever at word start -> drops NOT_BEGIN · "F" = only ever at word end -> drops NOT_END.
 
 const RUSSIAN_EASY: Array[String] = [
 	"ка", "ма", "ли", "за", "ди", "ло", "от", "да", "те", "ал", "ак", "ов",
@@ -31,12 +34,10 @@ const RUSSIAN_HARD: Array[String] = [
 ]
 
 const RUSSIAN_RESTRICT: Dictionary = {
-	"изм": "B",
-	"инт": "E",
-	"коп": "E",
+	"по": "E",
 	"мас": "E",
 	"кин": "E",
-	"лю": "E",
+	"сон": "E",
 }
 
 # English: Pass the Bomb (Piatnik 1994) letter cards + Bomb Party easy clusters.
@@ -63,8 +64,9 @@ const ENGLISH_HARD: Array[String] = [
 ]
 
 const ENGLISH_RESTRICT: Dictionary = {
-	"ING": "B",
 	"ACK": "B",
+	"ANK": "B",
+	"ATE": "B",
 	"TCH": "B",
 	"GHT": "B",
 	"OCK": "B",
@@ -77,7 +79,7 @@ const ENGLISH_RESTRICT: Dictionary = {
 	"UB": "B",
 	"FF": "B",
 	"RR": "B",
-	"PS": "E",
+	"KL": "BE",
 	"STR": "E",
 	"BL": "E",
 	"BR": "E",
@@ -100,78 +102,88 @@ const ENGLISH_RESTRICT: Dictionary = {
 	"SM": "E",
 	"SN": "E",
 	"SC": "E",
-	"KL": "E",
 	"THR": "E",
 	"SHR": "E",
 	"GLA": "E",
 	"CRI": "E",
 	"FRE": "E",
-	"STE": "E",
 	"SHE": "E",
-	"IMP": "E",
 	"INC": "E",
 	"CEN": "E",
 	"CI": "E",
 	"RES": "E",
 	"VO": "E",
 	"WO": "E",
+	"HAL": "E",
+	"POR": "E",
+	"DUC": "E",
+	"RIG": "E",
+	"PEA": "E",
 }
 
-# Serbian: Piatnik-style CV syllables + clusters (Balkan Tik Tak Bum).
+# Serbian (latinica): Piatnik-style CV syllables + clusters (Tik Tak Bum).
 const SERBIAN_EASY: Array[String] = [
-	"БА", "БЕ", "БИ", "БО", "БУ", "ВА", "ВЕ", "ВИ", "ВО", "ВУ", "ДА", "ДЕ",
-	"ДИ", "ДО", "ДУ", "КА", "КЕ", "КИ", "КО", "КУ", "МА", "МЕ", "МИ", "МО",
-	"МУ", "ПА", "ПЕ", "ПИ", "ПО", "ПУ", "РА", "РЕ", "РИ", "РО", "РУ", "СА",
-	"СЕ", "СИ", "СО", "СУ", "ТА", "ТЕ", "ТИ", "ТО", "ТУ", "АН", "ЕН", "ИН",
-	"ОН", "АТ", "ЕТ", "ИТ", "ОТ", "АР", "ЕР", "ОР", "ЛА", "ЛЕ", "ЛИ", "ЛО",
-	"НА", "НЕ", "НИ", "НО", "ЈА", "ЈЕ",
+	"BA", "BE", "BI", "BO", "BU", "VA", "VE", "VI", "VO", "VU", "DA", "DE",
+	"DI", "DO", "DU", "KA", "KE", "KI", "KO", "KU", "MA", "ME", "MI", "MO",
+	"MU", "PA", "PE", "PI", "PO", "PU", "RA", "RE", "RI", "RO", "RU", "SA",
+	"SE", "SI", "SO", "SU", "TA", "TE", "TI", "TO", "TU", "LA", "LE", "LI",
+	"LO", "NA", "NE", "NI", "NO", "JA", "JE", "AN", "EN", "IN", "ON", "AT",
+	"ET", "IT", "OT", "AR", "ER", "OR",
 ]
 
 const SERBIAN_MEDIUM: Array[String] = [
-	"СТ", "ПР", "ТР", "КР", "ГР", "БР", "ВР", "СП", "СК", "СМ", "СН", "ПЛ",
-	"КЛ", "ГЛ", "ДР", "БЛ", "АК", "ЕК", "ИК", "ОК", "УК", "ИР", "УР", "УН",
-	"АЦ", "ЕЦ", "ИЦ", "АВ", "ЕВ", "ИВ", "ОВ", "УВ", "АШ", "ЕШ", "ИШ", "УТ",
-	"АЈ", "ОЈ", "ОСТ", "НИК", "СТВ", "ИЦА",
+	"ST", "SK", "ŠT", "PR", "TR", "KR", "GR", "BR", "VR", "SP", "SM", "SN",
+	"PL", "KL", "GL", "DR", "BL", "AK", "EK", "IK", "OK", "UK", "IR", "UR",
+	"UN", "AV", "EV", "IV", "OV", "UV", "AŠ", "EŠ", "IŠ", "AJ", "OJ", "UT",
+	"OST", "NIK", "ICA", "STV", "NJE", "ĆE",
 ]
 
 const SERBIAN_HARD: Array[String] = [
-	"ФЛ", "ЗД", "ЗВ", "ЗМ", "ЦВ", "ЧВ", "ФР", "ШТ", "ШК", "ШП", "ХВ", "ХР",
-	"ПС", "ЊЕ", "ОЦ", "УЦ", "ОШ", "УШ", "ЉУ", "ЊА", "ЋЕ", "ЂА", "ЖД",
+	"FL", "FR", "ZD", "ZV", "ZM", "CV", "ČV", "ŠK", "ŠP", "HV", "HR", "PS",
+	"LJU", "NJA", "ĐA", "ŽD", "DŽ", "TK", "ZDR", "STR",
 ]
 
 const SERBIAN_RESTRICT: Dictionary = {
-	"ПР": "E",
-	"ТР": "E",
-	"КР": "E",
-	"ГР": "E",
-	"БР": "E",
-	"ВР": "E",
-	"СП": "E",
-	"СМ": "E",
-	"СН": "E",
-	"ПЛ": "E",
-	"КЛ": "E",
-	"ГЛ": "E",
-	"ДР": "E",
-	"БЛ": "E",
-	"ФЛ": "E",
-	"ЗВ": "E",
-	"ЗМ": "E",
-	"ЦВ": "E",
-	"ЧВ": "E",
-	"ФР": "E",
-	"ШК": "E",
-	"ШП": "E",
-	"ХВ": "E",
-	"ХР": "E",
-	"ПС": "E",
-	"ЉУ": "E",
-	"ЂА": "E",
-	"СТВ": "B",
-	"ИЦА": "B",
-	"ЖД": "BE",
-	"ОЦ": "E",
-	"УЦ": "E",
+	"IT": "B",
+	"AŠ": "B",
+	"EŠ": "B",
+	"OJ": "B",
+	"ICA": "B",
+	"NJA": "B",
+	"STV": "BE",
+	"PR": "E",
+	"TR": "E",
+	"KR": "E",
+	"GR": "E",
+	"BR": "E",
+	"VR": "E",
+	"SP": "E",
+	"SM": "E",
+	"SN": "E",
+	"PL": "E",
+	"KL": "E",
+	"GL": "E",
+	"DR": "E",
+	"BL": "E",
+	"FL": "E",
+	"FR": "E",
+	"ZD": "E",
+	"ZV": "E",
+	"ZM": "E",
+	"CV": "E",
+	"ČV": "E",
+	"ŠK": "E",
+	"ŠP": "E",
+	"HV": "E",
+	"HR": "E",
+	"PS": "E",
+	"DŽ": "E",
+	"ŽD": "E",
+	"TK": "E",
+	"ZDR": "E",
+	"STR": "E",
+	"UV": "E",
+	"UR": "E",
 }
 
 # Spanish: Goliath Tic Tac Boum sílabas + sílabas trabadas.
@@ -198,9 +210,25 @@ const SPANISH_HARD: Array[String] = [
 ]
 
 const SPANISH_RESTRICT: Dictionary = {
+	"IDO": "B",
+	"IA": "B",
+	"IO": "B",
+	"IE": "B",
+	"UE": "B",
+	"UA": "B",
+	"DAD": "B",
+	"BLE": "B",
+	"IÓN": "B",
+	"ÑA": "B",
+	"ÑO": "B",
+	"EZ": "B",
+	"OZ": "B",
+	"UO": "B",
 	"RR": "BE",
-	"LL": "E",
+	"TL": "BE",
+	"UI": "BE",
 	"CH": "E",
+	"LL": "E",
 	"QU": "E",
 	"BL": "E",
 	"BR": "E",
@@ -214,15 +242,9 @@ const SPANISH_RESTRICT: Dictionary = {
 	"PL": "E",
 	"PR": "E",
 	"TR": "E",
-	"TRA": "E",
-	"TRE": "E",
 	"TRI": "E",
-	"TRO": "E",
-	"PRE": "E",
 	"PRO": "E",
 	"PRI": "E",
-	"BRA": "E",
-	"CLA": "E",
 	"CRI": "E",
 	"PLU": "E",
 	"FLE": "E",
@@ -230,13 +252,24 @@ const SPANISH_RESTRICT: Dictionary = {
 	"ESP": "E",
 	"ESC": "E",
 	"GUI": "E",
-	"IÓN": "B",
-	"ÑA": "B",
-	"ÑO": "B",
-	"TL": "BE",
-	"DAD": "B",
-	"BLE": "B",
-	"IDO": "B",
+	"BI": "E",
+	"CI": "E",
+	"CU": "E",
+	"DI": "E",
+	"DU": "E",
+	"MU": "E",
+	"PI": "E",
+	"PU": "E",
+	"RI": "E",
+	"RU": "E",
+	"SU": "E",
+	"FI": "E",
+	"FU": "E",
+	"GI": "E",
+	"GU": "E",
+	"JI": "E",
+	"JU": "E",
+	"UR": "E",
 }
 
 const HINDI_EASY: Array[String] = [
@@ -254,7 +287,7 @@ const HINDI_MEDIUM: Array[String] = [
 ]
 
 const HINDI_HARD: Array[String] = [
-	"क्ष", "ज्ञ", "स्थ", "स्प", "द्र", "ध्य", "न्त्य", "च्छ", "ज्व", "क्त", "ष्ण", "ह्य",
+	"क्ष", "ज्ञ", "स्थ", "स्प", "द्र", "ध्य", "च्छ", "ज्व", "क्त", "ष्ण", "ह्य",
 	"द्व", "चं", "जं", "तं", "दं", "ऑ", "डॉ", "ख़", "ग़", "ज़", "फ़", "ड़",
 	"ढ़",
 ]
@@ -283,26 +316,31 @@ const HINDI_RESTRICT: Dictionary = {
 	"जं": "E",
 	"तं": "E",
 	"दं": "E",
-	"क्ष": "E",
-	"ज्ञ": "E",
-	"स्थ": "E",
+	"ड": "E",
+	"ढ": "E",
+	"गि": "E",
+	"जि": "E",
+	"दि": "E",
+	"पि": "E",
+	"बि": "E",
+	"रि": "E",
+	"लि": "E",
+	"सि": "E",
+	"हि": "E",
 	"स्प": "E",
-	"द्र": "E",
-	"ध्य": "E",
-	"न्त्य": "BE",
-	"च्छ": "E",
 	"ज्व": "E",
-	"क्त": "E",
-	"ष्ण": "BE",
-	"ह्य": "BE",
 	"द्व": "E",
-	"क्र": "E",
 	"प्र": "E",
-	"त्र": "E",
 	"श्र": "E",
 	"स्व": "E",
-	"स्त": "E",
 	"डॉ": "E",
+	"ख़": "E",
+	"ग़": "E",
+	"फ़": "E",
+	"च्छ": "B",
+	"क्त": "B",
+	"ष्ण": "B",
+	"ह्य": "B",
 	"ड़": "B",
 	"ढ़": "B",
 }
@@ -318,7 +356,7 @@ const GERMAN_EASY: Array[String] = [
 const GERMAN_MEDIUM: Array[String] = [
 	"TRA", "ENT", "LAN", "BAR", "LICH", "OCH", "UCH", "IND", "ANK", "INK", "AMP", "ECK",
 	"ICK", "OCK", "UCK", "AST", "OST", "ALT", "ELT", "ORT", "HEIT", "KEIT", "ISCH", "PF",
-	"TZ", "CK", "VOR", "ANN", "ENN", "ILL", "ELL", "ARG", "WI", "WEN", "ONG",
+	"TZ", "CK", "VOR", "ANN", "ENN", "ILL", "ELL", "WI", "WEN",
 ]
 
 const GERMAN_HARD: Array[String] = [
@@ -327,27 +365,37 @@ const GERMAN_HARD: Array[String] = [
 ]
 
 const GERMAN_RESTRICT: Dictionary = {
-	"UNG": "B",
-	"HEIT": "B",
-	"KEIT": "B",
-	"LICH": "B",
-	"ISCH": "B",
-	"CK": "B",
-	"TZ": "B",
-	"OHL": "B",
-	"ÄL": "B",
-	"ILT": "B",
-	"OLT": "B",
-	"UMP": "B",
-	"ONG": "B",
+	"EST": "B",
+	"IE": "B",
+	"UCH": "B",
+	"INK": "B",
+	"ICK": "B",
+	"ELT": "B",
+	"ANN": "B",
+	"ENN": "B",
+	"ILL": "B",
+	"ELL": "B",
+	"OCH": "B",
 	"OCK": "B",
 	"UCK": "B",
+	"HEIT": "B",
+	"KEIT": "B",
+	"ISCH": "B",
+	"TZ": "B",
+	"CK": "B",
+	"ILT": "B",
+	"OLT": "B",
+	"OHL": "B",
+	"AUL": "B",
+	"ÄL": "BE",
+	"ÄU": "BE",
+	"UMP": "BE",
+	"AMP": "E",
 	"TRA": "E",
 	"VER": "E",
 	"VOR": "E",
 	"SP": "E",
 	"WI": "E",
-	"WEN": "E",
 	"BLI": "E",
 	"DRI": "E",
 	"SCHR": "E",
@@ -358,11 +406,9 @@ const GERMAN_RESTRICT: Dictionary = {
 	"CHR": "E",
 	"ZW": "E",
 	"KN": "E",
-	"PS": "BE",
 	"GL": "E",
 	"BR": "E",
 	"KR": "E",
-	"AUL": "B",
 	"ÖL": "E",
 }
 
@@ -387,45 +433,8 @@ const FRENCH_HARD: Array[String] = [
 ]
 
 const FRENCH_RESTRICT: Dictionary = {
-	"ION": "B",
-	"TION": "B",
-	"ETTE": "B",
-	"OIR": "B",
-	"OIN": "B",
-	"IEN": "B",
-	"EIN": "B",
-	"AIL": "B",
-	"EIL": "B",
-	"EUIL": "B",
-	"OUIL": "B",
-	"GN": "B",
-	"OEU": "B",
-	"PT": "B",
-	"MN": "B",
-	"YE": "B",
-	"RH": "B",
-	"BL": "E",
-	"BR": "E",
-	"CL": "E",
-	"CR": "E",
-	"DR": "E",
-	"FL": "E",
-	"FR": "E",
-	"GL": "E",
-	"GR": "E",
-	"PL": "E",
-	"PR": "E",
-	"TR": "E",
-	"SP": "E",
-	"SC": "E",
-	"QU": "E",
-	"GUI": "E",
-	"VR": "E",
-	"SAN": "E",
-	"JAN": "E",
-	"PH": "E",
-	"TH": "E",
-	"GU": "E",
+	"RH": "S",
+	"EZ": "F",
 }
 
 # Italian: Passa la Bomba 2–3 letter combinations.
@@ -443,52 +452,11 @@ const ITALIAN_MEDIUM: Array[String] = [
 ]
 
 const ITALIAN_HARD: Array[String] = [
-	"BCO", "PS", "CCH", "GGH", "SCI", "SCH", "GLI", "SCE", "GNI", "NCH", "ZZ", "ZI",
+	"PS", "CCH", "GGH", "SCI", "SCH", "GLI", "SCE", "GNI", "NCH", "ZZ", "ZI",
 ]
 
-const ITALIAN_RESTRICT: Dictionary = {
-	"ATO": "B",
-	"UTO": "B",
-	"ITO": "B",
-	"ONE": "B",
-	"NZA": "B",
-	"ZZA": "B",
-	"MENT": "B",
-	"ELL": "B",
-	"BCO": "BE",
-	"CCH": "BE",
-	"GGH": "BE",
-	"PS": "E",
-	"BL": "E",
-	"BR": "E",
-	"CL": "E",
-	"CR": "E",
-	"DR": "E",
-	"FL": "E",
-	"FR": "E",
-	"GL": "E",
-	"GR": "E",
-	"PL": "E",
-	"PR": "E",
-	"TR": "E",
-	"SP": "E",
-	"STR": "E",
-	"PRE": "E",
-	"PRO": "E",
-	"TRA": "E",
-	"QU": "E",
-	"GH": "E",
-	"SCI": "E",
-	"SCH": "E",
-	"GLI": "E",
-	"SCE": "E",
-	"GNI": "E",
-	"NCH": "E",
-	"ZIO": "E",
-	"MP": "B",
-	"MB": "B",
-	"ZZ": "B",
-}
+# Exclusion conditions leave a medial fallback for every Italian card, so nothing is blocked.
+const ITALIAN_RESTRICT: Dictionary = {}
 
 
 static func normalize_difficulty(value: Variant) -> int:
@@ -550,19 +518,17 @@ static func get_cards(locale: String, difficulty: int = DEFAULT_DIFFICULTY) -> P
 
 static func allowed_conditions(locale: String, syllable: String) -> Array[int]:
 	var flags := str(_restrictions_for(locale).get(syllable, ""))
-	var hard_begin := flags.contains("B")
-	var hard_end := flags.contains("E")
 	var result: Array[int] = [WordCondition.Type.ANYWHERE]
 	if LocaleCatalog.uses_exclusion_conditions(locale):
-		if not hard_end:
+		if not flags.contains("S"):
 			result.append(WordCondition.Type.BEGIN)
-		if not hard_begin:
+		if not flags.contains("F"):
 			result.append(WordCondition.Type.END)
-	else:
-		if not hard_begin:
-			result.append(WordCondition.Type.BEGIN)
-		if not hard_end:
-			result.append(WordCondition.Type.END)
+		return result
+	if not flags.contains("B"):
+		result.append(WordCondition.Type.BEGIN)
+	if not flags.contains("E"):
+		result.append(WordCondition.Type.END)
 	return result
 
 

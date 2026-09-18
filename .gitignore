@@ -10,6 +10,11 @@ export.cfg
 export_credentials.cfg
 godot_sandbox
 
+# Android release signing (never commit)
+secrets/
+*.keystore
+*.jks
+
 # Imported translations (automatically generated from CSV files)
 *.translation
 

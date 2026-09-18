@@ -365,16 +365,25 @@ func _play_explosion() -> void:
 		)
 	if scaled_content:
 		_tween = create_tween()
-		var base := _content_base_pos
-		var cover_scale := get_cover_scale()
-		var punch_scale := Vector2.ONE * cover_scale * 1.055
-		var normal_scale := Vector2.ONE * cover_scale
+		var cover := get_cover_scale()
+		var offset := (size - DESIGN_SIZE * cover) * 0.5
+		var dial := DisplayFacing.dial_center()
+		var punch_mul := 1.055
+		var normal_scale := Vector2.ONE * cover
+		var punch_scale := normal_scale * punch_mul
+		var normal_pos := offset
+		var punch_pos := offset + dial * cover * (1.0 - punch_mul)
+		scaled_content.pivot_offset = Vector2.ZERO
+		scaled_content.position = normal_pos
+		scaled_content.scale = normal_scale
+		_content_base_pos = normal_pos
 		_tween.tween_property(scaled_content, "scale", punch_scale, 0.05).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		_tween.parallel().tween_property(scaled_content, "position", punch_pos, 0.05).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 		for i in 16:
 			var intensity := lerpf(38.0, 6.0, float(i) / 15.0)
 			var shake_offset := Vector2(randf_range(-intensity, intensity), randf_range(-intensity, intensity))
-			_tween.tween_property(scaled_content, "position", base + shake_offset, 0.032)
-		_tween.tween_property(scaled_content, "position", base, 0.1).set_trans(Tween.TRANS_SINE)
+			_tween.tween_property(scaled_content, "position", punch_pos + shake_offset, 0.032)
+		_tween.tween_property(scaled_content, "position", normal_pos, 0.1).set_trans(Tween.TRANS_SINE)
 		_tween.parallel().tween_property(scaled_content, "scale", normal_scale, 0.16).set_trans(Tween.TRANS_SINE)
 
 

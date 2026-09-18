@@ -1,99 +1,183 @@
 class_name LocaleStringsLocales
 extends RefCounted
 
-const RULES_TEXT_SR := """[font_size=36]Brza žurka-reči na jednom ekranu: sedite u krug, predajete bombu-telefon i smišljate reči u hodu. Ako zakasniš — bum i kazneni poen.
+const RULES_TEXT_SR := """[font_size=36]Brza žurka-reči na jednom ekranu: sedite u krug, predajete bombu-telefon i smišljate reči u hodu. Ako zakasniš — bum i kazneni poen. Za dvoje ili veliku ekipu.
 
 [font_size=40][b]Kako se igra?[/b][/font_size]
-Na brojčaniku je slog (na primer «СТ») i pravilo gde mora da bude u reči.
+Na brojčaniku je slog, npr. «СТ», i pravilo: na početku, na kraju ili bilo gde u reči.
 
-Izgovori reč naglas i kratko tapni ekran da predaš bombu sledećem.
+Izgovori reč naglas i kratko tapni ekran da predaš bombu.
+
+Sto — stolica — strana — st… bum! Ko drži bombu kad eksplodira — +1 kazna.
 
 [font_size=40][b]Kada je bum?[/b][/font_size]
-Tajmer je skriven i nasumičan: nekad eksplodira odmah, nekad posle više krugova.
+Tajmer je skriven i nasumičan: nekad odmah, nekad posle više krugova. Pre eksplozije bomba upozorava.
+
+Između rundi vidiš koliko minuta još ostaje do kraja partije.
 
 [font_size=40][b]Ko pobeđuje?[/b][/font_size]
-Na kraju partije pobeđuje igrač sa najmanje kaznenih poena. Ako više igrača deli najmanji rezultat, igraju nokaut dok ne ostane jedan pobednik.
+Na kraju — tabela. Manje kazni — bolje mesto. Ako više igrača deli najmanji skor, igraju nokaut dok ne ostane jedan pobednik.
+
+[font_size=40][b]Okupljanje[/b][/font_size]
+2–12 igrača. [b]+[/b] dodaje, prevuci slajma na suseda — zamena mesta, drži 1,5 s — ime i boja.
+
+U podešavanjima — trajanje partije (utječe na broj rundi) i težina (duži slogovi / stroža pravila).
+
+[font_size=40][b]Greška?[/b][/font_size]
+Pogrešna reč ili slučajni tap? Hitno dugme u borbi — izaberi ko ponavlja potez. Sastav menjaš preko liste igrača.
+
+[font_size=40][b]Telefon u centru[/b][/font_size]
+Za 6–12 ljudi: uključi režim «telefon u centru», ostavi telefon na stolu. Tekst na ekranu sam se okreće ka trenutnom igraču — niko ne okreće uređaj.
 
 [center][font_size=40][b]Srećno![/b][/font_size][/center]"""
 
-const RULES_TEXT_ES := """[font_size=36]Un juego de palabras para fiestas en una sola pantalla: sentaos en círculo, pasad la bomba-teléfono por turnos e inventad palabras al instante. Si tardas — boom y penalización.
+const RULES_TEXT_ES := """[font_size=36]Juego de palabras para fiestas en una sola pantalla: en círculo, pasad la bomba-teléfono e inventad palabras al momento. Si tardas — boom y penalización. De 2 a un grupo grande.
 
 [font_size=40][b]¿Cómo se juega?[/b][/font_size]
-En el dial aparece una sílaba (por ejemplo «CH») y una condición: al inicio, en cualquier parte o al final.
+En el dial hay una sílaba, p. ej. «CH», y una pista: al inicio, al final o en cualquier parte.
 
-Di una palabra en voz alta y toca rápido la pantalla para pasar la bomba.
+Di una palabra en voz alta y toca la pantalla para pasar la bomba.
+
+Chalé — noche — leche — ch… ¡boom! Quien tenga la bomba al explotar — +1 penalización.
 
 [font_size=40][b]¿Cuándo explota?[/b][/font_size]
-El temporizador es oculto y aleatorio. Puede explotar enseguida o tardar varios turnos.
+El temporizador es oculto y aleatorio. Puede ser al instante o tras varias rondas. La bomba avisa antes.
+
+Entre rondas ves cuántos minutos quedan hasta el final.
 
 [font_size=40][b]¿Quién gana?[/b][/font_size]
-Al final gana quien tenga menos penalizaciones. Si varios empatan a menos puntos, juegan a eliminación hasta que quede un ganador.
+Al final — ranking. Menos penalizaciones, mejor puesto. Si varios empatan al mínimo, juegan a eliminación hasta un ganador.
+
+[font_size=40][b]Jugadores[/b][/font_size]
+2–12 personas. [b]+[/b] añade, arrastra un slime a otro — cambio de sitio, mantén 1,5 s — nombre y color.
+
+En ajustes — duración de la partida y dificultad (sílabas más largas / reglas más duras).
+
+[font_size=40][b]¿Error?[/b][/font_size]
+Palabra incorrecta o toque accidental? Botón de emergencia en partida — elige quién repite el turno. Cambia el equipo con la lista de jugadores.
+
+[font_size=40][b]Teléfono en el centro[/b][/font_size]
+Para 6–12 personas: activa el modo «teléfono en el centro» y deja el móvil en la mesa. El texto gira hacia el jugador actual — nadie gira el aparato.
 
 [center][font_size=40][b]¡A jugar![/b][/font_size][/center]"""
 
-const RULES_TEXT_HI := """[font_size=36]एक स्क्रीन पर खेलने वाला मजेदार पार्टी वर्ड गेम: गोल बैठें, फोन-बम को बारी-बारी पास करें और तुरंत शब्द बोलें। देर हुई — बूम और पेनल्टी।
+const RULES_TEXT_HI := """[font_size=36]एक स्क्रीन पर पार्टी वर्ड गेम: गोल बैठें, फोन-बम पास करें और तुरंत शब्द बोलें। देर हुई — बूम और पेनल्टी। 2 से लेकर बड़ी पार्टी तक।
 
 [font_size=40][b]कैसे खेलें?[/b][/font_size]
-डायल पर एक अक्षर/सिलेबल (जैसे «क») और नियम दिखता है: शुरुआत, कहीं भी, या अंत।
+डायल पर सिलेबल है, जैसे «क», और नियम: शुरुआत, अंत, या कहीं भी।
 
-शब्द ज़ोर से बोलें और स्क्रीन पर जल्दी टैप करके बम आगे पास करें।
+शब्द ज़ोर से बोलें और टैप करके बम पास करें।
 
-[font_size=40][b]बूम कब होगा?[/b][/font_size]
-टाइमर छुपा और रैंडम है। कभी तुरंत, कभी कई टर्न बाद।
+कला — मकान — काला — क… बूम! विस्फोट पर बम जिसके पास — +1 पेनल्टी।
+
+[font_size=40][b]बूम कब?[/b][/font_size]
+टाइमर छुपा और रैंडम है। कभी तुरंत, कभी कई राउंड बाद। विस्फोट से पहले बम चेतावनी देता है।
+
+राउंड के बीच दिखता है कि खेल खत्म होने में कितने मिनट बचे हैं।
 
 [font_size=40][b]कौन जीतेगा?[/b][/font_size]
-मैच के अंत में सबसे कम पेनल्टी वाला खिलाड़ी जीतता है। अगर कई खिलाड़ियों का स्कोर एक जैसा सबसे कम है, तो वे नॉकआउट खेलते हैं जब तक एक विजेता न रह जाए।
+अंत में रैंकिंग। कम पेनल्टी — ऊँचा स्थान। सबसे कम स्कोर पर टाई हो तो नॉकआउट जब तक एक विजेता न रह जाए।
+
+[font_size=40][b]खिलाड़ी[/b][/font_size]
+2–12 लोग। [b]+[/b] जोड़ें, स्लाइम खींचकर सीट बदलें, 1.5 सेकंड दबाएँ — नाम और रंग।
+
+सेटिंग में — मैच की लंबाई और कठिनाई (लंबे सिलेबल / सख्त नियम)।
+
+[font_size=40][b]गलती?[/b][/font_size]
+गलत शब्द या गलत टैप? इमरजेंसी बटन — चुनें कौन दोबारा खेले। रोस्टर सूची से बदलें।
+
+[font_size=40][b]टेबल के बीच फोन[/b][/font_size]
+6–12 लोगों के लिए: «फोन केंद्र में» मोड चालू करें, फोन टेबल पर रख दें। टेक्स्ट खुद मौजूदा खिलाड़ी की ओर घूमेगा — फोन घुमाने की ज़रूरत नहीं।
 
 [center][font_size=40][b]मज़े से खेलिए![/b][/font_size][/center]"""
 
-const RULES_TEXT_DE := """[font_size=36]Ein schnelles Party-Wortspiel auf einem Bildschirm: Setzt euch im Kreis, gebt die Handy-Bombe reihum weiter und ruft passende Wörter. Zu langsam — bumm und ein Strafpunkt.
+const RULES_TEXT_DE := """[font_size=36]Schnelles Party-Wortspiel auf einem Bildschirm: im Kreis die Handy-Bombe weitergeben und Wörter erfinden. Zu langsam — bumm und Strafpunkt. Für zwei oder eine große Runde.
 
 [font_size=40][b]Wie spielt man?[/b][/font_size]
-Auf dem Zifferblatt steht eine Silbe (z. B. «CH») und eine Bedingung: am Anfang, irgendwo oder am Ende.
+Auf dem Zifferblatt steht eine Silbe, z. B. «CH», und eine Regel: am Anfang, am Ende oder irgendwo.
 
-Sag ein Wort laut und tippe kurz auf den Bildschirm, um die Bombe weiterzugeben.
+Sag ein Wort laut und tippe kurz, um die Bombe weiterzugeben.
 
-[font_size=40][b]Wann macht es bumm?[/b][/font_size]
-Der Timer ist versteckt und zufällig. Manchmal sofort, manchmal erst nach vielen Zügen.
+Chaos — Milch — Dach — ch… bumm! Wer die Bombe hält — +1 Strafpunkt.
+
+[font_size=40][b]Wann bumm?[/b][/font_size]
+Der Timer ist versteckt und zufällig. Manchmal sofort, manchmal nach vielen Runden. Vor dem Knall warnt die Bombe.
+
+Zwischen den Runden siehst du, wie viele Minuten bis zum Ende bleiben.
 
 [font_size=40][b]Wer gewinnt?[/b][/font_size]
-Am Ende gewinnt, wer die wenigsten Strafpunkte hat. Bei Gleichstand der Besten geht es im K.-o.-Modus weiter, bis ein Sieger bleibt.
+Am Ende — Rangliste. Weniger Strafen, besserer Platz. Bei Gleichstand der Besten: K.-o., bis ein Sieger bleibt.
+
+[font_size=40][b]Spieler[/b][/font_size]
+2–12 Personen. [b]+[/b] hinzufügen, Schleim auf Nachbarn ziehen — Platz tauschen, 1,5 s halten — Name und Farbe.
+
+In den Einstellungen — Spieldauer und Schwierigkeit (längere Silben / härtere Regeln).
+
+[font_size=40][b]Fehler?[/b][/font_size]
+Falsches Wort oder FehlTipp? Notfall-Taste im Kampf — wähle, wer den Zug wiederholt. Roster über die Spielerliste ändern.
+
+[font_size=40][b]Handy in der Mitte[/b][/font_size]
+Für 6–12 Leute: Modus «Handy in der Mitte» an, Gerät flach auf den Tisch. Text dreht sich zum aktuellen Spieler — niemand dreht das Handy.
 
 [center][font_size=40][b]Viel Spaß![/b][/font_size][/center]"""
 
-const RULES_TEXT_FR := """[font_size=36]Jeu de mots explosif pour soirée sur un seul écran: asseyez-vous en cercle, passez la bombe-téléphone à tour de rôle et trouvez des mots vite. Trop lent — boum et pénalité.
+const RULES_TEXT_FR := """[font_size=36]Jeu de mots explosif pour soirée sur un écran: en cercle, passez la bombe-téléphone et inventez des mots vite. Trop lent — boum et pénalité. Pour deux ou une grosse table.
 
 [font_size=40][b]Comment jouer ?[/b][/font_size]
-Le cadran affiche un groupe de lettres et une règle:
-- [b]TIC[/b] = [b]début interdit[/b] (exemple avec «CH»: «é[bgcolor=#ffffff22]ch[/bgcolor]ec», pas «[bgcolor=#ffffff22]ch[/bgcolor]at»)
-- [b]TIC TAC[/b] = [b]partout[/b] (avec «CH»: «[bgcolor=#ffffff22]ch[/bgcolor]at», «ma[bgcolor=#ffffff22]ch[/bgcolor]ine», «ri[bgcolor=#ffffff22]ch[/bgcolor]e»)
-- [b]BOUM[/b] = [b]fin interdite[/b] (avec «ER»: «[bgcolor=#ffffff22]er[/bgcolor]reur», pas «chant[bgcolor=#ffffff22]er[/bgcolor]»)
+Le cadran montre une syllabe, ex. «CH», et une règle: au début, à la fin ou n'importe où.
 
-Dis un mot à voix haute puis touche vite l'écran pour passer la bombe.
+Dis un mot à voix haute et touche l'écran pour passer la bombe.
+
+Chat — machine — riche — ch… boum ! Qui tient la bombe — +1 pénalité.
 
 [font_size=40][b]Quand ça explose ?[/b][/font_size]
-Le minuteur est caché et aléatoire: parfois immédiat, parfois après plusieurs tours.
+Le minuteur est caché et aléatoire. Parfois immédiat, parfois après plusieurs tours. La bombe prévient avant.
+
+Entre les manches, tu vois combien de minutes restent.
 
 [font_size=40][b]Qui gagne ?[/b][/font_size]
-Le joueur avec le moins de pénalités gagne. En cas d'égalité pour la première place, les joueurs à égalité jouent à l'élimination jusqu'à un vainqueur.
+À la fin — classement. Moins de pénalités, mieux. En cas d'égalité au minimum: élimination jusqu'à un vainqueur.
+
+[font_size=40][b]Joueurs[/b][/font_size]
+2–12 personnes. [b]+[/b] ajoute, glisse un slime sur un voisin — échange de place, maintiens 1,5 s — nom et couleur.
+
+Dans les réglages — durée de partie et difficulté (syllabes plus longues / règles plus dures).
+
+[font_size=40][b]Erreur ?[/b][/font_size]
+Mauvais mot ou tap accidentel ? Bouton d'urgence en partie — choisis qui rejoue le tour. Modifie l'équipe via la liste.
+
+[font_size=40][b]Téléphone au centre[/b][/font_size]
+Pour 6–12 personnes: active le mode «téléphone au centre», pose le téléphone à plat. Le texte tourne vers le joueur actuel — plus besoin de faire pivoter l'appareil.
 
 [center][font_size=40][b]Bonne partie ![/b][/font_size][/center]"""
 
-const RULES_TEXT_IT := """[font_size=36]Gioco di parole esplosivo da festa su uno schermo: sedetevi in cerchio, passate la bomba-telefono a turno e trovate parole al volo. Se sei lento — boom e penalità.
+const RULES_TEXT_IT := """[font_size=36]Gioco di parole da festa su uno schermo: in cerchio passate la bomba-telefono e inventate parole al volo. Troppo lenti — boom e penalità. Per due o un gruppo grande.
 
 [font_size=40][b]Come si gioca?[/b][/font_size]
-Il quadrante mostra una sillaba e una regola:
-- [b]TIC[/b] = [b]inizio vietato[/b] (con «ST»: «pa[bgcolor=#ffffff22]st[/bgcolor]a», non «[bgcolor=#ffffff22]st[/bgcolor]ella»)
-- [b]TIC TAC[/b] = [b]libero[/b] (con «ST»: «[bgcolor=#ffffff22]st[/bgcolor]ella», «pa[bgcolor=#ffffff22]st[/bgcolor]a», «te[bgcolor=#ffffff22]st[/bgcolor]a»)
-- [b]BOMBA[/b] = [b]fine vietata[/b] (con «ATO»: «[bgcolor=#ffffff22]ato[/bgcolor]mo», non «gel[bgcolor=#ffffff22]ato[/bgcolor]»)
+Il quadrante mostra una sillaba, es. «ST», e una regola: all'inizio, alla fine o ovunque.
 
-Pronuncia una parola ad alta voce e tocca velocemente lo schermo per passare la bomba.
+Pronuncia una parola ad alta voce e tocca per passare la bomba.
+
+Stella — pasta — testa — st… boom! Chi ha la bomba — +1 penalità.
 
 [font_size=40][b]Quando esplode?[/b][/font_size]
-Il timer è nascosto e casuale: a volte subito, a volte dopo molti turni.
+Il timer è nascosto e casuale. A volte subito, a volte dopo molti turni. La bomba avvisa prima.
+
+Tra i round vedi quanti minuti restano alla fine.
 
 [font_size=40][b]Chi vince?[/b][/font_size]
-Vince chi ha meno penalità. Se più giocatori sono a pari punti in testa, continuano a eliminazione fino a un solo vincitore.
+Alla fine — classifica. Meno penalità, posto migliore. A parità sul minimo: eliminazione fino a un vincitore.
+
+[font_size=40][b]Giocatori[/b][/font_size]
+2–12 persone. [b]+[/b] aggiunge, trascina uno slime su un vicino — scambio posto, tieni 1,5 s — nome e colore.
+
+Nelle impostazioni — durata partita e difficoltà (sillabe più lunghe / regole più dure).
+
+[font_size=40][b]Errore?[/b][/font_size]
+Parola sbagliata o tocco accidentale? Pulsante di emergenza — scegli chi ripete il turno. Cambia il roster dalla lista.
+
+[font_size=40][b]Telefono al centro[/b][/font_size]
+Per 6–12 persone: attiva la modalità «telefono al centro», lascia il telefono sul tavolo. Il testo ruota verso il giocatore attuale — nessuno gira il device.
 
 [center][font_size=40][b]Buon divertimento![/b][/font_size][/center]"""
 
@@ -105,6 +189,9 @@ const _SR: Dictionary = {
 	"SETTINGS_DIFFICULTY_EASY": "Laka",
 	"SETTINGS_DIFFICULTY_MEDIUM": "Srednja",
 	"SETTINGS_DIFFICULTY_HARD": "Teška",
+	"EMERGENCY_FIRST_HINT": "1) Izaberi ko ponavlja potez.\n2) «Nastavi» — partija ide dalje.",
+	"TIME_PROGRESS_ROUNDS": "još ~%d",
+	"SETTINGS_DIFFICULTY_HINT": "Menja špil: dužina slogova i stroža pravila",
 	"SETTINGS_MUSIC_MENU": "Muzika u meniju",
 	"SETTINGS_MUSIC_VOLUME": "Jačina muzike",
 	"SETTINGS_SFX_VOLUME": "Jačina zvukova",
@@ -168,7 +255,7 @@ const _SR: Dictionary = {
 	"ONBOARDING_SWAP_TITLE": "Raspored sedenja",
 	"ONBOARDING_SWAP_BODY": "Prevuci jednog slajma na drugog da zamenite mesta.",
 	"ONBOARDING_START_TITLE": "U boj!",
-	"ONBOARDING_START_BODY": "Kad su svi spremni — dodirni «START».",
+	"ONBOARDING_START_BODY": "Kad su svi spremni — «START». Za veliki sto kasnije uključi «telefon u centru».",
 	"ONBOARDING_CHOICE_TITLE": "Žreb",
 	"ONBOARDING_CHOICE_BODY": "Brojčanik bira ko igra prvi. Prati osvetljenog igrača.",
 	"ONBOARDING_READY_TITLE": "Početak runde",
@@ -176,7 +263,7 @@ const _SR: Dictionary = {
 	"ONBOARDING_PLAY_TITLE": "Tvoj potez",
 	"ONBOARDING_TIME_UP_TITLE": "Vreme je isteklo",
 	"ONBOARDING_DONE_TITLE": "Tutorijal završen!",
-	"ONBOARDING_DONE_BODY": "Sada znaš pravila igre Tik-Tak-Bada-Bum. Okupi društvo i igraj!",
+	"ONBOARDING_DONE_BODY": "Pravila znaš. Za 6–12 ljudi: režim «telefon u centru» okreće tekst ka igraču na potezu.",
 	"TUTORIAL_PLAY_BODY": "Slog «%s» — %s.\nOdgovaraju reči: %s.\nNa primer: «%s».\n%s",
 	"TUTORIAL_EXPLOSION": "%s nije stigao/la da smisli reč — bomba je eksplodirala.",
 	"OVERTIME_TITLE": "Osnovno vreme je isteklo",
@@ -194,6 +281,9 @@ const _ES: Dictionary = {
 	"SETTINGS_DIFFICULTY_EASY": "Fácil",
 	"SETTINGS_DIFFICULTY_MEDIUM": "Media",
 	"SETTINGS_DIFFICULTY_HARD": "Difícil",
+	"EMERGENCY_FIRST_HINT": "1) Elige quién repite el turno.\n2) Continuar — la partida sigue.",
+	"TIME_PROGRESS_ROUNDS": "quedan ~%d",
+	"SETTINGS_DIFFICULTY_HINT": "Cambia el mazo: longitud de sílabas y dureza de reglas",
 	"SETTINGS_MUSIC_MENU": "Música del menú",
 	"SETTINGS_MUSIC_VOLUME": "Volumen de música",
 	"SETTINGS_SFX_VOLUME": "Volumen de efectos",
@@ -257,7 +347,7 @@ const _ES: Dictionary = {
 	"ONBOARDING_SWAP_TITLE": "Asientos",
 	"ONBOARDING_SWAP_BODY": "Arrastra un slime sobre otro para cambiar asientos.",
 	"ONBOARDING_START_TITLE": "¡A jugar!",
-	"ONBOARDING_START_BODY": "Cuando todos estén listos — toca «INICIAR».",
+	"ONBOARDING_START_BODY": "Cuando todos estén listos — «INICIAR». Para mucha gente, activa luego «teléfono en el centro».",
 	"ONBOARDING_CHOICE_TITLE": "Sorteo",
 	"ONBOARDING_CHOICE_BODY": "El dial elegirá quién va primero.",
 	"ONBOARDING_READY_TITLE": "Comenzar ronda",
@@ -265,7 +355,7 @@ const _ES: Dictionary = {
 	"ONBOARDING_PLAY_TITLE": "Tu turno",
 	"ONBOARDING_TIME_UP_TITLE": "Se acabó el tiempo",
 	"ONBOARDING_DONE_TITLE": "¡Tutorial completado!",
-	"ONBOARDING_DONE_BODY": "Ahora conoces las reglas de Tic-Tac-Bada-Boum. ¡Reúne a tus amigos y juega!",
+	"ONBOARDING_DONE_BODY": "Ya conoces las reglas. Para 6–12: el modo «teléfono en el centro» gira el texto hacia quien juega.",
 	"TUTORIAL_PLAY_BODY": "Sílaba «%s» — %s.\nPalabras válidas: %s.\nPor ejemplo: «%s».\n%s",
 	"TUTORIAL_EXPLOSION": "%s se quedó sin tiempo para decir una palabra — la bomba explotó.",
 	"OVERTIME_TITLE": "Se acabó el tiempo reglamentario",
@@ -283,6 +373,9 @@ const _HI: Dictionary = {
 	"SETTINGS_DIFFICULTY_EASY": "आसान",
 	"SETTINGS_DIFFICULTY_MEDIUM": "मध्यम",
 	"SETTINGS_DIFFICULTY_HARD": "कठिन",
+	"EMERGENCY_FIRST_HINT": "1) चुनें कौन दोबारा खेले।\n2) जारी रखें — मैच चलता रहेगा।",
+	"TIME_PROGRESS_ROUNDS": "और ~%d",
+	"SETTINGS_DIFFICULTY_HINT": "डेक बदलता है: सिलेबल की लंबाई और नियम की सख्ती",
 	"SETTINGS_MUSIC_MENU": "मेन्यू संगीत",
 	"SETTINGS_MUSIC_VOLUME": "संगीत आवाज़",
 	"SETTINGS_SFX_VOLUME": "ध्वनि प्रभाव आवाज़",
@@ -346,7 +439,7 @@ const _HI: Dictionary = {
 	"ONBOARDING_SWAP_TITLE": "बैठने की जगह",
 	"ONBOARDING_SWAP_BODY": "एक स्लाइम को दूसरे पर खींचें और सीट बदलें।",
 	"ONBOARDING_START_TITLE": "खेल शुरू!",
-	"ONBOARDING_START_BODY": "सब तैयार हों तो «शुरू करें» दबाएँ।",
+	"ONBOARDING_START_BODY": "सब तैयार हों तो «शुरू करें». बड़ी पार्टी के लिए बाद में «फोन केंद्र में» चालू करें।",
 	"ONBOARDING_CHOICE_TITLE": "लॉटरी",
 	"ONBOARDING_CHOICE_BODY": "डायल तय करेगा कौन पहले खेलेगा।",
 	"ONBOARDING_READY_TITLE": "राउंड की शुरुआत",
@@ -354,7 +447,7 @@ const _HI: Dictionary = {
 	"ONBOARDING_PLAY_TITLE": "आपकी बारी",
 	"ONBOARDING_TIME_UP_TITLE": "समय समाप्त",
 	"ONBOARDING_DONE_TITLE": "ट्यूटोरियल पूरा!",
-	"ONBOARDING_DONE_BODY": "अब आपको टिक-टैक-बादाबूम के नियम पता हैं। दोस्तों को बुलाइए और खेलिए!",
+	"ONBOARDING_DONE_BODY": "नियम पता हैं। 6–12 के लिए: «फोन केंद्र में» मोड टेक्स्ट को मौजूदा खिलाड़ी की ओर घुमाता है।",
 	"TUTORIAL_PLAY_BODY": "सिलेबल «%s» — %s.\nमान्य शब्द: %s.\nउदाहरण: «%s».\n%s",
 	"TUTORIAL_EXPLOSION": "%s समय पर शब्द नहीं बोल पाया/पाई — बम फट गया।",
 	"OVERTIME_TITLE": "मुख्य समय समाप्त",
@@ -372,6 +465,9 @@ const _DE: Dictionary = {
 	"SETTINGS_DIFFICULTY_EASY": "Leicht",
 	"SETTINGS_DIFFICULTY_MEDIUM": "Mittel",
 	"SETTINGS_DIFFICULTY_HARD": "Schwer",
+	"EMERGENCY_FIRST_HINT": "1) Wähle, wer den Zug wiederholt.\n2) Weiter — die Runde geht weiter.",
+	"TIME_PROGRESS_ROUNDS": "noch ~%d",
+	"SETTINGS_DIFFICULTY_HINT": "Ändert das Deck: Silbenlänge und Regelhärte",
 	"SETTINGS_MUSIC_MENU": "Menümusik",
 	"SETTINGS_MUSIC_VOLUME": "Musiklautstärke",
 	"SETTINGS_SFX_VOLUME": "Effektlautstärke",
@@ -435,7 +531,7 @@ const _DE: Dictionary = {
 	"ONBOARDING_SWAP_TITLE": "Sitzordnung",
 	"ONBOARDING_SWAP_BODY": "Ziehe einen Schleim auf einen anderen zum Tauschen.",
 	"ONBOARDING_START_TITLE": "Los geht's!",
-	"ONBOARDING_START_BODY": "Wenn alle bereit sind — tippe «START».",
+	"ONBOARDING_START_BODY": "Wenn alle bereit sind — «START». Für große Runden später «Handy in der Mitte» anschalten.",
 	"ONBOARDING_CHOICE_TITLE": "Auslosung",
 	"ONBOARDING_CHOICE_BODY": "Das Rad wählt den ersten Spieler.",
 	"ONBOARDING_READY_TITLE": "Rundenstart",
@@ -443,7 +539,7 @@ const _DE: Dictionary = {
 	"ONBOARDING_PLAY_TITLE": "Du bist dran",
 	"ONBOARDING_TIME_UP_TITLE": "Zeit abgelaufen",
 	"ONBOARDING_DONE_TITLE": "Tutorial abgeschlossen!",
-	"ONBOARDING_DONE_BODY": "Jetzt kennst du die Regeln von Tic-Tac-Bada-Bumm. Viel Spaß mit Freunden!",
+	"ONBOARDING_DONE_BODY": "Regeln sitzen. Für 6–12: Modus «Handy in der Mitte» dreht den Text zum aktuellen Spieler.",
 	"TUTORIAL_PLAY_BODY": "Silbe «%s» — %s.\nPassende Wörter: %s.\nZum Beispiel: «%s».\n%s",
 	"TUTORIAL_EXPLOSION": "%s war zu langsam mit einem Wort — die Bombe ist explodiert.",
 	"OVERTIME_TITLE": "Die reguläre Zeit ist vorbei",
@@ -461,6 +557,9 @@ const _FR: Dictionary = {
 	"SETTINGS_DIFFICULTY_EASY": "Facile",
 	"SETTINGS_DIFFICULTY_MEDIUM": "Moyenne",
 	"SETTINGS_DIFFICULTY_HARD": "Difficile",
+	"EMERGENCY_FIRST_HINT": "1) Choisis qui rejoue le tour.\n2) Continuer — la partie reprend.",
+	"TIME_PROGRESS_ROUNDS": "encore ~%d",
+	"SETTINGS_DIFFICULTY_HINT": "Change le deck: longueur des syllabes et dureté des règles",
 	"SETTINGS_MUSIC_MENU": "Musique du menu",
 	"SETTINGS_MUSIC_VOLUME": "Volume de la musique",
 	"SETTINGS_SFX_VOLUME": "Volume des effets",
@@ -524,7 +623,7 @@ const _FR: Dictionary = {
 	"ONBOARDING_SWAP_TITLE": "Placement",
 	"ONBOARDING_SWAP_BODY": "Glissez un slime sur un autre pour échanger les places.",
 	"ONBOARDING_START_TITLE": "En jeu !",
-	"ONBOARDING_START_BODY": "Quand tout le monde est prêt — touchez «JOUER».",
+	"ONBOARDING_START_BODY": "Quand tout le monde est prêt — «JOUER». Pour une grande table, activez ensuite «téléphone au centre».",
 	"ONBOARDING_CHOICE_TITLE": "Tirage",
 	"ONBOARDING_CHOICE_BODY": "Le cadran choisit le premier joueur.",
 	"ONBOARDING_READY_TITLE": "Début de manche",
@@ -532,7 +631,7 @@ const _FR: Dictionary = {
 	"ONBOARDING_PLAY_TITLE": "À vous",
 	"ONBOARDING_TIME_UP_TITLE": "Temps écoulé",
 	"ONBOARDING_DONE_TITLE": "Tutoriel terminé !",
-	"ONBOARDING_DONE_BODY": "Vous connaissez maintenant les règles de Tic-Tac-Bada-Boum. Amusez-vous !",
+	"ONBOARDING_DONE_BODY": "Les règles sont claires. Pour 6–12: le mode «téléphone au centre» tourne le texte vers le joueur actif.",
 	"TUTORIAL_PLAY_BODY": "Syllabe «%s» — %s.\nMots valides: %s.\nPar exemple: «%s».\n%s",
 	"TUTORIAL_EXPLOSION": "%s n'a pas trouvé de mot à temps — la bombe a explosé.",
 	"OVERTIME_TITLE": "Temps réglementaire écoulé",
@@ -550,6 +649,9 @@ const _IT: Dictionary = {
 	"SETTINGS_DIFFICULTY_EASY": "Facile",
 	"SETTINGS_DIFFICULTY_MEDIUM": "Media",
 	"SETTINGS_DIFFICULTY_HARD": "Difficile",
+	"EMERGENCY_FIRST_HINT": "1) Scegli chi ripete il turno.\n2) Continua — la partita va avanti.",
+	"TIME_PROGRESS_ROUNDS": "ancora ~%d",
+	"SETTINGS_DIFFICULTY_HINT": "Cambia il mazzo: lunghezza sillabe e durezza delle regole",
 	"SETTINGS_MUSIC_MENU": "Musica del menu",
 	"SETTINGS_MUSIC_VOLUME": "Volume musica",
 	"SETTINGS_SFX_VOLUME": "Volume effetti",
@@ -613,7 +715,7 @@ const _IT: Dictionary = {
 	"ONBOARDING_SWAP_TITLE": "Posti a sedere",
 	"ONBOARDING_SWAP_BODY": "Trascina uno slime su un altro per scambiare posto.",
 	"ONBOARDING_START_TITLE": "Si parte!",
-	"ONBOARDING_START_BODY": "Quando tutti sono pronti — tocca «INIZIA».",
+	"ONBOARDING_START_BODY": "Quando tutti sono pronti — «INIZIA». Per tanti giocatori poi attiva «telefono al centro».",
 	"ONBOARDING_CHOICE_TITLE": "Sorteggio",
 	"ONBOARDING_CHOICE_BODY": "Il quadrante sceglie chi parte per primo.",
 	"ONBOARDING_READY_TITLE": "Inizio round",
@@ -621,7 +723,7 @@ const _IT: Dictionary = {
 	"ONBOARDING_PLAY_TITLE": "Tocca a te",
 	"ONBOARDING_TIME_UP_TITLE": "Tempo scaduto",
 	"ONBOARDING_DONE_TITLE": "Tutorial completato!",
-	"ONBOARDING_DONE_BODY": "Ora conosci le regole di Tic-Tac-Bada-Bomba. Invita gli amici e gioca!",
+	"ONBOARDING_DONE_BODY": "Conosci le regole. Per 6–12: la modalità «telefono al centro» gira il testo verso chi gioca.",
 	"TUTORIAL_PLAY_BODY": "Sillaba «%s» — %s.\nParole valide: %s.\nPer esempio: «%s».\n%s",
 	"TUTORIAL_EXPLOSION": "%s non ha trovato una parola in tempo — la bomba è esplosa.",
 	"OVERTIME_TITLE": "Tempo regolamentare scaduto",

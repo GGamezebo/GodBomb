@@ -457,7 +457,8 @@ func _show_between_rounds_progress() -> void:
 		_show_hint(LocaleService.text("HUD_START_ROUND_HINT"))
 		return
 	var minutes := game_manager.session.get_match_remaining_minutes()
-	_time_progress_banner.show_remaining(minutes)
+	var rounds := game_manager.session.get_estimated_rounds_remaining()
+	_time_progress_banner.show_remaining(minutes, rounds)
 	_time_progress_token += 1
 	var token := _time_progress_token
 	get_tree().create_timer(GameTimeProgressBanner.SHOW_DURATION).timeout.connect(

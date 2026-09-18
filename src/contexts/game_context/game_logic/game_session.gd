@@ -29,6 +29,8 @@ var _deck_game_time_minutes: int = -1
 var _knockout_seq: int = 0
 var match_limit_seconds: float = 0.0
 var match_elapsed_seconds: float = 0.0
+var regulation_boom_count: int = 0
+var emergency_intro_shown: bool = false
 
 
 func setup(p_config: GameConfig, p_events: GameEvents, account: PDataAccount) -> void:
@@ -47,6 +49,8 @@ func setup(p_config: GameConfig, p_events: GameEvents, account: PDataAccount) ->
 	is_overtime = false
 	_knockout_seq = 0
 	match_elapsed_seconds = 0.0
+	regulation_boom_count = 0
+	emergency_intro_shown = false
 	current_player_index = randi() % maxi(players.size(), 1)
 	max_rand_player_choices = 40 + randi() % maxi(players.size(), 1)
 	_emit_current_player()
@@ -378,6 +382,23 @@ func get_match_remaining_minutes() -> int:
 	if remaining <= 0.0:
 		return 0
 	return maxi(1, int(ceil(remaining / 60.0)))
+
+
+func note_regulation_boom() -> void:
+	if is_tutorial or is_overtime:
+		return
+	regulation_boom_count += 1
+
+
+func get_estimated_rounds_remaining() -> int:
+	var remaining := get_match_remaining_seconds()
+	if remaining <= 0.0:
+		return 0
+	var avg := 40.0
+	if regulation_boom_count > 0 and match_elapsed_seconds > 1.0:
+		avg = match_elapsed_seconds / float(regulation_boom_count)
+	avg = clampf(avg, 18.0, 75.0)
+	return maxi(1, int(ceil(remaining / avg)))
 
 
 func is_regulation_time_up() -> bool:

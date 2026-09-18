@@ -86,9 +86,26 @@ func open() -> void:
 	player_selection_widget.load_from_session_players(session.players)
 	_sync_preview(session.get_current_player().info)
 	_refresh_continue_button()
+	_apply_explanation_copy(session)
 	call_deferred("_layout_explanation_banner")
 	call_deferred("_layout_preview_on_table")
 	visible = true
+
+
+func _apply_explanation_copy(session: GameSession) -> void:
+	if not explanation_banner:
+		return
+	var title := explanation_banner.get_node_or_null("Margin/VBox/Title") as Label
+	if title:
+		title.text = LocaleService.text("EMERGENCY_TITLE")
+	var text := explanation_banner.get_node_or_null("Margin/VBox/ExplanationText") as RichTextLabel
+	if text == null:
+		return
+	if session != null and not session.emergency_intro_shown:
+		text.text = LocaleService.text("EMERGENCY_FIRST_HINT")
+		session.emergency_intro_shown = true
+	else:
+		text.text = LocaleService.text("EMERGENCY_EXPLANATION")
 
 
 func close_overlay() -> void:

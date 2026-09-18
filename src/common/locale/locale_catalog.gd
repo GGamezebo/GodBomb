@@ -17,7 +17,7 @@ const ORDER: Array[String] = [
 const NATIVE_NAMES: Dictionary = {
 	LOCALE_RU: "Русский",
 	LOCALE_EN: "English",
-	LOCALE_SR: "Српски",
+	LOCALE_SR: "Srpski",
 	LOCALE_ES: "Español",
 	LOCALE_HI: "हिन्दी",
 	LOCALE_DE: "Deutsch",

@@ -111,6 +111,11 @@ func _refresh_static_labels() -> void:
 		_update_game_time_label(int(game_time_slider.value))
 	if difficulty_slider:
 		_update_difficulty_label(int(difficulty_slider.value))
+	var difficulty_hint := get_node_or_null(
+		"Panel/Margin/VBox/Scroll/ContentGutter/Content/DifficultySection/DifficultyHint"
+	) as Label
+	if difficulty_hint:
+		difficulty_hint.text = LocaleService.text("SETTINGS_DIFFICULTY_HINT")
 
 
 func _sync_language_picker() -> void:

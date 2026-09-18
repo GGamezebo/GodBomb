@@ -292,6 +292,7 @@ func _on_explosion_finished() -> void:
 	if session.is_overtime:
 		_finish_overtime_explosion()
 		return
+	session.note_regulation_boom()
 	if session.is_regulation_time_up():
 		if session.has_unique_leader():
 			fsm.add_event(FSMGameEvents.MATCH_END)

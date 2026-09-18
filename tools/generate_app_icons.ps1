@@ -1,7 +1,12 @@
-# Single app icon: opaque black canvas, rounded plate, simple clock dial + bomb.
+# App icons for Godot / Android / itch.
+# Outputs under assets/:
+#   icon.png                     — 1024 master (also used as project/boot icon)
+#   icon_192.png                 — Android legacy launcher
+#   icon_adaptive_fg.png         — Android adaptive foreground 432
+#   icon_adaptive_bg.png         — Android adaptive background 432 (solid black)
 Add-Type -AssemblyName System.Drawing
 
-function New-IconBitmap([int]$Width, [int]$Height) {
+function New-IconBitmap([int]$Width, [int]$Height, [bool]$Transparent = $false) {
     $fmt = [System.Drawing.Imaging.PixelFormat]::Format32bppArgb
     $bmp = New-Object System.Drawing.Bitmap($Width, $Height, $fmt)
     $g = [System.Drawing.Graphics]::FromImage($bmp)
@@ -9,7 +14,11 @@ function New-IconBitmap([int]$Width, [int]$Height) {
     $g.InterpolationMode = [System.Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic
     $g.PixelOffsetMode = [System.Drawing.Drawing2D.PixelOffsetMode]::HighQuality
     $g.CompositingQuality = [System.Drawing.Drawing2D.CompositingQuality]::HighQuality
-    $g.Clear([System.Drawing.Color]::Black)
+    if ($Transparent) {
+        $g.Clear([System.Drawing.Color]::Transparent)
+    } else {
+        $g.Clear([System.Drawing.Color]::Black)
+    }
     return @{ Bmp = $bmp; G = $g }
 }
 
@@ -93,11 +102,11 @@ function Draw-Bomb($G, [float]$Cx, [float]$Cy, [float]$Radius) {
     $flameBrush.Dispose()
 }
 
-function Draw-IconArt($G, [float]$Size) {
+function Draw-IconArt($G, [float]$Size, [float]$ArtScale = 1.0) {
     $cx = $Size * 0.5
     $cy = $Size * 0.52
-    Draw-ClockDial $G $cx $cy ($Size * 0.31)
-    Draw-Bomb $G $cx $cy ($Size * 0.17)
+    Draw-ClockDial $G $cx $cy ($Size * 0.31 * $ArtScale)
+    Draw-Bomb $G $cx $cy ($Size * 0.17 * $ArtScale)
 }
 
 function Draw-AppIcon($G, [float]$Size) {
@@ -117,21 +126,41 @@ function Save-Png($Bmp, [string]$Path) {
     $Bmp.Save($Path, [System.Drawing.Imaging.ImageFormat]::Png)
 }
 
+function Save-Resized($SourceBmp, [int]$Size, [string]$Path) {
+    $ctx = New-IconBitmap $Size $Size
+    $ctx.G.DrawImage($SourceBmp, 0, 0, $Size, $Size)
+    Save-Png $ctx.Bmp $Path
+    $ctx.G.Dispose()
+    $ctx.Bmp.Dispose()
+}
+
 $assets = Join-Path (Split-Path $PSScriptRoot -Parent) "assets"
 
+# Master 1024
 $mainSize = 1024
 $ctx = New-IconBitmap $mainSize $mainSize
 Draw-AppIcon $ctx.G $mainSize
 Save-Png $ctx.Bmp (Join-Path $assets "icon.png")
-$ctx.G.Dispose(); $ctx.Bmp.Dispose()
+Save-Resized $ctx.Bmp 192 (Join-Path $assets "icon_192.png")
+$ctx.G.Dispose()
+$ctx.Bmp.Dispose()
 
+# Adaptive foreground 432 — art only, inside safe zone (~66%)
 $adSize = 432
+$ctx = New-IconBitmap $adSize $adSize $true
+Draw-IconArt $ctx.G $adSize 0.92
+Save-Png $ctx.Bmp (Join-Path $assets "icon_adaptive_fg.png")
+$ctx.G.Dispose()
+$ctx.Bmp.Dispose()
+
+# Adaptive background 432 — solid black
 $ctx = New-IconBitmap $adSize $adSize
 $ctx.G.Clear([System.Drawing.Color]::Black)
 Save-Png $ctx.Bmp (Join-Path $assets "icon_adaptive_bg.png")
-$ctx.G.Dispose(); $ctx.Bmp.Dispose()
+$ctx.G.Dispose()
+$ctx.Bmp.Dispose()
 
-foreach ($f in @("icon.png", "icon_adaptive_bg.png")) {
+foreach ($f in @("icon.png", "icon_192.png", "icon_adaptive_fg.png", "icon_adaptive_bg.png")) {
     $p = Join-Path $assets $f
     $img = [System.Drawing.Image]::FromFile($p)
     Write-Output "$f : $($img.Width)x$($img.Height)"
