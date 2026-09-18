@@ -11,7 +11,6 @@ extends Control
 @export var game_time_label: Label
 @export var difficulty_slider: HSlider
 @export var difficulty_label: Label
-@export var music_check: CheckBox
 @export var music_slider: HSlider
 @export var music_value_label: Label
 @export var sfx_slider: HSlider
@@ -43,9 +42,6 @@ func _ready() -> void:
 	if difficulty_slider:
 		difficulty_slider.value_changed.connect(_on_difficulty_changed)
 		UiSounds.bind_slider(difficulty_slider, 1.0)
-	if music_check:
-		music_check.toggled.connect(_on_music_toggled)
-		UiSounds.bind_checkbox(music_check)
 	if music_slider:
 		music_slider.value_changed.connect(_on_music_volume_changed)
 		UiSounds.bind_slider(music_slider, 5.0)
@@ -87,8 +83,6 @@ func _refresh_static_labels() -> void:
 	if title:
 		title.text = LocaleService.text("SETTINGS_TITLE")
 	_update_language_name_label()
-	if music_check:
-		music_check.text = LocaleService.text("SETTINGS_MUSIC_MENU")
 	var music_caption := get_node_or_null(
 		"Panel/Margin/VBox/Scroll/ContentGutter/Content/MusicSection/MusicCaption"
 	) as Label
@@ -218,8 +212,6 @@ func _sync_from_account() -> void:
 		difficulty_slider.step = 1.0
 		difficulty_slider.value = account.get_difficulty()
 		_update_difficulty_label(account.get_difficulty())
-	if music_check:
-		music_check.button_pressed = account.get_music_enabled()
 	if music_slider:
 		music_slider.value = account.get_music_volume() * 100.0
 		_update_music_label(account.get_music_volume())
@@ -231,7 +223,6 @@ func _sync_from_account() -> void:
 	if haptics_slider:
 		haptics_slider.value = account.get_haptics_strength() * 100.0
 		_update_haptics_label(account.get_haptics_strength())
-	_update_music_controls_enabled()
 	_update_haptics_controls_enabled()
 	_syncing_account = false
 
@@ -260,17 +251,7 @@ func _on_difficulty_changed(value: float) -> void:
 	_save_account()
 
 
-func _on_music_toggled(enabled: bool) -> void:
-	var audio := _get_audio_controller()
-	if audio:
-		audio.set_music_enabled(enabled)
-	_update_music_controls_enabled()
-	_save_account()
-
-
 func _on_music_volume_changed(value: float) -> void:
-	if music_slider and not music_slider.editable:
-		return
 	var linear := clampf(value / 100.0, 0.0, 1.0)
 	var audio := _get_audio_controller()
 	if audio:
@@ -367,19 +348,6 @@ func _update_sfx_label(linear: float) -> void:
 func _update_haptics_label(linear: float) -> void:
 	if haptics_value_label:
 		haptics_value_label.text = "%d%%" % int(round(linear * 100.0))
-
-
-func _update_music_controls_enabled() -> void:
-	var enabled := true
-	if account:
-		enabled = account.get_music_enabled()
-	elif music_check:
-		enabled = music_check.button_pressed
-	if music_slider:
-		music_slider.editable = enabled
-		music_slider.modulate = Color.WHITE if enabled else Color(0.72, 0.72, 0.72, 1.0)
-	if music_value_label:
-		music_value_label.modulate = Color.WHITE if enabled else Color(0.72, 0.72, 0.72, 1.0)
 
 
 func _update_haptics_controls_enabled() -> void:

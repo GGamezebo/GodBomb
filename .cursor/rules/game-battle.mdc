@@ -12,7 +12,7 @@ alwaysApply: false
 
 **Match clock:** `match_elapsed_seconds` only in **countdown** + **play** (not ready/explosion/emergency/pause/roster). Limit = `game_time_minutes * 60`. Roster resync does not reset clock. After boom: time up → result or overtime; else next card. Editor (`OS.has_feature("editor")`): top-left debug clock on GameManager CanvasLayer.
 
-**Time left banner:** between rounds `GameTimeProgressBanner` — «до конца игры» + remaining minutes from clock. Hidden in overtime.
+**Time left banner:** between rounds `GameTimeProgressBanner` — «до конца игры» + remaining minutes from clock. Hidden in overtime. Toggle `FixedPhoneButton` force-clears this slot (`_force_clear_shared_hint_slot`) before `HUD_TABLE_CENTER_HINT` / ready hint so banners never stack.
 
 **UI init trap:** FSM starts in `initialize()` before child `_ready`. HUD + `game_input` MUST `_sync_to_current_state()` in `_ready`.
 
@@ -34,6 +34,6 @@ State UI: choice/ready/countdown/play share dial layout · ready=«Готовы?
 
 **Audio:** gameplay → `GameSound` · UI buttons → `UiSounds` → `audio.mdc`.
 
-**Core:** `game_manager.gd` `game_session.gd` `game_sound.gd` `word_condition.gd`
+**Core:** `game_manager.gd` `game_session.gd` `game_sound.gd` `word_condition.gd` · decks `GameDecks` (`*_RESTRICT`: B=hard at start, E=hard at end). `WordCondition.random_for(syllable)` skips forbidden positions (FR/IT exclusion: B forbids NOT_END, E forbids NOT_BEGIN).
 
 **Match length:** clock from `account.game_time_minutes`; deck refills as needed. OT does not rebuild the deck. Roster add/remove does not reset the clock.

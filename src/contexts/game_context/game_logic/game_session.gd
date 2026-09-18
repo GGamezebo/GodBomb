@@ -163,7 +163,7 @@ func _fill_cards() -> void:
 	card_numbers = clampi(card_numbers, 1, card_strings.size())
 
 	for i in card_numbers:
-		cards.append(GameCard.new(card_strings[i], WordCondition.random()))
+		cards.append(GameCard.new(card_strings[i], WordCondition.random_for(card_strings[i])))
 	if match_cards_total <= 0:
 		match_cards_total = cards.size()
 
@@ -303,7 +303,8 @@ func _append_random_card() -> void:
 	if game_config == null or game_config.cards.is_empty():
 		return
 	var random_index := randi() % game_config.cards.size()
-	cards.append(GameCard.new(game_config.cards[random_index], WordCondition.random()))
+	var syllable := game_config.cards[random_index]
+	cards.append(GameCard.new(syllable, WordCondition.random_for(syllable)))
 
 
 func get_min_score() -> int:

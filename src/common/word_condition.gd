@@ -22,6 +22,12 @@ static func random() -> int:
 	return conditions[randi() % conditions.size()]
 
 
+static func random_for(syllable: String) -> int:
+	if syllable.is_empty():
+		return random()
+	return GameDecks.random_condition(syllable)
+
+
 static func uses_exclusion_rules() -> bool:
 	return LocaleCatalog.uses_exclusion_conditions(LocaleService.get_locale())
 

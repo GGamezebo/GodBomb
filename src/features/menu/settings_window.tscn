@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://bff3xhmdudpjx" path="res://src/features/menu/pill_action_button.tscn" id="2"]
 [ext_resource type="PackedScene" path="res://src/features/menu/language_flag_picker.tscn" id="3"]
 
-[node name="SettingsWindow" type="Control" unique_id=2113593075 node_paths=PackedStringArray("language_picker", "language_name_label", "settings_scroll", "game_time_slider", "game_time_label", "difficulty_slider", "difficulty_label", "music_check", "music_slider", "music_value_label", "sfx_slider", "sfx_value_label", "haptics_check", "haptics_slider", "haptics_value_label", "reset_button", "close_button")]
+[node name="SettingsWindow" type="Control" unique_id=2113593075 node_paths=PackedStringArray("language_picker", "language_name_label", "settings_scroll", "game_time_slider", "game_time_label", "difficulty_slider", "difficulty_label", "music_slider", "music_value_label", "sfx_slider", "sfx_value_label", "haptics_check", "haptics_slider", "haptics_value_label", "reset_button", "close_button")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -19,7 +19,6 @@ game_time_slider = NodePath("Panel/Margin/VBox/Scroll/ContentGutter/Content/Game
 game_time_label = NodePath("Panel/Margin/VBox/Scroll/ContentGutter/Content/GameTimeSection/GameTimeLabel")
 difficulty_slider = NodePath("Panel/Margin/VBox/Scroll/ContentGutter/Content/DifficultySection/DifficultyRow/DifficultySlider")
 difficulty_label = NodePath("Panel/Margin/VBox/Scroll/ContentGutter/Content/DifficultySection/DifficultyLabel")
-music_check = NodePath("Panel/Margin/VBox/Scroll/ContentGutter/Content/MusicCheck")
 music_slider = NodePath("Panel/Margin/VBox/Scroll/ContentGutter/Content/MusicSection/MusicRow/MusicSlider")
 music_value_label = NodePath("Panel/Margin/VBox/Scroll/ContentGutter/Content/MusicSection/MusicRow/MusicValueLabel")
 sfx_slider = NodePath("Panel/Margin/VBox/Scroll/ContentGutter/Content/SfxSection/SfxRow/SfxSlider")
@@ -152,13 +151,6 @@ grow_vertical = 2
 max_value = 2.0
 step = 1.0
 value = 1.0
-
-[node name="MusicCheck" type="CheckBox" parent="Panel/Margin/VBox/Scroll/ContentGutter/Content" unique_id=1077537578]
-custom_minimum_size = Vector2(0, 72)
-layout_mode = 2
-theme_type_variation = &"ModalCheckBox"
-button_pressed = true
-text = "Музыка в меню"
 
 [node name="MusicSection" type="VBoxContainer" parent="Panel/Margin/VBox/Scroll/ContentGutter/Content" unique_id=259983790]
 layout_mode = 2

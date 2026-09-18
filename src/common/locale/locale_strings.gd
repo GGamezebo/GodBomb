@@ -10,8 +10,6 @@ const RULES_TEXT_RU := """[font_size=36]Весёлая словесная игр
 
 Лодка — лось — ложка — ло… бум! У кого бомба взорвалась — +1 штраф.
 
-Сначала жребий выбирает первого. Потом «Готовы?», отсчёт — и раунд пошёл.
-
 [font_size=40][b]Когда бум?[/b][/font_size]
 Каждый раз по-своему: таймер случайный. Может рвануть сразу, а может дать много кругов. Перед взрывом бомба предупреждает.
 
@@ -49,8 +47,6 @@ The dial shows a syllable, e.g. «LO», and a hint: at the start, end, or anywhe
 Say a word out loud and pass the bomb to your neighbor — with a quick tap on the screen.
 
 Boat — canvas — paddle — aloe — lo… boom! Whoever gets caught with the bomb gets +1 penalty.
-
-First, a lottery picks who goes first. Then «Ready?», countdown — and the round begins.
 
 [font_size=40][b]When does it boom?[/b][/font_size]
 Every time is different: the timer is random. It may blow up right away or give you many turns. The bomb warns you before exploding.

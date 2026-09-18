@@ -237,13 +237,23 @@ func set_table_center_mode(enabled: bool, animate: bool = true) -> void:
 
 
 func show_table_center_hint() -> void:
+	_force_clear_shared_hint_slot()
 	if _current_state == FSMGameStates.READY_TO_START:
 		_show_hint(LocaleService.text("HUD_TABLE_CENTER_HINT"))
 
 
 func show_ready_hint() -> void:
+	_force_clear_shared_hint_slot()
 	if _current_state == FSMGameStates.READY_TO_START:
 		_show_hint(LocaleService.text("HUD_START_ROUND_HINT"))
+
+
+func _force_clear_shared_hint_slot() -> void:
+	_cancel_time_progress_timer()
+	if _time_progress_banner:
+		_time_progress_banner.hide_progress(false)
+	if _hint_banner:
+		_hint_banner.hide_message(false)
 
 
 func _on_table_center_mode_changed(enabled: bool) -> void:
