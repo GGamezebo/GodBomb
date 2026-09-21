@@ -1,0 +1,5 @@
+{
+  "name": "GodBomb (Godot 4.7)",
+  "user": "ubuntu",
+  "install": "bash .cursor/install.sh"
+}
