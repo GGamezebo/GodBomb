@@ -123,7 +123,6 @@ func _reposition_battle_ui() -> void:
 		_explosion_overlay.size = design_root.size
 		_explosion_overlay.relayout()
 	if _splash_overlay and _splash_overlay.visible:
-		_splash_overlay.size = design_root.size
 		_splash_overlay.relayout()
 	_apply_facing_rotation(_facing_rotation)
 
@@ -180,7 +179,7 @@ func _build_ui() -> void:
 	_battle_layer.add_child(_action_hints)
 
 	_build_explosion_overlay(design_root)
-	_build_splash_overlay(design_root)
+	_build_splash_overlay()
 	_build_result_overlay()
 
 
@@ -202,10 +201,15 @@ func _build_explosion_overlay(design_root: Control) -> void:
 	design_root.add_child(_explosion_overlay)
 
 
-func _build_splash_overlay(design_root: Control) -> void:
+func _build_splash_overlay() -> void:
+	# Parent on UI layer (like results), NOT ScaledContent — cover-scale crops sides on tall phones.
 	_splash_overlay = BattleSplashOverlay.new()
 	_splash_overlay.finished.connect(_on_splash_finished)
-	design_root.add_child(_splash_overlay)
+	var ui_layer := get_parent()
+	if ui_layer:
+		ui_layer.add_child(_splash_overlay)
+	else:
+		add_child(_splash_overlay)
 
 
 func _build_result_overlay() -> void:
@@ -538,6 +542,8 @@ func _on_battle_splash(kind: String, player: GamePlayer) -> void:
 				game_manager.session.get_sorted_eliminated()
 			)
 			return
+		_on_splash_finished()
+		return
 	else:
 		var player_name := ""
 		if player != null:

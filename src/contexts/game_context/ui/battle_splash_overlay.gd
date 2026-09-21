@@ -9,6 +9,7 @@ const PLAYER_PILL_SCALE := 1.45
 const CONTINUE_BUTTON_SIZE := Vector2(660.0, 180.0)
 const TOP_MARGIN := 188.0
 const BUTTON_BOTTOM_MARGIN := 212.0
+const BOARD_SCROLL_MIN_HEIGHT := 220.0
 const START_ACTIVE_TEXTURE := "res://assets/party_kitchen/buttons/start_active.svg"
 
 var _headline: Label
@@ -42,8 +43,13 @@ func _ready() -> void:
 	z_index = 12
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_build_ui()
-	resized.connect(_layout_content)
+	resized.connect(_on_resized)
 	call_deferred("_layout_content")
+
+
+func _on_resized() -> void:
+	if visible:
+		call_deferred("_layout_content")
 
 
 func _build_ui() -> void:
@@ -55,6 +61,8 @@ func _build_ui() -> void:
 
 	_margin_host = MarginContainer.new()
 	_margin_host.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_margin_host.add_theme_constant_override("margin_left", 0)
+	_margin_host.add_theme_constant_override("margin_right", 0)
 	_margin_host.add_theme_constant_override("margin_top", int(TOP_MARGIN))
 	_margin_host.add_theme_constant_override("margin_bottom", int(BUTTON_BOTTOM_MARGIN))
 	_margin_host.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -63,7 +71,7 @@ func _build_ui() -> void:
 	_content_col = VBoxContainer.new()
 	_content_col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_content_col.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	_content_col.add_theme_constant_override("separation", 24)
+	_content_col.add_theme_constant_override("separation", 20)
 	_margin_host.add_child(_content_col)
 
 	_elimination_block = VBoxContainer.new()
@@ -78,7 +86,7 @@ func _build_ui() -> void:
 	_board_block.visible = false
 	_board_block.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_board_block.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	_board_block.add_theme_constant_override("separation", 18)
+	_board_block.add_theme_constant_override("separation", 16)
 	_content_col.add_child(_board_block)
 	_build_board_block(_board_block)
 
@@ -89,15 +97,31 @@ func _build_ui() -> void:
 	_build_continue_button(button_host)
 
 
+func _style_title(label: Label, font_size: int) -> void:
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	label.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	label.clip_contents = false
+	label.add_theme_font_size_override("font_size", font_size)
+	label.add_theme_color_override("font_color", Color(0.99, 0.96, 0.9, 1.0))
+	label.add_theme_color_override("font_outline_color", Color(0.04, 0.03, 0.02, 0.88))
+	label.add_theme_constant_override("outline_size", 7)
+
+
+func _style_body(label: Label, font_size: int) -> void:
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	label.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	label.clip_contents = false
+	label.add_theme_font_size_override("font_size", font_size)
+	label.add_theme_color_override("font_color", Color(0.96, 0.9, 0.82, 1.0))
+	label.add_theme_color_override("font_outline_color", Color(0.1, 0.06, 0.04, 0.82))
+	label.add_theme_constant_override("outline_size", 4)
+
+
 func _build_elimination_block(host: VBoxContainer) -> void:
 	_headline = Label.new()
-	_headline.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_headline.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_headline.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	_headline.clip_contents = true
-	_headline.add_theme_font_size_override("font_size", 64)
-	_headline.add_theme_color_override("font_color", Color(0.99, 0.96, 0.9, 1.0))
-	_headline.add_theme_color_override("font_outline_color", Color(0.04, 0.03, 0.02, 0.88))
+	_style_title(_headline, 64)
 	_headline.add_theme_constant_override("outline_size", 8)
 	host.add_child(_headline)
 
@@ -111,40 +135,23 @@ func _build_elimination_block(host: VBoxContainer) -> void:
 	_pill_host.add_child(_player_strip)
 
 	_body = Label.new()
-	_body.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_body.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	_body.add_theme_font_size_override("font_size", 36)
-	_body.add_theme_color_override("font_color", Color(0.96, 0.9, 0.82, 1.0))
-	_body.add_theme_color_override("font_outline_color", Color(0.1, 0.06, 0.04, 0.82))
-	_body.add_theme_constant_override("outline_size", 4)
+	_style_body(_body, 36)
 	host.add_child(_body)
 
 
 func _build_board_block(host: VBoxContainer) -> void:
 	_board_title = Label.new()
-	_board_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_board_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_board_title.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	_board_title.add_theme_font_size_override("font_size", 52)
-	_board_title.add_theme_color_override("font_color", Color(0.99, 0.96, 0.9, 1.0))
-	_board_title.add_theme_color_override("font_outline_color", Color(0.04, 0.03, 0.02, 0.88))
-	_board_title.add_theme_constant_override("outline_size", 7)
+	_style_title(_board_title, 52)
 	host.add_child(_board_title)
 
 	_board_body = Label.new()
-	_board_body.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_board_body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_board_body.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	_board_body.add_theme_font_size_override("font_size", 30)
-	_board_body.add_theme_color_override("font_color", Color(0.96, 0.9, 0.82, 1.0))
-	_board_body.add_theme_color_override("font_outline_color", Color(0.1, 0.06, 0.04, 0.82))
-	_board_body.add_theme_constant_override("outline_size", 4)
+	_style_body(_board_body, 30)
 	host.add_child(_board_body)
 
 	_board_scroll = ScrollContainer.new()
 	_board_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_board_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_board_scroll.custom_minimum_size.y = BOARD_SCROLL_MIN_HEIGHT
 	_board_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	_board_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
 	host.add_child(_board_scroll)
@@ -241,6 +248,8 @@ func _on_continue_pressed() -> void:
 
 
 func show_splash(title: String, body: String, player: GamePlayer = null) -> void:
+	if not is_node_ready():
+		await ready
 	_board_mode = false
 	_elimination_block.visible = true
 	_board_block.visible = false
@@ -262,6 +271,8 @@ func show_overtime_board(
 	remaining: Array[GamePlayer],
 	eliminated: Array[GamePlayer]
 ) -> void:
+	if not is_node_ready():
+		await ready
 	_board_mode = true
 	_elimination_block.visible = false
 	_board_block.visible = true
@@ -301,7 +312,6 @@ func _present() -> void:
 	_apply_continue_label()
 	if _continue_button:
 		_continue_button.set_pulse_active(true)
-	_layout_content()
 	call_deferred("_layout_content")
 	var tween := create_tween()
 	tween.tween_property(self, "modulate:a", 1.0, 0.16).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
@@ -342,16 +352,24 @@ func _emit_finished() -> void:
 
 
 func _get_content_width() -> float:
-	return maxf(size.x - CONTENT_WIDTH_MARGIN, DESIGN_SIZE.x - CONTENT_WIDTH_MARGIN)
+	var host_w := size.x if size.x > 1.0 else DESIGN_SIZE.x
+	return maxf(host_w - CONTENT_WIDTH_MARGIN, DESIGN_SIZE.x - CONTENT_WIDTH_MARGIN)
 
 
 func _fit_control_size(control: Control) -> void:
-	if control == null:
+	if control == null or not is_instance_valid(control):
+		return
+	# Skip nodes queued for deletion from the previous board fill.
+	if control.is_queued_for_deletion():
 		return
 	control.reset_size()
-	var fitted := Vector2(_get_content_width(), control.get_combined_minimum_size().y)
-	control.custom_minimum_size = fitted
-	control.size = fitted
+	var width := _get_content_width()
+	# Measure height at the target wrap width so autowrap labels don't stay 1-line.
+	control.custom_minimum_size = Vector2(width, 0.0)
+	control.size = Vector2(width, 0.0)
+	var height := maxf(control.get_combined_minimum_size().y, 1.0)
+	control.custom_minimum_size = Vector2(width, height)
+	control.size = Vector2(width, height)
 
 
 func _layout_content() -> void:
@@ -374,15 +392,14 @@ func _sync_elimination_sizes() -> void:
 
 
 func _sync_board_sizes() -> void:
+	_fit_control_size(_board_title)
+	_fit_control_size(_board_body)
+	_fit_control_size(_remaining_title)
+	_fit_control_size(_eliminated_title)
 	for host in [_remaining_list, _eliminated_list]:
 		if host == null:
 			continue
 		for child in host.get_children():
 			_fit_control_size(child as Control)
-	_fit_control_size(_remaining_list)
-	_fit_control_size(_eliminated_list)
-	_fit_control_size(_remaining_title)
-	_fit_control_size(_eliminated_title)
+		_fit_control_size(host)
 	_fit_control_size(_board_lists)
-	_fit_control_size(_board_title)
-	_fit_control_size(_board_body)
