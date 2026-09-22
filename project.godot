@@ -22,6 +22,8 @@ config/icon="res://assets/icon.png"
 [autoload]
 
 LocaleService="*res://src/common/locale/locale_service.gd"
+YandexGames="*uid://cswkmnv5fv8wj"
+PlatformServices="*res://src/common/platform/platform_services.gd"
 
 [display]
 
@@ -39,7 +41,7 @@ project/assembly_name="GodBomb"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/android_emulator_launcher/plugin.cfg")
+enabled=PackedStringArray("res://addons/yandex_games/plugin.cfg")
 
 [gui]
 
@@ -61,3 +63,7 @@ renderer/rendering_method="mobile"
 textures/vram_compression/import_s3tc_bptc=true
 textures/vram_compression/import_etc2_astc=true
 environment/defaults/default_clear_color=Color(0, 0, 0, 1)
+
+[yandex_games]
+
+general/auto_call_game_ready=false

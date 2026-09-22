@@ -63,6 +63,9 @@ func _on_start_game(data: Dictionary) -> void:
 
 
 func _return_to_menu() -> void:
+	var platform := get_node_or_null("/root/PlatformServices")
+	if platform and platform.has_method("await_return_to_menu_gate"):
+		await platform.await_return_to_menu_gate()
 	if account:
 		account.increment_games_played()
 	if _pdata_controller and _pdata_controller.has_method("save_account"):
@@ -81,6 +84,11 @@ func _release_current_context() -> void:
 func switch_game_context(scene_path: String, use_loading_screen: bool = true, data: Dictionary = {}) -> void:
 	if is_loading:
 		return
+
+	if scene_path == menu_context_path:
+		var platform := get_node_or_null("/root/PlatformServices")
+		if platform and platform.has_method("on_left_battle_context"):
+			platform.on_left_battle_context()
 
 	load_start_time = Time.get_unix_time_from_system()
 	target_path = scene_path
