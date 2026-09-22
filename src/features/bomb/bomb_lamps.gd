@@ -84,7 +84,9 @@ func _on_game_state_changed(_from_state: String, to_state: String) -> void:
 			_start_blink(false)
 		FSMGameStates.EXPLOSION:
 			_play_explosion_hide()
-		FSMGameStates.RESULT, FSMGameStates.READY_TO_START, FSMGameStates.PLAYER_CHOICE, FSMGameStates.COUNTDOWN:
+		FSMGameStates.RESULT:
+			_hide_lamps_immediate()
+		FSMGameStates.READY_TO_START, FSMGameStates.PLAYER_CHOICE, FSMGameStates.COUNTDOWN:
 			_show_lamps()
 			_stop_blink()
 		_:
@@ -118,6 +120,13 @@ func _stop_blink() -> void:
 func _show_lamps() -> void:
 	_kill_fade_tween()
 	visible = true
+	modulate = Color.WHITE
+
+
+func _hide_lamps_immediate() -> void:
+	_stop_blink()
+	_kill_fade_tween()
+	visible = false
 	modulate = Color.WHITE
 
 
