@@ -202,14 +202,10 @@ func _build_explosion_overlay(design_root: Control) -> void:
 
 
 func _build_splash_overlay() -> void:
-	# Parent on UI layer (like results), NOT ScaledContent — cover-scale crops sides on tall phones.
+	# Child of HUD (fullscreen Control) — reliable size; not cover-scaled ScaledContent.
 	_splash_overlay = BattleSplashOverlay.new()
 	_splash_overlay.finished.connect(_on_splash_finished)
-	var ui_layer := get_parent()
-	if ui_layer:
-		ui_layer.add_child(_splash_overlay)
-	else:
-		add_child(_splash_overlay)
+	add_child(_splash_overlay)
 
 
 func _build_result_overlay() -> void:

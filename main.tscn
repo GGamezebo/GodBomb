@@ -1,14 +1,14 @@
 [gd_scene format=3 uid="uid://ciuai5oeap4w0"]
 
 [ext_resource type="Script" uid="uid://b41ecollkdfce" path="res://src/contexts/main_context/main_context.gd" id="1"]
-[ext_resource type="PackedScene" path="res://src/ui/loading_screen/loading_screen.tscn" id="2"]
+[ext_resource type="PackedScene" uid="uid://d2rtm1xn7xr2y" path="res://src/ui/loading_screen/loading_screen.tscn" id="2"]
 [ext_resource type="Script" uid="uid://cc5pglmkra4lh" path="res://src/contexts/main_context/account/persisten_data_controller.gd" id="3"]
 [ext_resource type="Resource" path="res://src/contexts/main_context/account/pdata_account.tres" id="4"]
 [ext_resource type="Resource" path="res://src/contexts/main_context/main_events.tres" id="6"]
 [ext_resource type="PackedScene" uid="uid://wcp2ufiuf4an" path="res://src/contexts/menu_context/menu_context.tscn" id="7"]
 [ext_resource type="AudioStream" uid="uid://dv8uia21j7gcl" path="res://assets/audio/music/background.mp3" id="8"]
 [ext_resource type="Script" uid="uid://buwrgl58owt40" path="res://src/contexts/main_context/audio/game_audio_controller.gd" id="10"]
-[ext_resource type="Script" path="res://src/features/onboarding/onboarding_controller.gd" id="11"]
+[ext_resource type="Script" uid="uid://bt6ynof2mpv4l" path="res://src/features/onboarding/onboarding_controller.gd" id="11"]
 
 [node name="MainContext" type="Node" unique_id=2117372034 node_paths=PackedStringArray("current_context")]
 script = ExtResource("1")
@@ -36,7 +36,7 @@ script = ExtResource("10")
 music_player = NodePath("../MusicPlayer")
 account = ExtResource("4")
 
-[node name="OnboardingController" type="Node" parent="."]
+[node name="OnboardingController" type="Node" parent="." unique_id=1504381369]
 script = ExtResource("11")
 account = ExtResource("4")
 main_events = ExtResource("6")
