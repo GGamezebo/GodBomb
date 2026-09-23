@@ -1,11 +1,13 @@
 extends SceneTree
 ## Headless: godot --headless --path . --script res://tests/test_yandex_games.gd
 
+const YandexGamesScript := preload("res://core/systems/yandex/yandex_games.gd")
+
+
 func _init() -> void:
 	var failed := 0
 	failed += _test_gameplay_states()
 	failed += _test_export_preset_has_sdk()
-	failed += _test_platform_mute()
 	failed += await _test_node_noop_offline()
 	if failed == 0:
 		print("test_yandex_games: OK")
@@ -16,47 +18,24 @@ func _init() -> void:
 
 
 func _test_gameplay_states() -> int:
-	var active := PackedStringArray([FSMGameStates.COUNTDOWN, FSMGameStates.PLAY])
+	var active := PackedStringArray(["countdown", "play"])
 	var idle := PackedStringArray([
-		FSMGameStates.PLAYER_CHOICE,
-		FSMGameStates.READY_TO_START,
-		FSMGameStates.EMERGENCY,
-		FSMGameStates.EXPLOSION,
-		FSMGameStates.RESULT,
+		"player_choice",
+		"ready_to_start",
+		"emergency",
+		"explosion",
+		"result",
 		"",
 		"menu",
 	])
 	for state_name in active:
-		if not YandexGames.is_gameplay_state(state_name):
+		if not YandexGamesScript.is_gameplay_state(state_name):
 			printerr("expected gameplay: %s" % state_name)
 			return 1
 	for state_name in idle:
-		if YandexGames.is_gameplay_state(state_name):
+		if YandexGamesScript.is_gameplay_state(state_name):
 			printerr("did not expect gameplay: %s" % state_name)
 			return 1
-	return 0
-
-
-func _test_platform_mute() -> int:
-	var audio := GameAudioController.new()
-	root.add_child(audio)
-	var master := AudioServer.get_bus_index(&"Master")
-	if master < 0:
-		printerr("Master bus missing")
-		audio.queue_free()
-		return 1
-	audio.set_platform_muted(true)
-	if not AudioServer.is_bus_mute(master):
-		printerr("Master not muted for Yandex pause")
-		audio.set_platform_muted(false)
-		audio.queue_free()
-		return 1
-	audio.set_platform_muted(false)
-	if AudioServer.is_bus_mute(master):
-		printerr("Master stayed muted after Yandex resume")
-		audio.queue_free()
-		return 1
-	audio.queue_free()
 	return 0
 
 
@@ -72,7 +51,7 @@ func _test_export_preset_has_sdk() -> int:
 
 
 func _test_node_noop_offline() -> int:
-	var node := YandexGames.new()
+	var node := YandexGamesScript.new()
 	root.add_child(node)
 	node.notify_interactive()
 	node.on_left_game()

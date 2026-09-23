@@ -13,7 +13,7 @@ signal platform_pause_changed(paused: bool)
 signal fullscreen_ad_closed(was_shown: bool)
 signal _ad_js_closed(was_shown: bool)
 
-@export var audio: GameAudioController
+@export var audio: Node
 @export var game_events: GameEvents
 
 var is_available: bool = false
@@ -34,7 +34,7 @@ var _js_callbacks: Array = []
 
 
 static func is_gameplay_state(state_name: String) -> bool:
-	return state_name == FSMGameStates.COUNTDOWN or state_name == FSMGameStates.PLAY
+	return state_name == "countdown" or state_name == "play"
 
 
 func _ready() -> void:
@@ -99,10 +99,9 @@ func show_fullscreen_ad() -> void:
 		return
 	_ad_busy = true
 	_sync_gameplay_api()
-	if audio:
-		audio.set_platform_muted(true)
+	_set_audio_muted(true)
 
-	var callback := _keep_callback(_on_js_ad_closed)
+	var callback: Variant = _keep_callback(_on_js_ad_closed)
 	var window: Variant = _js_window()
 	if window != null:
 		window.__godbombOnAdClose = callback
@@ -120,8 +119,8 @@ func show_fullscreen_ad() -> void:
 
 	var shown := await _await_ad_result()
 	_ad_busy = false
-	if not is_platform_paused and audio:
-		audio.set_platform_muted(false)
+	if not is_platform_paused:
+		_set_audio_muted(false)
 	_sync_gameplay_api()
 	fullscreen_ad_closed.emit(shown)
 
@@ -189,8 +188,8 @@ func _bind_pause_resume() -> void:
 	if window == null:
 		_focus_fallback = true
 		return
-	var on_pause := _keep_callback(_on_js_pause)
-	var on_resume := _keep_callback(_on_js_resume)
+	var on_pause: Variant = _keep_callback(_on_js_pause)
+	var on_resume: Variant = _keep_callback(_on_js_resume)
 	window.__godbombOnPause = on_pause
 	window.__godbombOnResume = on_resume
 	var bound := bool(_js_eval(
@@ -221,17 +220,16 @@ func _apply_platform_pause(paused: bool) -> void:
 	if is_platform_paused == paused:
 		return
 	is_platform_paused = paused
-	if audio:
-		audio.set_platform_muted(paused)
+	_set_audio_muted(paused)
 	var game_manager := _find_game_manager()
 	if paused:
-		if game_manager:
-			game_manager.set_paused(true)
+		if game_manager and game_manager.has_method("set_paused"):
+			game_manager.call("set_paused", true)
 			_paused_by_platform = true
 	elif _paused_by_platform:
 		_paused_by_platform = false
-		if game_manager and not _is_emergency(game_manager):
-			game_manager.set_paused(false)
+		if game_manager and game_manager.has_method("set_paused") and not _is_emergency(game_manager):
+			game_manager.call("set_paused", false)
 	_sync_gameplay_api()
 	platform_pause_changed.emit(paused)
 
@@ -263,7 +261,12 @@ func _await_ad_result() -> bool:
 	return bool(state["shown"])
 
 
-func _find_game_manager() -> GameManager:
+func _set_audio_muted(muted: bool) -> void:
+	if audio and audio.has_method("set_platform_muted"):
+		audio.call("set_platform_muted", muted)
+
+
+func _find_game_manager() -> Node:
 	var main := get_parent()
 	if main == null:
 		return null
@@ -271,15 +274,18 @@ func _find_game_manager() -> GameManager:
 	if ctx == null:
 		return null
 	var game_manager: Variant = ctx.get("game_manager")
-	if game_manager is GameManager:
+	if game_manager is Node:
 		return game_manager
 	return null
 
 
-func _is_emergency(game_manager: GameManager) -> bool:
-	if game_manager == null or game_manager.fsm == null:
+func _is_emergency(game_manager: Node) -> bool:
+	if game_manager == null:
 		return false
-	return game_manager.fsm.get_current_state_name() == FSMGameStates.EMERGENCY
+	var fsm: Variant = game_manager.get("fsm")
+	if fsm == null or not fsm.has_method("get_current_state_name"):
+		return false
+	return str(fsm.get_current_state_name()) == "emergency"
 
 
 func _keep_callback(method: Callable) -> Variant:
