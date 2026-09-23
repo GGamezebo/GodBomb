@@ -8,6 +8,8 @@ alwaysApply: false
 
 **FSM:** choice → ready → countdown → play ⇄ **emergency** → explosion → ready|result. First card at countdown end if null. After boom: next_card→next_player→ready, or match end / overtime.
 
+**Yandex GameplayAPI:** countdown + play = start; ready/emergency/explosion/result/menu = stop (`YandexGames` on GameEvents).
+
 **Overtime knockout:** regulation clock up after boom → unique min = `result`. Tie on min → `enter_overtime()`, splash `OVERTIME_*`. Roster hidden. Each OT boom: +1 and out. Splash **Continue** (`EMERGENCY_CONTINUE`) sits in the same bottom slot as results «В МЕНЮ». Tutorial skips OT.
 
 **Match clock:** `match_elapsed_seconds` only in **countdown** + **play** (not ready/explosion/emergency/pause/roster). Limit = `game_time_minutes * 60`. Roster resync does not reset clock. After boom: time up → result or overtime; else next card. Editor (`OS.has_feature("editor")`): top-left debug clock on GameManager CanvasLayer.

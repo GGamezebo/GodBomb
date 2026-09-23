@@ -47,3 +47,5 @@ Static API, bus `SFX`, one-shot `AudioStreamPlayer` on root.
 - battle overlay Done: confirm если ok, click если < min_players
 
 **Не смешивать:** gameplay → `GameSound` · UI → `UiSounds` · menu bg → Music bus only
+
+**Yandex / tab / ads:** `GameAudioController.set_platform_muted` mutes Master (and stops menu music). Driven by `YandexGames` on `game_api_pause` / interstitial. Does not change account music toggle.

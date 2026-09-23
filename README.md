@@ -40,7 +40,8 @@
 - `HapticsManager` — `Input.vibrate_handheld` на play/alert/explosion
 
 ### Этап 7 — Экспорт (TODO)
-- [ ] Android / iOS пресеты
+- [x] Android / Web пресеты (`export_presets.cfg`)
+- [x] Yandex Games SDK на Web (`/sdk.js`, Game Ready, GameplayAPI) — `docs/store/yandex_games.md`
 - [ ] Проверка portrait 1080×1920 на устройствах
 - [ ] Локализация через CSV (опционально)
 

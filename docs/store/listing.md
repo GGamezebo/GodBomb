@@ -65,6 +65,10 @@ Local multiplayer. No accounts. Vibration optional.
 
 **Kind of project:** Downloadable / HTML5 (if web export) · Mobile-friendly
 
+## Yandex Games
+
+Web preset injects `/sdk.js` and calls Game Ready / GameplayAPI. Upload the Web `bin/` zip. Details: `docs/store/yandex_games.md`.
+
 ---
 
 ## Google Play

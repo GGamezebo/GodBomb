@@ -16,6 +16,9 @@ After `tools/optimize_build_assets.py` + editor reimport.
 7. Emergency once: first-hint copy, then normal explanation  
 8. Leave tab in background 30s → return without crash / huge lag  
 9. Memory: play ~5 min, no browser kill  
+10. Yandex draft (`/sdk.js` present): debug-mode=16 → loader **IT**, Game Ready after lobby, tab blur mutes audio  
+
+See `docs/store/yandex_games.md`.  
 
 ## Fail notes
 

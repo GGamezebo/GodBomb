@@ -10,6 +10,7 @@ const SFX_BUS := &"SFX"
 @export var account: PDataAccount
 
 var _in_battle: bool = false
+var _platform_muted: bool = false
 
 
 func _ready() -> void:
@@ -25,6 +26,17 @@ func _ready() -> void:
 func set_in_battle(in_battle: bool) -> void:
 	_in_battle = in_battle
 	_sync_music_player()
+
+
+func set_platform_muted(muted: bool) -> void:
+	_platform_muted = muted
+	var master_index := AudioServer.get_bus_index(&"Master")
+	if master_index >= 0:
+		AudioServer.set_bus_mute(master_index, muted)
+	if muted and music_player:
+		music_player.stop()
+	elif not muted:
+		_sync_music_player()
 
 
 func _prepare_music_stream() -> void:
@@ -54,7 +66,7 @@ func _apply_bus(bus_name: StringName, linear_volume: float, enabled: bool) -> vo
 
 
 func _can_play_menu_music() -> bool:
-	return not _in_battle and account.get_music_enabled()
+	return not _platform_muted and not _in_battle and account.get_music_enabled()
 
 
 func _sync_music_player() -> void:

@@ -16,6 +16,8 @@ alwaysApply: false
 
 **Сервисы:** под `main.tscn`, не autoloads. `@export` для зависимостей, не `get_node("/root/...")`.
 
+**Yandex Games:** `core/systems/yandex/yandex_games.gd` на `MainContext`. Web `html/head_include` → `/sdk.js` + `YaGames.init`. `LoadingAPI.ready` после лобби. GameplayAPI: countdown/play = start. Реклама и mute — `docs/store/yandex_games.md`. No-op вне Web/без SDK.
+
 **F6:** `@export` дефолты в `.tscn`, тяжёлая логика в `initialize()`, не в `_ready()` контекста до add_child.
 
 **Editor window:** play from editor uses 360×640 (`window_width/height_override` + `MainContext._apply_editor_window_size`). Viewport stays 1080×1920, stretch `canvas_items`.

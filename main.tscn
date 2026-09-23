@@ -9,6 +9,8 @@
 [ext_resource type="AudioStream" uid="uid://dv8uia21j7gcl" path="res://assets/audio/music/background.mp3" id="8"]
 [ext_resource type="Script" uid="uid://buwrgl58owt40" path="res://src/contexts/main_context/audio/game_audio_controller.gd" id="10"]
 [ext_resource type="Script" path="res://src/features/onboarding/onboarding_controller.gd" id="11"]
+[ext_resource type="Script" path="res://core/systems/yandex/yandex_games.gd" id="12"]
+[ext_resource type="Resource" path="res://src/common/game_events.tres" id="13"]
 
 [node name="MainContext" type="Node" unique_id=2117372034 node_paths=PackedStringArray("current_context")]
 script = ExtResource("1")
@@ -40,6 +42,11 @@ account = ExtResource("4")
 script = ExtResource("11")
 account = ExtResource("4")
 main_events = ExtResource("6")
+
+[node name="YandexGames" type="Node" parent="." node_paths=PackedStringArray("audio")]
+script = ExtResource("12")
+audio = NodePath("../GameAudio")
+game_events = ExtResource("13")
 
 [node name="UI" type="CanvasLayer" parent="." unique_id=88402808]
 

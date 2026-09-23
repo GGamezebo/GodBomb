@@ -18,6 +18,7 @@ var listener: EventListener = EventListener.new()
 @onready var _pdata_controller: Node = $Account/PersistentDataController
 @onready var _game_audio: GameAudioController = $GameAudio
 @onready var _onboarding: OnboardingController = $OnboardingController
+@onready var _yandex: YandexGames = get_node_or_null("YandexGames") as YandexGames
 
 
 func _ready() -> void:
@@ -30,6 +31,7 @@ func _ready() -> void:
 
 	call_deferred("_apply_context_music", true)
 	call_deferred("_boot_onboarding")
+	call_deferred("_notify_yandex_interactive")
 
 
 func _boot_onboarding() -> void:
@@ -48,6 +50,7 @@ func _session_data() -> Dictionary:
 		"account": account,
 		"pdata_controller": _pdata_controller,
 		"onboarding_controller": _onboarding,
+		"yandex_games": _yandex,
 	}
 
 
@@ -63,10 +66,14 @@ func _on_start_game(data: Dictionary) -> void:
 
 
 func _return_to_menu() -> void:
+	var skip_ad := _is_current_session_tutorial()
 	if account:
 		account.increment_games_played()
 	if _pdata_controller and _pdata_controller.has_method("save_account"):
 		_pdata_controller.save_account()
+	if _yandex:
+		_yandex.on_left_game()
+		await _yandex.maybe_show_fullscreen_on_menu_return(skip_ad)
 	switch_game_context(menu_context_path, false, _session_data())
 
 
@@ -160,6 +167,25 @@ func _on_loading_complete(scene: PackedScene, data: Dictionary) -> void:
 func _apply_context_music(in_menu: bool) -> void:
 	if _game_audio:
 		_game_audio.set_in_battle(not in_menu)
+
+
+func _notify_yandex_interactive() -> void:
+	if get_tree():
+		await get_tree().process_frame
+		await get_tree().process_frame
+		if is_inside_tree():
+			await get_tree().create_timer(0.05).timeout
+	if _yandex and is_instance_valid(_yandex):
+		_yandex.notify_interactive()
+
+
+func _is_current_session_tutorial() -> bool:
+	if current_context == null:
+		return false
+	var game_manager: Variant = current_context.get("game_manager")
+	if game_manager is GameManager and game_manager.session:
+		return game_manager.session.is_tutorial
+	return false
 
 
 func _get_audio_controller() -> GameAudioController:
