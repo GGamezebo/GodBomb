@@ -1,15 +1,15 @@
 ---
-description: Yandex Games — preset, SDK, требования модерации
+description: Yandex Games — preset, SDK, moderation hooks
 globs: src/common/platform/**,addons/yandex_games/**,export_presets.cfg,project.godot
 alwaysApply: false
 ---
 
 # Yandex Games
 
-**Preset:** `Web (Yandex Games)` → `bin/yandex/index.html`, feature `yandex`, HTML shell `addons/yandex_games/templates/yandex_template.html`. Отдельно от `Web` и `Android`.
+**Preset:** `Web (Yandex Games)` → `bin/yandex/index.html`, `custom_features=yandex`, HTML shell `addons/yandex_games/templates/yandex_template.html` (`/sdk.js`). Separate from `Web` and `Android`.
 
-**Интеграция:** plugin `Yandex Games SDK` + autoload `YandexGames` + `PlatformServices` (`src/common/platform/platform_services.gd`). Хуки только при `OS.has_feature("yandex")`.
+**Integration:** plugin `Yandex Games SDK` + autoload `YandexGames` + `PlatformServices` (`src/common/platform/platform_services.gd`). Hooks only when `OS.has_feature("yandex")`.
 
-**Lifecycle:** `game_ready` после init · `gameplay_start` на `play` · `gameplay_stop` иначе · interstitial (cooldown) при выходе в меню после `result` · mute/pause ads — настройки плагина · locale с портала → `LocaleService`.
+**Lifecycle:** `game_ready` after SDK init (LoadingAPI) · `gameplay_start` on FSM `play` · `gameplay_stop` otherwise · interstitial (cooldown) via `await_return_to_menu_gate` after `result` · mute on platform pause/ads (plugin) · portal lang → `LocaleService`.
 
-**Не трогать:** игровой FSM/HUD не импортирует `YandexGames` напрямую — только через `PlatformServices`.
+**Do not:** import `YandexGames` from FSM/HUD — only through `PlatformServices`. Keep `yandex_games/general/auto_call_game_ready=false` (ready is owned by `PlatformServices`).

@@ -46,14 +46,14 @@ func _boot_yandex() -> void:
 	if yg.has_method("ensure_initialized"):
 		var ok: bool = await yg.ensure_initialized()
 		if ok:
-			_on_sdk_initialized({})
+			await _on_sdk_initialized({})
 	else:
-		_notify_game_ready()
+		await _notify_game_ready()
 
 
 func _on_sdk_initialized(_data: Dictionary = {}) -> void:
 	_sync_locale_from_sdk()
-	_notify_game_ready()
+	await _notify_game_ready()
 
 
 func _sync_locale_from_sdk() -> void:
@@ -72,11 +72,13 @@ func _sync_locale_from_sdk() -> void:
 func _notify_game_ready() -> void:
 	if _ready_sent:
 		return
+	_ready_sent = true
+	# Wait until the lobby is in the tree and interactive (LoadingAPI.ready must not be timer-based).
+	await get_tree().process_frame
 	var yg := _yg()
 	if yg == null or not yg.has_method("game_ready"):
 		return
 	yg.game_ready()
-	_ready_sent = true
 
 
 func _on_game_state_changed(_from: String, to_state: String) -> void:
