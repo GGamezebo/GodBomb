@@ -37,11 +37,22 @@ const FLAG_ICON_PATHS: Dictionary = {
 }
 
 
+## Unsupported-locale fallback: CIS cluster → ru, everything else → en.
+## (Matches common store policies; safe for Play / Yandex / plain Web.)
+const FALLBACK_TO_RU: Array[String] = ["be", "kk", "uk", "uz"]
+
+
 static func normalize(code: String) -> String:
-	var lowered := code.to_lower()
-	if ORDER.has(lowered):
-		return lowered
-	return LOCALE_RU
+	var lowered := code.strip_edges().to_lower()
+	if lowered.is_empty():
+		return LOCALE_RU
+	# Accept "en-US" / "ru_RU" → primary subtag.
+	var primary := lowered.replace("_", "-").split("-")[0]
+	if ORDER.has(primary):
+		return primary
+	if FALLBACK_TO_RU.has(primary):
+		return LOCALE_RU
+	return LOCALE_EN
 
 
 static func detect_from_system() -> String:

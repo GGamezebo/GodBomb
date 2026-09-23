@@ -21,4 +21,4 @@ Party hot-potato, слоги. Godot **4.7** GDScript, 1080×1920 portrait, mobil
 
 **Build / memory (mobile + HTML):** `tools/optimize_build_assets.py` — MP3→mono 64–80kbps, Background ≤1024 + VRAM compress, SVG size caps, WAV mono/ADPCM. `assets/reference/.gdignore` + export exclude `assets/reference/*,tools/*`. Project: mobile renderer, web=`gl_compatibility`, ETC2/ASTC (+ S3TC for Web), importer_defaults VRAM. Re-run optimizer after replacing music; open editor once to reimport.
 
-**Stores:** presets `Android` (Play) · `Web` (generic) · `Web (Yandex Games)` (feature `yandex`). SDK/hooks → `yandex-games.mdc`.
+**Stores:** presets `Android` (Play) · `Web` (generic) · `Yandex` (feature `yandex`). SDK/hooks → `yandex-games.mdc`.

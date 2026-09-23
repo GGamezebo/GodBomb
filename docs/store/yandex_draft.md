@@ -3,7 +3,7 @@
 Консоль: https://games.yandex.ru/console  
 Доки: [заполнение черновика](https://yandex.ru/dev/games/doc/ru/console/add-new-game/draft), [требования](https://yandex.ru/dev/games/doc/ru/concepts/requirements)
 
-Экспорт: preset **Web (Yandex Games)** → `bin/yandex/` → Project → Tools → **Yandex Games: Package Web Export to Yandex ZIP**
+Экспорт: preset **Yandex** (`custom_features=yandex`, HTML shell `yandex_template.html`) → `bin/yandex/` → Project → Tools → **Yandex Games: Package Web Export to Yandex ZIP**
 
 ---
 
@@ -145,9 +145,9 @@ Use the emergency button for a wrong word or mis-tap. One long swipe per round r
 
 | Материал | Спека | Статус в репо |
 |----------|--------|----------------|
-| **Иконка** * | PNG 512×512 | Есть `assets/icon.png` — проверить размер; иначе апскейл/экспорт 512 |
+| **Иконка** * | PNG **512×512** | `assets/reference/store/yandex_icon_512.png` (не в билде) |
 | **Maskable** | 512×512, важная графика в круге ~80% | опционально; `icon_adaptive_fg` + bg как референс |
-| **Обложка** * | PNG **800×470** | сделать: бомба + циферблат + название |
+| **Обложка** * | PNG **800×470** | `assets/reference/store/yandex_cover_800x470.png` (не в билде) |
 | **Обложка витрины** | 1560×520 | опционально |
 | **Скриншоты** * | portrait **9:16**, длинная сторона 1280–2560, ≥2 на мобильные | снять на телефоне (см. список ниже) |
 | Видео 9:16 / 16:9 | MP4 ≤28 с | опционально, но сильно помогает продвижению |
@@ -168,7 +168,9 @@ Use the emergency button for a wrong word or mis-tap. One long swipe per round r
 ## Чеклист перед «Отправить на модерацию»
 
 - [ ] ZIP через плагин, `index.html` в корне  
-- [ ] Draft URL / debug-панель: `game_ready`, язык портала, interstitial после матча  
+- [ ] Export preset **Yandex**: feature `yandex`, shell `addons/yandex_games/templates/yandex_template.html`  
+- [ ] Debug-панель: индикатор 文 зелёный **на старте** (I18N is used); `game_ready`; interstitial после матча  
+- [ ] Очистить кеш → каждый язык из «Игра переведена на» (ru/en/sr/es/hi/de/fr/it) через SDK mocks — UI/правила/подсказки переключаются  
 - [ ] Звук после первого жеста; пауза при уходе во вкладку  
 - [ ] Portrait-заглушка SDK при landscape  
 - [ ] Тексты RU+EN вставлены; категории и возрастной рейтинг  

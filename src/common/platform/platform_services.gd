@@ -57,6 +57,8 @@ func _on_sdk_initialized(_data: Dictionary = {}) -> void:
 
 
 func _sync_locale_from_sdk() -> void:
+	## Yandex-only (guarded by is_yandex in _ready). Play/Web use account + system locale.
+	## Requirement 2.14: apply environment.i18n.lang at startup, before gameplay.
 	var yg := _yg()
 	if yg == null or not ("environment" in yg):
 		return
@@ -66,7 +68,7 @@ func _sync_locale_from_sdk() -> void:
 	if lang.is_empty():
 		return
 	if LocaleService:
-		LocaleService.set_locale(lang, false)
+		LocaleService.set_locale(lang, true)
 
 
 func _notify_game_ready() -> void:

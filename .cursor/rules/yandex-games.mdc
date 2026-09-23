@@ -6,10 +6,10 @@ alwaysApply: false
 
 # Yandex Games
 
-**Preset:** `Web (Yandex Games)` → `bin/yandex/index.html`, feature `yandex`, HTML shell `addons/yandex_games/templates/yandex_template.html`. Отдельно от `Web` и `Android`.
+**Preset:** `Yandex` → `bin/yandex/`, feature `yandex`, HTML shell `addons/yandex_games/templates/yandex_template.html`. Отдельно от `Web` и `Android`.
 
-**Интеграция:** plugin `Yandex Games SDK` + autoload `YandexGames` + `PlatformServices` (`src/common/platform/platform_services.gd`). Хуки только при `OS.has_feature("yandex")`.
+**Интеграция:** plugin `Yandex Games SDK` + autoload `YandexGames` + `PlatformServices`. Хуки **только** при `OS.has_feature("yandex")` — Android/Play и plain Web не трогаем.
 
-**Lifecycle:** `game_ready` после init · `gameplay_start` на `play` · `gameplay_stop` иначе · interstitial (cooldown) при выходе в меню после `result` · mute/pause ads — настройки плагина · locale с портала → `LocaleService`.
+**Граница слоёв:** `LocaleService` / `LocaleCatalog` / FSM / HUD — платформенно-нейтральны. Портальный `i18n.lang`, ads, `game_ready` — только через `PlatformServices`. Не тянуть `YandexGames` и `OS.has_feature("yandex")` в common/locale или contexts.
 
-**Не трогать:** игровой FSM/HUD не импортирует `YandexGames` напрямую — только через `PlatformServices`.
+**Lifecycle (yandex):** `game_ready` после init · `gameplay_start` на `play` · `gameplay_stop` иначе · interstitial при выходе в меню после `result` · **2.14** `i18n.lang` → `LocaleService.set_locale` на старте.
