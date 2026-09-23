@@ -14,24 +14,23 @@ func _supports_platform(platform: EditorExportPlatform) -> bool:
 		return platform.get_os_name() == "Web"
 	return false
 
-func _get_export_option_warning(platform: EditorExportPlatform, option: String) -> String:
+func _get_export_option_warning(_platform: EditorExportPlatform, option: String) -> String:
+	# Feature set is available in `_export_begin`; avoid warning on generic Web presets.
 	if option == "html/custom_html_shell":
-		var current: String = str(get_option("html/custom_html_shell"))
-		if current != _TEMPLATE_PATH:
-			return "Yandex Games SDK requires this template.\nSet to: %s" % _TEMPLATE_PATH
+		return ""
 	return ""
 
 var _target_path: String = ""
 
 func _export_begin(features: PackedStringArray, is_debug: bool, path: String, flags: int) -> void:
-	if not features.has("web"):
+	if not features.has("web") or not features.has("yandex"):
 		return
 	_target_path = path
 	var shell: String = str(get_option("html/custom_html_shell"))
 	if shell != _TEMPLATE_PATH:
 		push_error(
 			"[YandexGames] Custom HTML Shell is not set to the Yandex template.\n" +
-			"Go to Project → Export → Web → Options → Custom HTML Shell and select:\n" +
+			"Go to Project → Export → Web (Yandex Games) → Options → Custom HTML Shell and select:\n" +
 			_TEMPLATE_PATH
 		)
 
@@ -79,6 +78,31 @@ func _get_default_catalog_json() -> String:
 		}
 	], "\t")
 
+static func _is_yandex_preset_name(preset_name: String) -> bool:
+	var n := preset_name.strip_edges().to_lower()
+	return n == "yandex" or n.contains("yandex")
+
+
+static func _apply_yandex_preset_options(cfg: ConfigFile, section: String) -> bool:
+	var changed := false
+	var opt_sec := section + ".options"
+	if str(cfg.get_value(section, "custom_features", "")) != "yandex":
+		cfg.set_value(section, "custom_features", "yandex")
+		changed = true
+	var exclude_filter: String = str(cfg.get_value(section, "exclude_filter", ""))
+	if exclude_filter.is_empty():
+		cfg.set_value(section, "exclude_filter", "assets/reference/*,tools/*")
+		changed = true
+	var export_path: String = str(cfg.get_value(section, "export_path", ""))
+	if export_path.is_empty() or not export_path.ends_with("index.html"):
+		cfg.set_value(section, "export_path", "bin/yandex/index.html")
+		changed = true
+	if str(cfg.get_value(opt_sec, "html/custom_html_shell", "")) != _TEMPLATE_PATH:
+		cfg.set_value(opt_sec, "html/custom_html_shell", _TEMPLATE_PATH)
+		changed = true
+	return changed
+
+
 static func configure_web_presets(presets_path: String = "res://export_presets.cfg") -> Dictionary:
 	var cfg := ConfigFile.new()
 	var err := cfg.load(presets_path)
@@ -87,18 +111,24 @@ static func configure_web_presets(presets_path: String = "res://export_presets.c
 
 	var updated_count := 0
 	var created := false
-	var web_section_found := false
+	var yandex_section_found := false
 
 	for section in cfg.get_sections():
-		if cfg.get_value(section, "platform", "") == "Web":
-			web_section_found = true
-			var opt_sec := section + ".options"
-			var current_shell: String = str(cfg.get_value(opt_sec, "html/custom_html_shell", ""))
-			if current_shell != _TEMPLATE_PATH:
-				cfg.set_value(opt_sec, "html/custom_html_shell", _TEMPLATE_PATH)
-				updated_count += 1
+		if not section.begins_with("preset.") or section.ends_with(".options"):
+			continue
+		if str(cfg.get_value(section, "platform", "")) != "Web":
+			continue
+		var preset_name: String = str(cfg.get_value(section, "name", ""))
+		if not _is_yandex_preset_name(preset_name):
+			continue
+		yandex_section_found = true
+		if preset_name != "Web (Yandex Games)":
+			cfg.set_value(section, "name", "Web (Yandex Games)")
+			updated_count += 1
+		if _apply_yandex_preset_options(cfg, section):
+			updated_count += 1
 
-	if not web_section_found:
+	if not yandex_section_found:
 		var sections := cfg.get_sections()
 		var idx := 0
 		for s in sections:
@@ -111,10 +141,11 @@ static func configure_web_presets(presets_path: String = "res://export_presets.c
 		cfg.set_value(section, "runnable", true)
 		cfg.set_value(section, "advanced_export", false)
 		cfg.set_value(section, "dedicated_server", false)
+		cfg.set_value(section, "custom_features", "yandex")
 		cfg.set_value(section, "export_filter", "all_resources")
 		cfg.set_value(section, "include_filter", "")
-		cfg.set_value(section, "exclude_filter", "")
-		cfg.set_value(section, "export_path", "")
+		cfg.set_value(section, "exclude_filter", "assets/reference/*,tools/*")
+		cfg.set_value(section, "export_path", "bin/yandex/index.html")
 		cfg.set_value(section, "encryption_include_filters", "")
 		cfg.set_value(section, "encryption_exclude_filters", "")
 		cfg.set_value(section, "encrypt_pck", false)
@@ -127,11 +158,11 @@ static func configure_web_presets(presets_path: String = "res://export_presets.c
 	if cfg.save(presets_path) == OK:
 		var msg := ""
 		if created:
-			msg = "Created new Web (Yandex Games) export preset with Yandex template."
+			msg = "Created new Web (Yandex Games) export preset with Yandex template and feature `yandex`."
 		elif updated_count > 0:
-			msg = "Updated %d Web preset(s) with Yandex HTML template." % updated_count
+			msg = "Updated Yandex Web preset(s) with template + feature `yandex`."
 		else:
-			msg = "Web preset already configured with Yandex HTML template."
+			msg = "Yandex Web preset already configured."
 		return { "success": true, "message": msg }
 	return { "success": false, "message": "Failed to save export_presets.cfg" }
 

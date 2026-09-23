@@ -14,7 +14,7 @@ alwaysApply: false
 
 **Ресурсы:** `class_name` Resource, save `user://account.tres` via `PersistentDataController`. Дефолты в `.tres`.
 
-**Сервисы:** под `main.tscn`, не autoloads. `@export` для зависимостей, не `get_node("/root/...")`.
+**Сервисы:** под `main.tscn`, не autoloads. `@export` для зависимостей, не `get_node("/root/...")`. Исключение: платформенные `YandexGames` + `PlatformServices` (см. `yandex-games.mdc`).
 
 **F6:** `@export` дефолты в `.tscn`, тяжёлая логика в `initialize()`, не в `_ready()` контекста до add_child.
 
