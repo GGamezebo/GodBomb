@@ -2,6 +2,8 @@
 
 Use for itch.io and Google Play. Screenshots: capture on a real phone (1080×1920), portrait.
 
+**Yandex Games draft (ready-to-paste):** [yandex_draft.md](./yandex_draft.md)
+
 ## Versions (export preset)
 
 - `version/name`: **1.0.0**
