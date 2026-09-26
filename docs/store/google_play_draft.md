@@ -26,7 +26,7 @@ Facts this draft relies on (re-check if the code changes):
 ## 2. App content (Policy → App content)
 
 ### Privacy policy
-URL of the hosted `docs/privacy/index.html` (see §6). Replace `Igorion` / `iyubelyash@gmail.com` first.
+**https://igorion.itch.io/tic-tac-bada-boom-privacy** (source: `docs/privacy/index.html`, see §6).
 
 ### App access
 **All functionality is available without any access restrictions.**
