@@ -22,7 +22,9 @@ Party hot-potato, слоги. Godot **4.7** GDScript, 1080×1920 portrait, mobil
 | `rules/menu-lobby.md` | лобби: игроки, DnD, edit window, настройки |
 | `rules/audio.md` | шины, music, `GameSound`, `UiSounds` |
 | `rules/visual-style.md` | визуальный концепт (industrial bomb UI) |
-| `rules/yandex-games.md` | preset Yandex, SDK, `PlatformServices` |
+| `rules/platform.md` | фасад `PlatformServices` + backend'ы (Yandex / Play / Null) |
+| `rules/yandex-games.md` | preset Yandex, SDK, модерация |
+| `rules/google-play.md` | preset Android, Google Play, релиз |
 | `rules/locale.md` | `LocaleService`, строки, колоды слогов |
 
 Если задача затрагивает область, а правило не подгрузилось автоматически — прочитай его явно. Планы крупных фич — `.claude/plans/`.
@@ -40,7 +42,7 @@ Party hot-potato, слоги. Godot **4.7** GDScript, 1080×1920 portrait, mobil
 - Не редактировать `.godot/`, `*.import`, `*.uid` вручную; `.godot/` не читать. `project.godot` / `export_presets.cfg` — править аккуратно, точечно.
 - Любая сцена должна запускаться через **F6** без падений (дефолтные `@export` в `.tscn`) — см. `rules/architecture.md`.
 - Вес билда (mobile + HTML): после замены музыки/текстур — `python tools/optimize_build_assets.py`, затем открыть редактор для реимпорта.
-- Stores: presets `Android` (Play) · `Web` (generic) · `Yandex` (feature `yandex`) → `rules/yandex-games.md`.
+- Stores: presets `Android` (feature `play`) · `Web` (generic) · `Yandex` (feature `yandex`) → `rules/platform.md`.
 
 ## Запуск и проверка
 
