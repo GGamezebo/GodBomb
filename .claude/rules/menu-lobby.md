@@ -1,0 +1,41 @@
+---
+description: Лобби — игроки, DnD, edit window, настройки, UI sounds
+paths:
+  - "src/features/player_selection/**"
+  - "src/features/menu/**"
+  - "src/features/onboarding/**"
+  - "src/contexts/menu_context/**"
+  - "src/contexts/game_context/ui/battle_player_lobby_overlay.*"
+  - "src/common/player_info.gd"
+  - "src/common/slime_colors.gd"
+---
+
+# Лобби
+
+MenuContext + `PlayerSelectionWidget`. Party kitchen, bomb bg `MenuBombLayout` (1080×1920 cover). `ScaledContent`: TopBar, стол, Start, hint Marker2D. `ModalLayer.follow_viewport_enabled = true` в `player_selection_widget.tscn`.
+
+**Игроки:** 2–12 · `PDataAccount`→`PlayerInfo`(name, **max 12 chars**, preset_id) · slimes `party_kitchen/slimes/{id}.svg` · `SlimeColors` · занятые цвета — `PlayerPresetStorage`
+
+**Порядок:** `SeatOrderBadge` 38×38 font 26 · стрелки `TurnOrderArrowsLayer` (`RING_MARGIN=24`, accent 75% on drag) · badges gap `BADGE_GAP_AFTER_ARROWS=10`
+
+**Swap:** drag slime → swap · hint: «Перетащи персонажа на стул другого…» · hit: circle–circle (`get_grab_radius_global`, `seat_interaction_radius`)
+
+**Remove:** `+` → delete mode · dashed ring **child of `add_player_button`** (не table_area) · drop slime center in ring · min_players_for_remove=0
+
+**Touch:** `TOUCH_GRAB_RADIUS=78` · `HOLD_HOME_TOLERANCE=36` · haptics on drag pickup / target lock / lobby action
+
+**Hold-edit:** `hold_time=1.4` (hint «1,5 сек») · `HoldProgressRing` · move > tolerance cancels · `EditPlayerWindow` · hints until `has_edited_player`
+
+**EditPlayerWindow:** no scroll · margins как settings (32/64 panel, 48 inner, buttons 180) · colors grid под name history · OK add / Apply edit / Cancel · sounds → `audio.md`
+
+**Start:** `StartActionButton` (pulse, `refresh_label_layout()` centers label on SVG pill, clip_contents=false) · menu Start + battle Done share script · SVG `start_active/inactive` viewBox `-6 0 452 120`
+
+**Min 2:** start disabled · `+` pulse · banner hint
+
+**Settings:** party 1–30min · **difficulty** easy/medium/hard + hint under label (deck: syllable length / rule hardness; `*_RESTRICT` still applies) · music volume slider only (mute = TopBar) · sfx→SFX · haptics on/off + strength · reset: 2-step confirm · `reset_progress()` clears players, recent names = slime defaults · язык — `LanguageFlagPicker` → `locale.md`
+
+**Onboarding:** `OnboardingController` + `OnboardingOverlay` + `OnboardingTutorialData` — шаги RULES → LOBBY_ADD/NAME/SWAP/START → GAME_CHOICE/READY/PLAY/RESULT; туториальный бой `session.is_tutorial` (без овертайма).
+
+**UI sounds:** см. `audio.md` · widget: click `+`, lobby add/remove/swap
+
+**Start game:** bomb preview → `ev_start_game` → GameContext · `SCOPE_MENU` off

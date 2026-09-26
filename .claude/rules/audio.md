@@ -1,0 +1,61 @@
+---
+description: Аудио — шины, music, gameplay SFX, UI sounds
+paths:
+  - "core/systems/audio/**"
+  - "assets/audio/**"
+  - "tools/generate_ui_sounds.py"
+  - "tools/generate_menu_music.py"
+  - "src/features/menu/**"
+  - "src/features/player_selection/**"
+  - "src/contexts/menu_context/**"
+  - "src/contexts/main_context/audio/**"
+  - "src/contexts/game_context/audio/**"
+  - "src/contexts/game_context/ui/game_input.gd"
+  - "src/contexts/game_context/ui/battle_player_lobby_overlay.gd"
+  - "main.tscn"
+  - "default_bus_layout.tres"
+---
+
+# Аудио
+
+**Шины:** `Music` = фон меню only · `SFX` = геймплей **+ весь UI**
+
+## Menu music
+
+`GameAudioController` → `music_player` on `MusicPlayer` (`background.mp3`, ~120s seamless loop, procedural, **mono ~64kbps**).
+Regen: `python tools/generate_menu_music.py` · then `python tools/optimize_build_assets.py` · `set_in_battle(false)` + `music_enabled` → loop.
+
+## Gameplay SFX — `GameSound` (`game_sound.gd`)
+
+- `Countdown.wav` — roulette + countdown ticks (import: mono + ADPCM)
+- `ui_confirm.wav` — tap pass (`ev_touch_next_player`) · `FastTick.mp3` / `SlowTick.mp3` — bomb alert (random)
+- `game_sound.mp3` — loop in **PLAY** (paused in **EMERGENCY**) — keep **mono ~64kbps**
+- `win.mp3` — loop in **RESULT** — **mono ~80kbps**
+- `Explosion.mp3` — взрыв
+
+**Weight:** do not re-export music at 192–320kbps stereo. Use `tools/optimize_build_assets.py` after replacing tracks.
+
+## UI SFX — `UiSounds` (`core/systems/audio/ui_sounds.gd`)
+
+Static API, bus `SFX`, one-shot `AudioStreamPlayer` on root.
+
+**Assets:** `assets/audio/ui/*.wav` · regen: `py -3 tools/generate_ui_sounds.py`
+
+| id | файл | когда |
+|----|------|-------|
+| click | ui_click | обычные кнопки |
+| confirm | ui_confirm | Старт, OK, раунд, Готово |
+| toggle | ui_toggle | CheckBox, музыка |
+| slider_tick | ui_slider_tick | слайдеры |
+| modal_open/close | ui_modal_* | модалки |
+| lobby_add/remove/swap | lobby_player_* | add/remove/swap в лобби |
+
+**API:** `play_*()` · `bind_button(btn, id?)` · `bind_slider(range, step)` · `bind_checkbox(cb)`
+
+**Интеграция (не дублировать звук):**
+- `bind_button` — menu/settings/rules/exit; Start/StartRound = confirm
+- модалки: `play_modal_open()` в open · cancel → `play_modal_close()` · OK/Apply → `play_confirm()` **в handler после валидации** (не bind)
+- лобби: click на `+` · `play_lobby_*` в `_on_player_added` / `_remove_player` / `_swap_players`
+- battle overlay Done: confirm если ok, click если < min_players
+
+**Не смешивать:** gameplay → `GameSound` · UI → `UiSounds` · menu bg → Music bus only

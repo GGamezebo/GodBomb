@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(./.godot/**)",
+      "Edit(./.godot/**)",
+      "Edit(./**/*.import)",
+      "Edit(./**/*.uid)"
+    ]
+  }
+}
