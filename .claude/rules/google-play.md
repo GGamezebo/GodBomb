@@ -19,4 +19,4 @@ paths:
 
 **Подпись:** upload key через `tools/create_android_release_keystore.ps1` → `secrets/` (gitignored). Пароли вводит пользователь, в репо/чат не попадают. Play App Signing.
 
-**Console:** новый личный аккаунт → закрытый тест 12+ тестировщиков 14 дней до продакшна. Нужен URL политики конфиденциальности.
+**Console:** новый личный аккаунт → закрытый тест 12+ тестировщиков 14 дней до продакшна. Готовые ответы/тексты → `docs/store/google_play_draft.md`; политика конфиденциальности → `docs/privacy/index.html` (плейсхолдеры `{{DEVELOPER_NAME}}`/`{{CONTACT_EMAIL}}`); feature graphic → `assets/reference/store/google_play_feature_1024x500.png`. При изменении разрешений/SDK — обновить Data safety и политику.

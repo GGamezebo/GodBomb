@@ -87,7 +87,7 @@ Tic-Tac-Bada-Boom
 5. Кому бомба взорвалась — получает штраф. Между раундами видно, сколько времени осталось.
 6. В конце — таблица результатов. При равном минимуме штрафов — овертайм на вылет до одного победителя.
 
-Аварийная кнопка — если ошиблись словом или тапом. Длинный свайп один раз за раунд возвращает бомбу предыдущему игроку.
+Аварийная кнопка — если ошиблись словом или тапом: выберите, кто переигрывает ход.
 ```
 
 ---
@@ -129,7 +129,7 @@ Local multiplayer. No accounts, no online matchmaking. Optional vibration. Perfe
 5. Whoever holds the bomb when it explodes gets a penalty. Between rounds you see remaining time.
 6. At the end, check the ranking. Equal lowest penalties trigger overtime knockout until one winner remains.
 
-Use the emergency button for a wrong word or mis-tap. One long swipe per round returns the bomb to the previous player.
+Use the emergency button for a wrong word or mis-tap and pick who replays the turn.
 ```
 
 ---
