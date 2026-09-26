@@ -26,7 +26,7 @@ Facts this draft relies on (re-check if the code changes):
 ## 2. App content (Policy → App content)
 
 ### Privacy policy
-URL of the hosted `docs/privacy/index.html` (see §6). Replace `{{DEVELOPER_NAME}}` / `{{CONTACT_EMAIL}}` first.
+URL of the hosted `docs/privacy/index.html` (see §6). Replace `Igorion` / `iyubelyash@gmail.com` first.
 
 ### App access
 **All functionality is available without any access restrictions.**
@@ -65,7 +65,7 @@ URL of the hosted `docs/privacy/index.html` (see §6). Replace `{{DEVELOPER_NAME
 |---|---|
 | App category | **Game → Word** |
 | Tags (≤5) | Word, Party, Casual, Local multiplayer, Trivia *(pick from Google's list)* |
-| Contact email | `{{CONTACT_EMAIL}}` (shown publicly) |
+| Contact email | `iyubelyash@gmail.com` (shown publicly) |
 | Website | optional |
 
 ---
