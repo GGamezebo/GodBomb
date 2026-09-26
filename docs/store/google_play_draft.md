@@ -158,15 +158,13 @@ Every upload: `version/code` +1 in `export_presets.cfg` (`version/name` e.g. `1.
 
 ## 6. Hosting the privacy policy
 
-The file `docs/privacy/index.html` must be reachable by a public URL that works without login:
-- **GitHub Pages** — only if the repo is public (or on a paid plan); otherwise a separate public repo with just this page.
-- **Google Sites** — paste the text, publish, copy the URL.
+Hosted on itch.io as a separate public project (classification *Other*, no files, payments off): **https://igorion.itch.io/tic-tac-bada-boom-privacy**. The game page https://igorion.itch.io/tic-tac-bada-boom links to it. When `docs/privacy/index.html` changes, paste the new body into that project's description (itch.io → Edit project) and update the effective date.
 
 ---
 
 ## Checklist
 
-- [ ] Placeholders in `docs/privacy/index.html` replaced, page hosted, URL works in incognito
+- [x] Privacy policy hosted on itch.io, opens without login
 - [ ] Upload keystore created (`tools/create_android_release_keystore.ps1`), `secrets/` backed up offline
 - [ ] Release AAB exported (preset `Android`, Release), `version/code` unique
 - [ ] App content: privacy, app access, ads, rating, audience, data safety, ad ID — all green
