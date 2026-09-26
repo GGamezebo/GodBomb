@@ -150,7 +150,9 @@ Use the emergency button for a wrong word or mis-tap. One long swipe per round r
 | **Обложка** * | PNG **800×470** | `assets/reference/store/yandex_cover_800x470.png` (не в билде) |
 | **Обложка витрины** | 1560×520 | опционально |
 | **Скриншоты** * | portrait **9:16**, длинная сторона 1280–2560, ≥2 на мобильные | `assets/reference/store/screenshots/` — 19 шт. 1080×1920 (промо-моки + концепт); для модерации лучше 2–4 живых с телефона |
-| Видео 9:16 / 16:9 | MP4 ≤28 с | опционально, но сильно помогает продвижению |
+| Видео 9:16 | MP4 ≤28 с | `yandex_gameplay_vertical_9x16.mp4` (если есть) / промо |
+| Видео 16:9 * | MP4 ≤28 с, высота ≥400 | `assets/reference/store/yandex_gameplay_horizontal_16x9.mp4` — геймплей-промо |
+| Рекламное 16:9 | MP4 ≤28 с | `assets/reference/store/yandex_promo_ad_16x9.mp4` — «древняя и крутая», ~19 с |
 
 ### Shot list (как в `listing.md`)
 
