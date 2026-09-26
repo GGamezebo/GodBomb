@@ -9,11 +9,13 @@ paths:
 
 # Google Play
 
-**Решения:** бесплатно, **без рекламы** на старте · In-App Review (в работе) · Play Games не подключаем.
+**Решения:** бесплатно, **без рекламы** на старте · In-App Review · Play Games не подключаем.
 
-**Backend:** `GooglePlayBackend` (`src/common/platform/google_play_backend.gd`), feature `play`. Все Android/Play-плагины вызываются только отсюда.
+**Backend:** `GooglePlayBackend` (`src/common/platform/google_play_backend.gd`), feature `play`. Все Android/Play-вызовы только отсюда.
 
-**Preset `Android`:** gradle build (`android/build/`, нужен для splash bg), arm64 only, `com.tictacbadaboom.app`, immersive. TODO релиза: feature `play`, AAB (`gradle_build/export_format=1`), явный target SDK, `version/code` +1 на каждую загрузку.
+**In-App Review:** без Kotlin-плагина — `JavaClassWrapper` + `AndroidRuntime.getActivity()`, Play Tasks опрашиваются `isComplete()`. Gradle-зависимость `com.google.android.play:review` добавляет `addons/godbomb_android` (EditorExportPlugin, только для пресетов с feature `play`). Политика: после 3-го завершённого матча, не чаще раза в 30 дней, не блокирует возврат в меню; состояние `user://platform_play.cfg`. Диалог показывается только у установки из Play (internal/closed track) — локально не проверить.
+
+**Preset `Android`:** feature `play`, **AAB** (`gradle_build/export_format=1`), gradle build (`android/build/`, нужен для splash bg), arm64 only, `com.tictacbadaboom.app`, immersive. target SDK пустой = дефолт шаблона 4.7.1 (36, `android/build/config.gradle`). `version/code` +1 на каждую загрузку в Console.
 
 **Подпись:** upload key через `tools/create_android_release_keystore.ps1` → `secrets/` (gitignored). Пароли вводит пользователь, в репо/чат не попадают. Play App Signing.
 
