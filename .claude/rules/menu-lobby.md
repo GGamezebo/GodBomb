@@ -32,7 +32,7 @@ MenuContext + `PlayerSelectionWidget`. Party kitchen, bomb bg `MenuBombLayout` (
 
 **Min 2:** start disabled · `+` pulse · banner hint
 
-**Settings:** party 1–30min · **difficulty** easy/medium/hard + hint under label (deck: syllable length / rule hardness; `*_RESTRICT` still applies) · music volume slider only (mute = TopBar) · sfx→SFX · haptics on/off + strength · reset: 2-step confirm · `reset_progress()` clears players, recent names = slime defaults · язык — `LanguageFlagPicker` → `locale.md`
+**Settings:** party 1–30min · **difficulty** easy/medium/hard + hint under label (deck: syllable length / rule hardness; `*_RESTRICT` still applies) · music volume slider only (mute = TopBar) · sfx→SFX · haptics on/off + strength · reset: 2-step confirm · `reset_progress()` clears players, recent names = slime defaults · язык — `LanguageFlagPicker` → `locale.md` · внизу скролла `PrivacyLink` (LinkButton, URL из `PlatformServices.privacy_policy_url()`, пусто → скрыт; требование Google Play)
 
 **Onboarding:** `OnboardingController` + `OnboardingOverlay` + `OnboardingTutorialData` — шаги RULES → LOBBY_ADD/NAME/SWAP/START → GAME_CHOICE/READY/PLAY/RESULT; туториальный бой `session.is_tutorial` (без овертайма).
 

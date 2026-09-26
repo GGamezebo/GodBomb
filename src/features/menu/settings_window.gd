@@ -60,8 +60,25 @@ func _ready() -> void:
 	if close_button:
 		close_button.pressed.connect(close)
 		UiSounds.bind_button(close_button)
+	_setup_privacy_link()
 	call_deferred("_update_modal_layer_visibility")
 	_refresh_static_labels()
+
+
+func _privacy_link() -> LinkButton:
+	return get_node_or_null("Panel/Margin/VBox/Scroll/ContentGutter/Content/PrivacyLink") as LinkButton
+
+
+## URL comes from PlatformServices; empty (e.g. Yandex) hides the link.
+func _setup_privacy_link() -> void:
+	var link := _privacy_link()
+	if link == null:
+		return
+	var platform := get_node_or_null("/root/PlatformServices")
+	var url: String = platform.privacy_policy_url() if platform and platform.has_method("privacy_policy_url") else ""
+	link.visible = not url.is_empty()
+	link.uri = url
+	UiSounds.bind_button(link)
 
 
 func _setup_language_picker() -> void:
@@ -105,6 +122,9 @@ func _refresh_static_labels() -> void:
 		reset_hint.text = LocaleService.text("SETTINGS_RESET_HINT")
 	if close_button:
 		close_button.action_text = LocaleService.text("SETTINGS_CLOSE")
+	var privacy_link := _privacy_link()
+	if privacy_link:
+		privacy_link.text = LocaleService.text("SETTINGS_PRIVACY_POLICY")
 	if reset_button and not _awaiting_reset_confirm:
 		reset_button.text = LocaleService.text("SETTINGS_RESET")
 	if game_time_slider:

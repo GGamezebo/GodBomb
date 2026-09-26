@@ -254,6 +254,17 @@ text = "100%"
 horizontal_alignment = 2
 vertical_alignment = 1
 
+[node name="PrivacyLink" type="LinkButton" parent="Panel/Margin/VBox/Scroll/ContentGutter/Content"]
+custom_minimum_size = Vector2(0, 88)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_colors/font_color = Color(0.78, 0.71, 0.62, 1)
+theme_override_colors/font_hover_color = Color(0.95, 0.62, 0.3, 1)
+theme_override_colors/font_pressed_color = Color(0.95, 0.62, 0.3, 1)
+theme_override_font_sizes/font_size = 32
+text = "Политика конфиденциальности"
+underline = 1
+
 [node name="ResetHint" type="Label" parent="Panel/Margin/VBox" unique_id=43390430]
 layout_mode = 2
 theme_type_variation = &"ModalMuted"

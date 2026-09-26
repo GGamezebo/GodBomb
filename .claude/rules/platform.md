@@ -13,7 +13,7 @@ paths:
 
 **Фасад делает сам (платформенно-нейтрально):** подписка на `GameEvents.ev_game_state_changed` → `set_gameplay_active(state == PLAY)`; флаг «матч завершён» на `RESULT` → `await_return_to_menu_gate()` вызывает `backend.on_match_finished_return_to_menu()` (Yandex: interstitial, Play: review). `MainContext` зовёт только `await_return_to_menu_gate()` / `on_left_battle_context()`.
 
-**Backend API** (`platform_backend.gd`, всё no-op): `boot()` · `set_gameplay_active(bool)` · `on_match_finished_return_to_menu()` · `on_history_back()` · `get_id()`. Новая платформа = новый subclass + ветка в `_create_backend()` + feature в пресете.
+**Backend API** (`platform_backend.gd`, всё no-op): `boot()` · `set_gameplay_active(bool)` · `on_match_finished_return_to_menu()` · `on_history_back()` · `get_id()` · `privacy_policy_url()` (дефолт — itch-страница политики; Yandex → "" = ссылка скрыта, модерация запрещает внешние ссылки). Новая платформа = новый subclass + ветка в `_create_backend()` + feature в пресете.
 
 **Запрещено:** `OS.has_feature("yandex"/"play")` и SDK-синглтоны вне `src/common/platform/`. Контексты / FSM / HUD / locale про платформы не знают.
 

@@ -4,6 +4,8 @@ extends RefCounted
 ## Store/portal adapter used by the PlatformServices facade.
 ## Every hook is a safe no-op here; subclasses override only what their platform needs.
 
+const PRIVACY_POLICY_URL := "https://igorion.itch.io/tic-tac-bada-boom-privacy"
+
 var host: Node
 
 
@@ -31,3 +33,8 @@ func on_match_finished_return_to_menu() -> void:
 
 func on_history_back() -> void:
 	pass
+
+
+## Empty string hides the in-game link (portals that forbid external links).
+func privacy_policy_url() -> String:
+	return PRIVACY_POLICY_URL

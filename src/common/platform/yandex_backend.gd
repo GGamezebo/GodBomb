@@ -10,6 +10,11 @@ func get_id() -> String:
 	return "yandex"
 
 
+## Yandex moderation forbids external links; the portal shows its own policy.
+func privacy_policy_url() -> String:
+	return ""
+
+
 func _yg() -> Node:
 	if host == null:
 		return null

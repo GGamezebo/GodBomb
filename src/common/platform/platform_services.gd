@@ -45,6 +45,10 @@ func is_google_play() -> bool:
 	return backend is GooglePlayBackend
 
 
+func privacy_policy_url() -> String:
+	return backend.privacy_policy_url() if backend else ""
+
+
 func _on_game_state_changed(_from: String, to_state: String) -> void:
 	_set_gameplay_active(to_state == FSMGameStates.PLAY)
 	if to_state == FSMGameStates.RESULT:
