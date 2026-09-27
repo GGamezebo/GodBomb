@@ -26,7 +26,8 @@ static func reset_position(scroll: ScrollContainer) -> void:
 static func _style_vertical_scroll_bar(bar: VScrollBar) -> void:
 	if bar == null:
 		return
-	bar.custom_minimum_size.x = 12
+	# Wide enough to grab with a finger on a phone (viewport is 1080 px wide).
+	bar.custom_minimum_size.x = 32
 	var track := StyleBoxFlat.new()
 	track.bg_color = SCROLL_TRACK
 	track.set_corner_radius_all(6)
@@ -42,4 +43,4 @@ static func _style_vertical_scroll_bar(bar: VScrollBar) -> void:
 	bar.add_theme_stylebox_override("scroll", track)
 	bar.add_theme_stylebox_override("grabber", grabber)
 	bar.add_theme_stylebox_override("grabber_highlight", grabber_hi)
-	bar.add_theme_constant_override("minimum_grabber_size", 64)
+	bar.add_theme_constant_override("minimum_grabber_size", 120)

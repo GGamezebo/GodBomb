@@ -66,7 +66,7 @@ func _ready() -> void:
 
 
 func _privacy_link() -> LinkButton:
-	return get_node_or_null("Panel/Margin/VBox/Scroll/ContentGutter/Content/PrivacyLink") as LinkButton
+	return get_node_or_null("PrivacyLink") as LinkButton
 
 
 ## URL comes from PlatformServices; empty (e.g. Yandex) hides the link.
