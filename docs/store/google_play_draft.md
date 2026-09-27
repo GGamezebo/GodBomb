@@ -147,6 +147,8 @@ Perfect for parties, family nights, road trips and hanging out with friends.
 
 ## 5. Release plan
 
+**Status (2026-09-27):** internal testing live — release `1 (1.0)`, testers list «Internal testers» (owner only). Opt-in link: https://play.google.com/apps/internaltest/4701361120510454944 (works only for listed emails). Price: Free. Next: closed testing via a Google Group (≥12 testers × 14 days).
+
 1. **Internal testing** — upload the first signed AAB right away (checks signing, lets you install via Play and see the In-App Review dialog).
 2. **Closed testing** — required for new personal accounts: **≥12 testers opted-in for 14 consecutive days**. Add testers by email list, share the opt-in link.
 3. **Apply for production** (Dashboard) after 14 days → answer the questionnaire about the test → production release.
