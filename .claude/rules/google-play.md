@@ -9,7 +9,9 @@ paths:
 
 # Google Play
 
-**Решения:** бесплатно, **без рекламы** на старте · In-App Review · Play Games не подключаем.
+**Решения:** **бесплатно** (выставлено в Console 2026-09-27; после публикации сделать платным нельзя) · **без рекламы** на старте · In-App Review · Play Games не подключаем.
+
+**Монетизация — план на потом:** «Поддержать разработчика» / паки колод только через **Google Play Billing** (consumable/one-time IAP) в `GooglePlayBackend`. Внешние ссылки на донаты (Boosty и т.п.) из игры — запрещено правилами Play и модерацией Яндекса. Блокер: нужен платёжный профиль продавца (ограничения для РФ — проверить). При добавлении рекламы/IAP обновить Data safety, декларации «Реклама»/«Рекламный идентификатор», политику конфиденциальности.
 
 **Backend:** `GooglePlayBackend` (`src/common/platform/google_play_backend.gd`), feature `play`. Все Android/Play-вызовы только отсюда.
 
@@ -19,4 +21,4 @@ paths:
 
 **Подпись:** upload key через `tools/create_android_release_keystore.ps1` → `secrets/` (gitignored). Godot 4.7 берёт keystore из `.godot/export_credentials.cfg` (заполняется в окне Export у **каждого** пресета отдельно), корневой `export_credentials.cfg` скрипта не используется. Пароли вводит пользователь, в репо/чат не попадают. Play App Signing.
 
-**Console:** новый личный аккаунт → закрытый тест 12+ тестировщиков 14 дней до продакшна. Готовые ответы/тексты → `docs/store/google_play_draft.md`; политика конфиденциальности → https://igorion.itch.io/tic-tac-bada-boom-privacy (исходник `docs/privacy/index.html`, при правке — вставить заново в описание itch-проекта); feature graphic → `assets/reference/store/google_play_feature_1024x500.png`. При изменении разрешений/SDK — обновить Data safety и политику.
+**Console:** новый личный аккаунт → закрытый тест 12+ тестировщиков 14 дней до продакшна. Готовые ответы/тексты → `docs/store/google_play_draft.md`; политика конфиденциальности → https://igorion.itch.io/tic-tac-bada-boom-privacy (исходник `docs/privacy/index.html`, при правке — вставить заново в описание itch-проекта); feature graphic → `assets/reference/store/google_play_feature_1024x500.png`; иконка Play (квадрат без скруглений, Google скругляет сам) → `assets/reference/store/google_play_icon_512.png`. Store listing: en-US (по умолчанию) + ru-RU, по 8 скриншотов из `yandex_screen_shots_en/` и `_ru/`. При изменении разрешений/SDK — обновить Data safety и политику.
