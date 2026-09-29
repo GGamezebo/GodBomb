@@ -71,6 +71,10 @@ UI_ICON_PARAMS = {
 BACKGROUND_PARAMS = {
 	**TEXTURE_VRAM_PARAMS,
 	"process/size_limit": "1024",
+	# Fine wire/rope detail needs a better ETC2 encode than the default 0.7 —
+	# low quality showed as stripe/block artifacts on some Adreno GPUs.
+	"compress/high_quality": "true",
+	"compress/lossy_quality": "1.0",
 }
 
 WAV_UI_PARAMS = {

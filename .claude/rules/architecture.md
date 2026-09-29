@@ -24,3 +24,5 @@ paths:
 **Editor window:** play from editor uses 360×640 (`window_width/height_override` + `MainContext._apply_editor_window_size`). Viewport stays 1080×1920, stretch `canvas_items`, aspect `keep_width`.
 
 **Ship weight:** textures VRAM-compressed (ETC2/ASTC mobile, S3TC web), importer_defaults VRAM + size_limit 1024; concept art under `assets/reference/` is `.gdignore`d + export exclude `assets/reference/*,tools/*`. `tools/optimize_build_assets.py` — MP3→mono 64–80kbps, Background ≤1024 + VRAM compress, SVG size caps, WAV mono/ADPCM. Re-run after replacing music; open editor once to reimport.
+
+**Background.png (арт бомбы):** `BACKGROUND_PARAMS` — `compress/high_quality=true` + `lossy_quality=1.0` (→ ASTC на mobile). Дефолт ETC2 0.7 давал полосы/«трещины» на проводах у части Adreno-GPU (Nothing Phone 3a). **Ловушка скрипта:** его `UI_ICON_PARAMS` устарели и сбрасывают `svg/scale` 2.0→1.0 / `size_limit` у иконок — после запуска откатить `*.svg.import` (`git checkout`), оставить только нужные изменения.
