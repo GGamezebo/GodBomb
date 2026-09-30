@@ -3,7 +3,7 @@
 Консоль: https://games.yandex.ru/console  
 Доки: [заполнение черновика](https://yandex.ru/dev/games/doc/ru/console/add-new-game/draft), [требования](https://yandex.ru/dev/games/doc/ru/concepts/requirements)
 
-Экспорт: preset **Yandex** (`custom_features=yandex`, HTML shell `yandex_template.html`) → `bin/yandex/` → Project → Tools → **Yandex Games: Package Web Export to Yandex ZIP**
+Экспорт: preset **Yandex** (`custom_features=yandex`, HTML shell `yandex_template.html`) → `bin/yandex/index.html` → Project → Tools → **Yandex Games: Package Web Export to Yandex ZIP**
 
 ---
 
@@ -24,7 +24,7 @@
 |------|----------|
 | **Игра переведена на** | ru, en, sr, es, hi, de, fr, it *(как в `LocaleCatalog`)* |
 | **Возрастной рейтинг** | **0+** (мультик-бомба, без жестокости; при сомнении — 6+) |
-| **Категории** (≤2) | **Словесные**, **Казуальные** |
+| **Категории** (≤2) | **Казуальные**, **Настольные** (категории «Словесные» у Яндекса нет — слова через теги «в слова», «со словами») |
 | **Теги** | для компании, локальный мультиплеер, вечеринка, слова, на одном телефоне, pass and play, hot potato, casual |
 | **Ключевые слова** (≤100, нижний регистр) | бомба слова, вечеринка, словесная игра, party game, hot potato, локальный мультиплеер |
 
