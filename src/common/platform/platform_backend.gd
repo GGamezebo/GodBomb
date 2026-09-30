@@ -35,6 +35,11 @@ func on_history_back() -> void:
 	pass
 
 
+## Called on every press (touch / mouse / key) that reaches the game.
+func on_user_input() -> void:
+	pass
+
+
 ## Empty string hides the in-game link (portals that forbid external links).
 func privacy_policy_url() -> String:
 	return PRIVACY_POLICY_URL

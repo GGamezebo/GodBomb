@@ -25,6 +25,14 @@ func _ready() -> void:
 	backend.boot.call_deferred()
 
 
+func _input(event: InputEvent) -> void:
+	if backend is NullBackend:
+		return
+	var pressed := (event is InputEventScreenTouch or event is InputEventMouseButton or event is InputEventKey) and event.is_pressed()
+	if pressed:
+		backend.on_user_input()
+
+
 func _exit_tree() -> void:
 	_listener.deinit()
 

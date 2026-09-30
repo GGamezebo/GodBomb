@@ -78,6 +78,22 @@ func set_gameplay_active(active: bool) -> void:
 		yg.gameplay_stop()
 
 
+## A tap reached the game, so no portal overlay (ad, dialog) covers it. If the plugin still holds
+## a platform pause (a `game_api_resume` was missed, e.g. on first launch), audio stays muted
+## until reload — release that stale pause here.
+func on_user_input() -> void:
+	var yg := _yg()
+	if yg == null or not ("is_platform_paused" in yg) or not yg.is_platform_paused:
+		return
+	if bool(JavaScriptBridge.eval("Boolean(document.hidden)")):
+		return
+	push_warning("YandexBackend: releasing stale platform pause on user input")
+	if "_ad_playing" in yg:
+		yg._ad_playing = false
+	if yg.has_method("_on_platform_resume"):
+		yg._on_platform_resume()
+
+
 func on_match_finished_return_to_menu() -> void:
 	var yg := _yg()
 	if yg == null or not ("ads" in yg):

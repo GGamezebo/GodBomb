@@ -22,4 +22,6 @@ paths:
 
 **Lifecycle (yandex):** `game_ready` после init · `gameplay_start` на `play` · `gameplay_stop` иначе (через `GameEvents.ev_game_state_changed`) · interstitial при выходе в меню после `result` · **2.14** `i18n.lang` → `LocaleService.set_locale` на старте.
 
+**Звук (первый запуск):** плагин глушит Master по `game_api_pause` и ждёт `game_api_resume`; если resume потерян — звук пропадает до перезагрузки. Страховка: `YandexBackend.on_user_input()` снимает паузу, если нажатие дошло до игры и вкладка видима. В `yandex_template.html` добавлен (наш) скрипт: трекинг `AudioContext` + `resume()` на `touchend`/`pointerup`/`keydown`/`click` (autoplay). Sticky-баннеры выключены в консоли (Реклама → Sticky баннеры) — мешают тапам.
+
 **Листинги / черновики сторов:** `docs/store/` (`listing.md`, `yandex_draft.md`, `web_smoke.md`).

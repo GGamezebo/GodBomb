@@ -867,6 +867,31 @@
         </div>
     </div>
 
+    <script>
+        // GodBomb: browsers may start the engine's AudioContext suspended (autoplay policy, first
+        // launch). Track every context and resume it from a real user gesture.
+        (function () {
+            const Base = window.AudioContext || window.webkitAudioContext;
+            if (!Base) return;
+            const contexts = [];
+            const Tracked = function (...args) {
+                const ctx = new Base(...args);
+                contexts.push(ctx);
+                return ctx;
+            };
+            Tracked.prototype = Base.prototype;
+            window.AudioContext = Tracked;
+            if (window.webkitAudioContext) window.webkitAudioContext = Tracked;
+            const resumeAll = () => {
+                for (const ctx of contexts) {
+                    if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+                }
+            };
+            ['touchend', 'pointerup', 'keydown', 'click'].forEach((type) => {
+                window.addEventListener(type, resumeAll, true);
+            });
+        })();
+    </script>
     <script src="$GODOT_URL"></script>
     <script>
         const GODOT_CONFIG = $GODOT_CONFIG;
