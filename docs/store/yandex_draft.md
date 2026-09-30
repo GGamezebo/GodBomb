@@ -3,6 +3,8 @@
 Консоль: https://games.yandex.ru/console  
 Доки: [заполнение черновика](https://yandex.ru/dev/games/doc/ru/console/add-new-game/draft), [требования](https://yandex.ru/dev/games/doc/ru/concepts/requirements)
 
+**Статус (2026-09-30):** отправлено на модерацию (ID 613559, версия 1.0.0, только мобильные, категории «Казуальные» + «Настольные», sticky-баннеры выключены). Предыдущая попытка отклонена: `index.html` не в корне ZIP. Договор ЕЛС/РСЯ действует.
+
 Экспорт: preset **Yandex** (`custom_features=yandex`, HTML shell `yandex_template.html`) → `bin/yandex/index.html` → Project → Tools → **Yandex Games: Package Web Export to Yandex ZIP**
 
 ---
