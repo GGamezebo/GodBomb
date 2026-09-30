@@ -1,6 +1,6 @@
 # GodBomb (Tic-Tac-Bada-Boom)
 
-Party hot-potato, слоги. Godot **4.7** GDScript, 1080×1920 portrait, mobile renderer (web = `gl_compatibility`). Entry: `main.tscn` → `MainContext`.
+Party hot-potato, слоги. Godot **4.7** GDScript, 1080×1920 portrait, mobile renderer на десктопе; Android и web = `gl_compatibility`. Entry: `main.tscn` → `MainContext`.
 
 **Цикл:** 2–12 игроков, слог+условие, передача бомбы, скрытый таймер, взрыв = +1 штраф, победа = min score. Основное время = countdown+play до `game_time_minutes`; истекло: уникальный лидер → result, ничья → овертайм на вылет.
 
