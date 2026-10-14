@@ -147,7 +147,9 @@ Perfect for parties, family nights, road trips and hanging out with friends.
 
 ## 5. Release plan
 
-**Status (2026-09-27):** internal testing live — release `1 (1.0)`, testers list «Internal testers» (owner only). Opt-in link: https://play.google.com/apps/internaltest/4701361120510454944 (works only for listed emails). Price: Free. Next: closed testing via a Google Group (≥12 testers × 14 days).
+**Status (2026-10-14):** production access granted; production release `5 (1.0.4)` (all countries, full rollout) sent for Google review. Managed publishing is ON — after approval press «Опубликовать» in Publishing overview. Closed test (Google Group `tic-tac-bada-boom-testers`) stays as the pre-release channel.
+
+**Earlier (2026-09-27):** internal testing live — release `1 (1.0)`, testers list «Internal testers» (owner only). Opt-in link: https://play.google.com/apps/internaltest/4701361120510454944 (works only for listed emails). Price: Free. Next: closed testing via a Google Group (≥12 testers × 14 days).
 
 1. **Internal testing** — upload the first signed AAB right away (checks signing, lets you install via Play and see the In-App Review dialog).
 2. **Closed testing** — required for new personal accounts: **≥12 testers opted-in for 14 consecutive days**. Add testers by email list, share the opt-in link.
