@@ -34,7 +34,7 @@ FFMPEG = imageio_ffmpeg.get_ffmpeg_exe()
 # Mobile-friendly bitrates. Loops don't need CD quality.
 MP3_JOBS = [
 	("audio/music/background.mp3", ["-ac", "1", "-ar", "44100", "-b:a", "64k"]),
-	("audio/music/game_sound.mp3", ["-ac", "1", "-ar", "44100", "-b:a", "64k"]),
+	("audio/music/game_sound.mp3", ["-ac", "1", "-ar", "44100", "-b:a", "96k"]),
 	("audio/music/win.mp3", ["-ac", "1", "-ar", "44100", "-b:a", "80k"]),
 	("audio/sfx/Explosion.mp3", ["-ac", "1", "-ar", "44100", "-b:a", "96k"]),
 	("audio/sfx/FastTick.mp3", ["-ac", "1", "-ar", "44100", "-b:a", "64k"]),

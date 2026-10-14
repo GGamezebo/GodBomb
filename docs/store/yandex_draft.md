@@ -1,7 +1,9 @@
 # Черновик Яндекс Игр — Tic-Tac-Bada-Boom
 
-Консоль: https://games.yandex.ru/console  
+Консоль: https://games.yandex.ru/console · игра **ID 613559** → https://games.yandex.ru/console/application/613559  
 Доки: [заполнение черновика](https://yandex.ru/dev/games/doc/ru/console/add-new-game/draft), [требования](https://yandex.ru/dev/games/doc/ru/concepts/requirements)
+
+Монетизация: аккаунт на обычной схеме РСЯ — модерация, покупки и доход с рекламы доступны. Ошибка «Регистрация в ЕЛС недоступна» — ожидаемо; на ЕЛС переведут автоматически (уведомление на почту консоли), через поддержку не подключить (ответ поддержки РСЯ, 2026-10-01).
 
 **Статус (2026-09-30):** отправлено на модерацию (ID 613559, версия 1.0.0, только мобильные, категории «Казуальные» + «Настольные», sticky-баннеры выключены). Предыдущая попытка отклонена: `index.html` не в корне ZIP. Договор ЕЛС/РСЯ действует.
 
@@ -152,9 +154,9 @@ Use the emergency button for a wrong word or mis-tap and pick who replays the tu
 | **Обложка** * | PNG **800×470** | `assets/reference/store/yandex_cover_800x470.png` (не в билде) |
 | **Обложка витрины** | 1560×520 | опционально |
 | **Скриншоты** * | portrait **9:16**, длинная сторона 1280–2560, ≥2 на мобильные | `assets/reference/store/screenshots/` — 19 шт. 1080×1920 (промо-моки + концепт); для модерации лучше 2–4 живых с телефона |
-| Видео 9:16 | MP4 ≤28 с | `yandex_gameplay_vertical_9x16.mp4` (если есть) / промо |
-| Видео 16:9 * | MP4 ≤28 с, высота ≥400 | `assets/reference/store/yandex_gameplay_horizontal_16x9.mp4` — геймплей-промо |
-| Рекламное 16:9 | MP4 ≤28 с | `assets/reference/store/yandex_promo_ad_16x9.mp4` — «древняя и крутая», ~19 с |
+| Видео 9:16 | MP4 ≤28 с | RU: нет отдельного файла. EN: `assets/reference/store/en_gameplay_9x16.mp4` |
+| Видео 16:9 * | MP4 ≤28 с, высота ≥400 | RU: `yandex_gameplay_horizontal_16x9.mp4`. EN: `en_gameplay_16x9.mp4` |
+| Рекламное 16:9 | MP4 ≤28 с | RU: `yandex_promo_ad_16x9.mp4` («древняя и крутая»). EN: `en_promo_ad_16x9.mp4` («Ancient and awesome») |
 
 ### Shot list (как в `listing.md`)
 

@@ -79,7 +79,7 @@ Facts this draft relies on (re-check if the code changes):
 | App icon | 512×512 PNG 32-bit, ≤1 MB | `assets/reference/store/yandex_icon_512.png` |
 | Feature graphic | 1024×500 PNG/JPG, no alpha | `assets/reference/store/google_play_feature_1024x500.png` |
 | Phone screenshots | 2–8, 9:16, 1080×1920 | RU: `assets/reference/store/yandex_screen_shots_ru/` · EN: `…_en/` |
-| Video | optional, YouTube URL | — |
+| Video | optional, YouTube URL (public or unlisted) | EN 16:9: `assets/reference/store/en_gameplay_16x9.mp4` and `en_promo_ad_16x9.mp4` (also fit Yandex, ≤28 s). Upload either to YouTube and paste the link. Portrait cut: `en_gameplay_9x16.mp4`. |
 
 Pick 4–8 screenshots: lobby → syllable on dial → pass sparks → explosion → results → table-center mode.
 

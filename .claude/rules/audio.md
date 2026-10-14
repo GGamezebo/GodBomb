@@ -29,7 +29,7 @@ Regen: `python tools/generate_menu_music.py` · then `python tools/optimize_buil
 
 - `Countdown.wav` — roulette + countdown ticks (import: mono + ADPCM)
 - `ui_confirm.wav` — tap pass (`ev_touch_next_player`) · `FastTick.mp3` / `SlowTick.mp3` — bomb alert (random)
-- `game_sound.mp3` — loop in **PLAY** (paused in **EMERGENCY**) — keep **mono ~64kbps**
+- `game_sound.mp3` — loop in **PLAY** (paused in **EMERGENCY**) — same groove, softened master (less clip, less bite), **mono ~96kbps**
 - `win.mp3` — loop in **RESULT** — **mono ~80kbps**
 - `Explosion.mp3` — взрыв
 
