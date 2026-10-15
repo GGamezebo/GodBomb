@@ -41,7 +41,7 @@ project/assembly_name="GodBomb"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/yandex_games/plugin.cfg", "res://addons/godbomb_android/plugin.cfg")
+enabled=PackedStringArray("res://addons/yandex_games/plugin.cfg", "res://addons/godbomb_android/plugin.cfg", "res://addons/godot_mcp/plugin.cfg")
 
 [gui]
 
