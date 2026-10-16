@@ -25,6 +25,7 @@ Party hot-potato, слоги. Godot **4.7** GDScript, 1080×1920 portrait, mobil
 | `rules/platform.md` | фасад `PlatformServices` + backend'ы (Yandex / Play / Null) |
 | `rules/yandex-games.md` | preset Yandex, SDK, модерация |
 | `rules/google-play.md` | preset Android, Google Play, релиз |
+| `rules/rustore.md` | preset RuStore, консоль, чек-лист выхода |
 | `rules/locale.md` | `LocaleService`, строки, колоды слогов |
 
 Если задача затрагивает область, а правило не подгрузилось автоматически — прочитай его явно. Планы крупных фич — `.claude/plans/`.

@@ -17,4 +17,4 @@ paths:
 
 **Запрещено:** `OS.has_feature("yandex"/"play")` и SDK-синглтоны вне `src/common/platform/`. Контексты / FSM / HUD / locale про платформы не знают.
 
-**Пресеты:** `Android` (feature `play`, Google Play) · `Web` (без feature → Null) · `Yandex` (feature `yandex`) → `yandex-games.md`, `google-play.md`.
+**Пресеты:** `Android` (feature `play`, Google Play) · `Web` (без feature → Null) · `Yandex` (feature `yandex`) · `RuStore APK` (feature `rustore` → Null, без Play-кода) → `yandex-games.md`, `google-play.md`, `rustore.md`.
