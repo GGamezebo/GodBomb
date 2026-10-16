@@ -10,7 +10,7 @@ config_version=5
 
 [application]
 
-config/name="Tic-Tac-Bada-Boom"
+config/name="TicTacBadaBoom: Party Game"
 config/description="Party hot-potato word game ported from Unity"
 run/main_scene="res://main.tscn"
 config/features=PackedStringArray("4.7", "Mobile")
