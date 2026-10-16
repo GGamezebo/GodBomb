@@ -15,7 +15,7 @@ Facts this draft relies on (re-check if the code changes):
 
 | Field | Value |
 |---|---|
-| App name (≤30) | `Tic-Tac-Bada-Boom` |
+| App name (≤30) | `TicTacBadaBoom: Party Game` (since 2026-10-16; was `Tic-Tac-Bada-Boom`). On the phone: `TicTacBadaBoom` (`package/name`) |
 | Default language | Russian – ru-RU *(or English – en-US if you target the world first)* |
 | App or game | **Game** |
 | Free or paid | **Free** (can't switch free → paid later) |
@@ -78,76 +78,90 @@ Facts this draft relies on (re-check if the code changes):
 |---|---|---|
 | App icon | 512×512 PNG 32-bit, ≤1 MB | `assets/reference/store/yandex_icon_512.png` |
 | Feature graphic | 1024×500 PNG/JPG, no alpha | `assets/reference/store/google_play_feature_1024x500.png` |
-| Phone screenshots | 2–8, 9:16, 1080×1920 | RU: `assets/reference/store/yandex_screen_shots_ru/` · EN: `…_en/` |
-| Video | optional, YouTube URL (public or unlisted) | EN 16:9: `assets/reference/store/en_gameplay_16x9.mp4` and `en_promo_ad_16x9.mp4` (also fit Yandex, ≤28 s). Upload either to YouTube and paste the link. Portrait cut: `en_gameplay_9x16.mp4`. |
+| Phone screenshots | 2–8, 9:16, 1080×1920 | Captioned (live order 01→06): `assets/reference/store/google_play_screens/{ru,en}/`, generated from real frames in `yandex_screen_shots_*/_original*` |
+| Video | optional, YouTube URL (public or unlisted) | Ad 14 s, 1920×1080: `assets/reference/store/google_play_ad_16x9.mp4` (bar boom → English gameplay with party lines → logo, music fades out). Also `en_gameplay_16x9.mp4`, `en_promo_ad_16x9.mp4`. Upload to YouTube and paste the link. Portrait cut: `en_gameplay_9x16.mp4`. |
 
 Pick 4–8 screenshots: lobby → syllable on dial → pass sparks → explosion → results → table-center mode.
 
 ### Русский (ru-RU)
 
+Live since 2026-10-15 (ASO pass: «игра в слова», «для компании», «на одном телефоне», «горячая картошка», «вечеринки»; no competitor brands).
+
 **Краткое описание (≤80):**
 ```
-Бомба-слова на одном телефоне. Передавай, придумывай, не взорвись!
+Игра в слова для компании на одном телефоне. Передай бомбу, пока не рвануло!
 ```
 
 **Полное описание (≤4000):**
 ```
-Садитесь кругом. Один телефон — бомба. 💣
-
-На циферблате слог и условие: слог в начале, в конце или в любом месте слова. Назовите подходящее слово вслух и коротким тапом передайте бомбу соседу. Таймер скрыт — может рвануть сразу, а может дать много кругов. Не успели — бум и штрафное очко!
+Tic-Tac-Bada-Boom — быстрая игра в слова для компании друзей на одном телефоне. Как «горячая картошка», только вместо картошки — тикающая бомба. 💣
 
 КАК ИГРАТЬ
-• Добавьте от 2 до 12 игроков, задайте имена и цвета слаймов.
-• Выберите длительность партии и сложность.
-• Придумывайте слова и передавайте бомбу тапом.
-• Меньше штрафов — выше место. При ничьей — овертайм на вылет до одного победителя.
+• На бомбе появляется слог и условие: слог в начале слова, в конце или в любом месте.
+• Назови подходящее слово вслух и коротким тапом передай бомбу следующему игроку.
+• Таймер скрыт: бомба может взорваться сразу, а может продержаться много кругов.
+• Не успел — бум! Штрафное очко. Побеждает тот, у кого меньше штрафов. При ничьей — овертайм на вылет.
+
+ДЛЯ ЧЕГО
+Вечеринки, дни рождения, семейные вечера, поездки и любые посиделки с друзьями. Никаких карточек, поля и подготовки — нужен только один телефон и компания.
 
 ОСОБЕННОСТИ
-• Локальная игра для компании на одном телефоне — без аккаунтов и интернета.
-• Режим «телефон в центре»: положите смартфон на стол, текст сам повернётся к текущему игроку.
-• Аварийная кнопка — если ошиблись словом или случайно нажали.
-• Три уровня сложности.
-• 8 языков: русский, английский, сербский, испанский, хинди, немецкий, французский, итальянский.
+• От 2 до 12 игроков на одном устройстве, без аккаунтов и регистрации.
+• Работает без интернета.
 • Без рекламы.
+• Режим «телефон в центре стола»: текст сам поворачивается к текущему игроку.
+• Три уровня сложности.
+• Аварийная пауза, если ошиблись словом или случайно нажали.
+• 8 языков: русский, английский, сербский, испанский, хинди, немецкий, французский, итальянский.
 
-Идеально для вечеринок, семейных вечеров, поездок и посиделок с друзьями.
+Садитесь в круг, передавайте бомбу — и пусть она взорвётся не у вас!
 ```
 
 ### English (en-US)
 
 **Short description (≤80):**
 ```
-Party word bomb on one phone. Pass it, invent words, don't explode!
+Party word game for friends on one phone. Pass the bomb before it explodes!
 ```
 
 **Full description (≤4000):**
 ```
-Sit in a circle. One phone is the bomb. 💣
-
-The dial shows a syllable and a rule: at the start, at the end, or anywhere in the word. Say a fitting word out loud and tap once to pass the bomb. The fuse is hidden — it may blow right away or last many rounds. Too slow? Boom — a penalty point!
+Tic-Tac-Bada-Boom is a fast party word game for a group of friends, played on a single phone. Think hot potato, but with a ticking bomb and words. 💣
 
 HOW TO PLAY
-• Add 2 to 12 players, set names and slime colors.
-• Choose match length and difficulty.
-• Invent words and pass the bomb with a tap.
-• Fewest penalties win. Ties go to overtime knockout until one winner remains.
+• The bomb shows a syllable and a rule: at the start of the word, at the end, or anywhere in it.
+• Say a matching word out loud and tap to pass the bomb to the next player.
+• The timer is hidden: the bomb can go off right away or survive many rounds.
+• Too slow? Boom! You get a penalty point. Fewest penalties wins. A tie goes to sudden-death overtime.
+
+PERFECT FOR
+Parties, birthdays, family game nights, road trips and any get-together with friends. No board, no cards, no setup: just one phone and a circle of people.
 
 FEATURES
-• Local party game on one phone — no accounts, no internet needed.
-• “Phone in the center” mode: put the phone on the table and the text turns to the current player.
-• Emergency button for a wrong word or a mis-tap.
-• Three difficulty levels.
-• 8 languages: English, Russian, Serbian, Spanish, Hindi, German, French, Italian.
+• 2 to 12 players on one device, no accounts or sign-up.
+• Works offline, no internet needed.
 • No ads.
+• "Phone in the center" mode: put the phone on the table and the text turns to face the current player.
+• Three difficulty levels.
+• Emergency pause for a wrong word or an accidental tap.
+• 8 languages: English, Russian, Serbian, Spanish, Hindi, German, French, Italian.
 
-Perfect for parties, family nights, road trips and hanging out with friends.
+Sit in a circle, pass the bomb, and make sure it doesn't go off in your hands!
 ```
+
+**Video (both languages, set on en-US, ru-RU inherits):** https://www.youtube.com/watch?v=CkWwSkvXi1w (`google_play_ad_16x9.mp4`, public on the Igorion channel).
+
+**AI declaration:** icon, feature graphic and video are marked as AI-generated; screenshots are not.
 
 ---
 
 ## 5. Release plan
 
-**Status (2026-10-14):** production access granted; production release `5 (1.0.4)` (all countries, full rollout) sent for Google review. Managed publishing is ON — after approval press «Опубликовать» in Publishing overview. Closed test (Google Group `tic-tac-bada-boom-testers`) stays as the pre-release channel.
+**Status (2026-10-16):** release `6 (1.0.5)` (new app icon, themed-icon layer, launcher name `TicTacBadaBoom`) sent for review; listing changes (new title en/ru, new icon marked as AI) sent for review; tags set to Word, Board games, Casual, Trivia; screenshots replaced with captioned ones (`assets/reference/store/google_play_screens/`).
+
+**Status (2026-10-15):** production live (1.0.4). Store listing update (new EN/RU descriptions + YouTube video) sent for review.
+
+**Earlier (2026-10-14):** production access granted; production release `5 (1.0.4)` (all countries, full rollout) sent for Google review. Managed publishing is ON — after approval press «Опубликовать» in Publishing overview. Closed test (Google Group `tic-tac-bada-boom-testers`) stays as the pre-release channel.
 
 **Earlier (2026-09-27):** internal testing live — release `1 (1.0)`, testers list «Internal testers» (owner only). Opt-in link: https://play.google.com/apps/internaltest/4701361120510454944 (works only for listed emails). Price: Free. Next: closed testing via a Google Group (≥12 testers × 14 days).
 

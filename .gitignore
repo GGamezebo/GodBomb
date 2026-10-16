@@ -26,3 +26,6 @@ mono_crash.*.json
 
 bin
 addons/android_emulator_launcher
+
+# Heavy promo videos: keep local / on YouTube, do not commit (already-tracked ones stay tracked)
+assets/reference/store/*.mp4
