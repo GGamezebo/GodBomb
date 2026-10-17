@@ -2,23 +2,29 @@ class_name GameResultOverlay
 extends Control
 
 signal return_to_menu_requested
+signal play_again_requested
 
 const DESIGN_SIZE := Vector2(1080.0, 1920.0)
 const SLIME_PATH := "res://assets/party_kitchen/slimes/%d.svg"
 const START_ACTIVE_TEXTURE := "res://assets/party_kitchen/buttons/start_active.svg"
 const WINNER_PILL_SCALE := 1.42
-const MENU_BUTTON_SIZE := Vector2(660.0, 180.0)
+const ACTION_BUTTON_SIZE := Vector2(430.0, 140.0)
+const ACTION_BUTTON_FONT := 54
+const ACTIONS_GAP := 20.0
+const STATS_BUTTON_SIZE := Vector2(440.0, 92.0)
 const MENU_REVEAL_SEC := 10.0
 const HAPTIC_PULSE_INTERVAL := 0.55
 const CONTENT_WIDTH_MARGIN := 200.0
 const WINNER_RANKING_GAP := 36.0
 const TOP_MARGIN := 188.0
 const BUTTON_BOTTOM_MARGIN := 212.0
-const PREVIEW_NAMES := ["ANYA", "MAX", "OLGA", "DIMA", "KATE", "IGOR"]
+const PREVIEW_NAMES := ["ANYA", "MAX", "OLGA", "DIMA", "KATE", "IGOR", "LENA", "PAVEL"]
 
-## F6 preview: fake leaderboard when this scene runs on its own.
-@export var preview_player_count: int = 6
+## F6 preview: simulated match (late joiner, leaver, overtime) when this scene runs on its own.
+@export var preview_player_count: int = 5
 @export var preview_rounds: int = 9
+@export var preview_overtime: bool = true
+@export var preview_open_stats: bool = false
 
 var _winner_bg: ColorRect
 var _celebration: ResultCelebrationLayer
@@ -33,7 +39,11 @@ var _winner_strip: GamePlayerStrip
 var _winner_title: Label
 var _winner_subtitle: Label
 var _menu_button: StartActionButton
-var _menu_button_reveal: Control
+var _play_again_button: StartActionButton
+var _menu_button_reveal: HBoxContainer
+var _stats_button: Button
+var _stats_panel: GameResultStatsPanel
+var _session: GameSession
 var _main_events: MainEvents
 var _menu_reveal_tween: Tween
 var _haptic_tween: Tween
@@ -55,13 +65,38 @@ func _ready() -> void:
 
 
 func _show_preview() -> void:
-	var players: Array[GamePlayer] = []
-	var count := clampi(preview_player_count, 1, PREVIEW_NAMES.size())
+	show_results(build_preview_session(preview_player_count, preview_rounds, preview_overtime))
+	if preview_open_stats:
+		_on_stats_pressed()
+
+
+## Deterministic fake match for F6 / tests: player #2 leaves and a new one joins mid-match.
+static func build_preview_session(player_count: int, rounds: int, with_overtime: bool) -> GameSession:
+	var count := clampi(player_count, 2, PREVIEW_NAMES.size() - 1)
+	var session := GameSession.new()
 	for i in count:
-		var player := GamePlayer.new(PlayerInfo.new(PREVIEW_NAMES[i], i), i)
-		player.score = maxi(preview_rounds - i * 2, 0)
-		players.append(player)
-	show_results(players, preview_rounds)
+		session.players.append(GamePlayer.new(PlayerInfo.new(PREVIEW_NAMES[i], i), i))
+	var half := maxi(rounds / 2, 1)
+	for r in rounds:
+		if r == half:
+			var roster := PDataAccount.new()
+			var entries: Array = []
+			for i in count + 1:
+				if i != 1:
+					entries.append({"name": PREVIEW_NAMES[i], "preset_id": i})
+			roster.set_players(entries)
+			session.resync_players_from_account(roster)
+		session.match_elapsed_seconds += 25.0 + float((r * 7) % 19)
+		session.award_round(session.players[(r * 3 + 1) % session.players.size()])
+	if with_overtime and not session.has_unique_leader():
+		session.enter_overtime()
+		var active := session.get_sorted_active()
+		while active.size() > 1:
+			var loser := active[active.size() - 1]
+			session.award_round(loser)
+			session.eliminate_player(loser)
+			active = session.get_sorted_active()
+	return session
 
 
 func _on_resized() -> void:
@@ -137,42 +172,89 @@ func _build_ui() -> void:
 	_rank_list.add_theme_constant_override("separation", 14)
 	rank_host.add_child(_rank_list)
 
+	var stats_host := CenterContainer.new()
+	stats_host.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_root_layout.add_child(stats_host)
+	_stats_button = _build_stats_button()
+	stats_host.add_child(_stats_button)
+
+	var stats_gap := Control.new()
+	stats_gap.custom_minimum_size = Vector2(0.0, 18.0)
+	_root_layout.add_child(stats_gap)
+
 	var button_host := CenterContainer.new()
 	button_host.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	button_host.size_flags_vertical = Control.SIZE_SHRINK_END
 	_root_layout.add_child(button_host)
 
-	_menu_button_reveal = Control.new()
-	_menu_button_reveal.custom_minimum_size = MENU_BUTTON_SIZE
-	_menu_button_reveal.size = MENU_BUTTON_SIZE
+	_menu_button_reveal = HBoxContainer.new()
+	_menu_button_reveal.alignment = BoxContainer.ALIGNMENT_CENTER
+	_menu_button_reveal.add_theme_constant_override("separation", int(ACTIONS_GAP))
 	_menu_button_reveal.modulate = Color(1.0, 1.0, 1.0, 0.0)
 	_menu_button_reveal.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	button_host.add_child(_menu_button_reveal)
 
-	_menu_button = StartActionButton.new()
-	_menu_button.name = "MenuButton"
-	_menu_button.custom_minimum_size = MENU_BUTTON_SIZE
-	_menu_button.size = MENU_BUTTON_SIZE
-	_menu_button.texture_normal = load(START_ACTIVE_TEXTURE) as Texture2D
-	_menu_button.ignore_texture_size = true
-	_menu_button.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
-	_menu_button.clip_contents = false
-	_menu_button.disabled = true
-	_menu_button.mouse_filter = Control.MOUSE_FILTER_STOP
-	_menu_button.pressed.connect(_on_menu_button_pressed)
-	UiSounds.bind_button(_menu_button, &"confirm")
+	_menu_button = _build_action_button("MenuButton", "RESULT_TO_MENU", _on_menu_button_pressed)
+	_play_again_button = _build_action_button("PlayAgainButton", "RESULT_PLAY_AGAIN", _on_play_again_pressed)
 	_menu_button_reveal.add_child(_menu_button)
+	_menu_button_reveal.add_child(_play_again_button)
 
-	var menu_label := Label.new()
-	menu_label.name = "StartLabel"
-	menu_label.text = LocaleService.text("RESULT_TO_MENU")
-	menu_label.theme_type_variation = &"Hero"
-	menu_label.add_theme_font_size_override("font_size", 72)
-	menu_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	menu_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	menu_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_menu_button.add_child(menu_label)
+	_stats_panel = GameResultStatsPanel.new()
+	_stats_panel.closed.connect(_on_stats_closed)
+	add_child(_stats_panel)
 	call_deferred("_refresh_menu_button_layout")
+
+
+func _build_action_button(node_name: String, text_key: String, on_pressed: Callable) -> StartActionButton:
+	var button := StartActionButton.new()
+	button.name = node_name
+	button.custom_minimum_size = ACTION_BUTTON_SIZE
+	button.size = ACTION_BUTTON_SIZE
+	button.texture_normal = load(START_ACTIVE_TEXTURE) as Texture2D
+	button.ignore_texture_size = true
+	button.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
+	button.clip_contents = false
+	button.disabled = true
+	button.mouse_filter = Control.MOUSE_FILTER_STOP
+	button.pressed.connect(on_pressed)
+	UiSounds.bind_button(button, &"confirm")
+
+	var label := Label.new()
+	label.name = "StartLabel"
+	label.text = LocaleService.text(text_key)
+	label.theme_type_variation = &"Hero"
+	label.add_theme_font_size_override("font_size", ACTION_BUTTON_FONT)
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	button.add_child(label)
+	return button
+
+
+func _build_stats_button() -> Button:
+	var button := Button.new()
+	button.name = "StatsButton"
+	button.text = LocaleService.text("RESULT_STATS")
+	button.custom_minimum_size = STATS_BUTTON_SIZE
+	button.focus_mode = Control.FOCUS_NONE
+	button.add_theme_font_size_override("font_size", 38)
+	button.add_theme_color_override("font_color", Color.WHITE)
+	button.add_theme_color_override("font_hover_color", Color.WHITE)
+	button.add_theme_color_override("font_pressed_color", Color(1.0, 0.86, 0.62, 1.0))
+	button.add_theme_color_override("font_outline_color", Color(0.04, 0.03, 0.02, 0.6))
+	button.add_theme_constant_override("outline_size", 3)
+	for state in ["normal", "hover", "pressed", "focus"]:
+		var style := StyleBoxFlat.new()
+		style.bg_color = Color(0.12, 0.09, 0.07, 0.8 if state == "pressed" else 0.62)
+		style.border_color = Color(0.88, 0.62, 0.38, 0.75 if state == "normal" else 0.95)
+		style.set_border_width_all(3)
+		style.set_corner_radius_all(46)
+		style.shadow_color = Color(0.05, 0.03, 0.02, 0.25)
+		style.shadow_size = 8
+		button.add_theme_stylebox_override(state, style)
+	button.pressed.connect(_on_stats_pressed)
+	UiSounds.bind_button(button, &"modal_open")
+	return button
 
 
 func _build_winner_frame() -> PanelContainer:
@@ -242,15 +324,20 @@ func _sync_section_sizes() -> void:
 
 
 func _refresh_menu_button_layout() -> void:
-	if _menu_button:
-		_menu_button.refresh_label_layout()
+	for button: StartActionButton in [_menu_button, _play_again_button]:
+		if button:
+			button.refresh_label_layout()
 
 
-func show_results(sorted_players: Array[GamePlayer], total_rounds: int, tutorial_mode: bool = false) -> void:
+func show_results(session: GameSession) -> void:
+	var sorted_players := session.get_sorted_results()
 	if sorted_players.is_empty():
 		return
 	if not is_node_ready():
 		await ready
+	_session = session
+	var tutorial_mode := session.is_tutorial
+	var total_rounds := session.rounds_played
 
 	_kill_timers()
 	_menu_button_ready = false
@@ -266,8 +353,11 @@ func show_results(sorted_players: Array[GamePlayer], total_rounds: int, tutorial
 	for i in sorted_players.size():
 		_rank_list.add_child(_build_rank_row(i + 1, sorted_players[i], i == 0))
 
-	_menu_button.disabled = true
-	_menu_button.set_pulse_active(false)
+	_set_actions_enabled(false)
+	_play_again_button.visible = not tutorial_mode
+	_stats_button.visible = not tutorial_mode
+	_stats_button.modulate.a = 0.0
+	_stats_panel.visible = false
 	_reset_menu_button_reveal()
 
 	call_deferred("_sync_section_sizes")
@@ -400,6 +490,7 @@ func _play_reveal() -> void:
 	tween.tween_property(self, "modulate:a", 1.0, 0.22).set_trans(Tween.TRANS_SINE)
 	tween.parallel().tween_property(_winner_frame, "modulate:a", 1.0, 0.28).set_delay(0.05)
 	tween.parallel().tween_property(_ranking_title, "modulate:a", 1.0, 0.22).set_delay(0.16)
+	tween.parallel().tween_property(_stats_button, "modulate:a", 1.0, 0.3).set_delay(0.5)
 	tween.parallel().tween_property(_winner_strip, "scale", Vector2.ONE, 0.34).set_delay(0.12).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 	for i in _rank_list.get_child_count():
@@ -437,19 +528,44 @@ func _pulse_celebration_haptic() -> void:
 
 func _enable_menu_button() -> void:
 	_menu_button_ready = true
-	_menu_button.disabled = false
 	if _menu_button_reveal:
 		_menu_button_reveal.modulate = Color(1.0, 1.0, 1.0, 1.0)
-	_menu_button.set_pulse_active(true)
+	_set_actions_enabled(true)
 	_refresh_menu_button_layout()
+
+
+func _set_actions_enabled(enabled: bool) -> void:
+	for button: StartActionButton in [_menu_button, _play_again_button]:
+		button.disabled = not enabled
+		button.set_pulse_active(enabled)
 
 
 func _on_menu_button_pressed() -> void:
 	if not _menu_button_ready:
 		return
+	_menu_button_ready = false
 	return_to_menu_requested.emit()
 	if _main_events:
 		_main_events.ev_return_to_menu.emit()
+
+
+func _on_play_again_pressed() -> void:
+	if not _menu_button_ready:
+		return
+	_menu_button_ready = false
+	play_again_requested.emit()
+	if _main_events:
+		_main_events.ev_play_again.emit()
+
+
+func _on_stats_pressed() -> void:
+	if _session == null or _stats_panel.visible:
+		return
+	_stats_panel.show_stats(_session, _winner_bg.color)
+
+
+func _on_stats_closed() -> void:
+	_refresh_menu_button_layout()
 
 
 func _kill_menu_reveal_timers() -> void:
@@ -473,8 +589,9 @@ func hide_overlay() -> void:
 		modulate.a = 0.0
 		return
 	if _menu_button:
-		_menu_button.set_pulse_active(false)
-		_menu_button.disabled = true
+		_set_actions_enabled(false)
+	if _stats_panel:
+		_stats_panel.visible = false
 	_reset_menu_button_reveal()
 	if _celebration:
 		_celebration.stop()

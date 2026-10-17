@@ -560,5 +560,4 @@ func _show_result() -> void:
 		_splash_overlay.hide_overlay()
 	if not _result_overlay or not game_manager:
 		return
-	var sorted := game_manager.session.get_sorted_results()
-	_result_overlay.show_results(sorted, game_manager.session.rounds_played, game_manager.session.is_tutorial)
+	_result_overlay.show_results(game_manager.session)

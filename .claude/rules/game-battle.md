@@ -14,7 +14,9 @@ paths:
 
 **FSM:** choice → ready → countdown → play ⇄ **emergency** → explosion → ready|result. First card at countdown end if null. After boom: next_card→next_player→ready, or match end / overtime.
 
-**Score = points:** `GameSession.award_round(exploded)` on each boom → `rounds_played += 1`, every other **active** player `+1` (`GamePlayer.on_round_survived`). Winner = max points; `get_sorted_results()` desc. Tutorial: `apply_tutorial_final_scores()` (rounds = `ROUND_COUNT`).
+**Score = points:** `GameSession.award_round(exploded)` on each boom → `rounds_played += 1`, every other **active** player `+1` (`GamePlayer.on_round_survived`). Winner = max points; `get_sorted_results()` desc. Tutorial: `apply_tutorial_final_scores()` (rounds = `ROUND_COUNT`). Roster resync: new / returning player gets `score = rounds_played - explosions` (missed rounds = survived); removed players go to `departed_players`.
+
+**Match stats:** `GamePlayer` `explosions`, `joined_round/sec`, `left_round/sec`, `left_reason` (`LEFT_REMOVED` / `LEFT_ELIMINATED`); `session.explosion_log` (round, sec, name, preset, overtime); `get_stats_players()` = ranked roster + departed. Report UI: `GameResultStatsPanel` (`game_result_stats_panel.gd`, child of result overlay) — summary chips, player cards (in/out, boom dots), timeline (join/leave sit between rounds, shown as «before round N»).
 
 **Overtime knockout:** regulation clock up after boom → unique max = `result`. Tie on max → `enter_overtime()` (players below max out), splash `OVERTIME_*` (`BattleSplashOverlay` child of HUD fullscreen — not cover-scaled `ScaledContent`). Roster hidden. Each OT boom: exploded out, others +1. Splash **Continue** (`EMERGENCY_CONTINUE`) bottom slot like results. OT board: plain VBox/Scroll + expand-fill rows (no CenterContainer / `_fit_control_size`). Tutorial skips OT. Подробности / лидерборд → `.claude/plans/battle-overtime-knockout.md`.
 
@@ -32,7 +34,7 @@ paths:
 
 State UI: choice/ready/countdown/play share dial layout · ready=«Готовы?»+StartRoundButton · play=full HUD.
 
-**Input** (`game_input.gd`): `mouse_filter=IGNORE`. PLAY: multi-touch pass — next only when **all** fingers up within **0.3s**; hold longer = invalid · tap→next + sparks. **Emergency** button (PLAY only) → `EMERGENCY` state, pause game+audio, overlay to re-pick current player · continue → `try_add_bonus_bomb_time()`. RESULT→`GameResultOverlay` «В МЕНЮ» button (10s reveal, haptics, no tap-skip).
+**Input** (`game_input.gd`): `mouse_filter=IGNORE`. PLAY: multi-touch pass — next only when **all** fingers up within **0.3s**; hold longer = invalid · tap→next + sparks. **Emergency** button (PLAY only) → `EMERGENCY` state, pause game+audio, overlay to re-pick current player · continue → `try_add_bonus_bomb_time()`. RESULT→`GameResultOverlay`: «В МЕНЮ» + «ЕЩЁ РАЗ» side by side (10s reveal together, haptics, no tap-skip) · «СТАТИСТИКА» pill visible right away → `GameResultStatsPanel`. Tutorial: only menu. «Ещё раз» → `MainEvents.ev_play_again` → `MainContext._play_again()` (same ad gate / games_played / save as menu, then reload GameContext with saved roster).
 
 **Pass sparks:** `pass_bomb_spark_layer.gd` on `ScaledContent` — radial additive fire burst at touch (one-shot CPUParticles2D). Pass also pulses whole bomb (`GameBombBackground.pulse_pass`) — art + dial glass + ScaledContent scale+position around dial center (no `pivot_offset`; TextureRect+pivot drifted on device).
 
@@ -40,7 +42,7 @@ State UI: choice/ready/countdown/play share dial layout · ready=«Готовы?
 
 **Battle lobby overlay:** `BattlePlayerLobbyOverlay` — edit roster mid-game · hidden/locked in overtime · Done = confirm if roster ok else click · reuses `PlayerSelectionWidget` + `StartActionButton`.
 
-**Visual:** `GameBombBackground` — player-color backdrop · `DisplayBomb`/`BombDialGlass` dial glass (`BombDialLayout` cover-scale 800@138,550) · hides with bomb on explosion/result · alert pulse · bomb flash/shake on explosion · `ExplosionEffect` · `GameResultOverlay` (`game_result_overlay.tscn`, instanced by HUD; F6 = demo leaderboard via `preview_*` exports) full-screen winner tint, subtitle `RESULT_TOTAL_ROUNDS` (session `rounds_played`), rank rows show points, celebration particles.
+**Visual:** `GameBombBackground` — player-color backdrop · `DisplayBomb`/`BombDialGlass` dial glass (`BombDialLayout` cover-scale 800@138,550) · hides with bomb on explosion/result · alert pulse · bomb flash/shake on explosion · `ExplosionEffect` · `GameResultOverlay` (`game_result_overlay.tscn`, instanced by HUD; F6 = simulated match via `build_preview_session()` + `preview_*` exports, `preview_open_stats` opens report) full-screen winner tint, subtitle `RESULT_TOTAL_ROUNDS` (session `rounds_played`), rank rows show points, celebration particles.
 
 **Audio:** gameplay → `GameSound` · UI buttons → `UiSounds` → `audio.md`.
 

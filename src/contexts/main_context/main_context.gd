@@ -23,6 +23,7 @@ var listener: EventListener = EventListener.new()
 func _ready() -> void:
 	listener.add(main_events.ev_start_game, _on_start_game)
 	listener.add(main_events.ev_return_to_menu, _return_to_menu)
+	listener.add(main_events.ev_play_again, _play_again)
 
 	var menu_context: IContext = current_context as IContext
 	if menu_context:
@@ -63,6 +64,16 @@ func _on_start_game(data: Dictionary) -> void:
 
 
 func _return_to_menu() -> void:
+	await _finish_match()
+	switch_game_context(menu_context_path, false, _session_data())
+
+
+func _play_again() -> void:
+	await _finish_match()
+	_on_start_game({})
+
+
+func _finish_match() -> void:
 	var platform := get_node_or_null("/root/PlatformServices")
 	if platform and platform.has_method("await_return_to_menu_gate"):
 		await platform.await_return_to_menu_gate()
@@ -70,7 +81,6 @@ func _return_to_menu() -> void:
 		account.increment_games_played()
 	if _pdata_controller and _pdata_controller.has_method("save_account"):
 		_pdata_controller.save_account()
-	switch_game_context(menu_context_path, false, _session_data())
 
 
 func _release_current_context() -> void:

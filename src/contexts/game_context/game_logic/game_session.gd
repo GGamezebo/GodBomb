@@ -4,6 +4,8 @@ extends RefCounted
 const SPLASH_OVERTIME := "overtime"
 const SPLASH_ELIMINATED := "eliminated"
 const _STILL_IN := 1_000_000
+const LEFT_REMOVED := &"removed"
+const LEFT_ELIMINATED := &"eliminated"
 
 var game_config: GameConfig
 var game_events: GameEvents
@@ -31,6 +33,10 @@ var match_limit_seconds: float = 0.0
 var match_elapsed_seconds: float = 0.0
 var regulation_boom_count: int = 0
 var rounds_played: int = 0
+## Players removed from the roster mid-match (kept for the stats report).
+var departed_players: Array[GamePlayer] = []
+## One entry per boom: {round, sec, name, preset_id, overtime}.
+var explosion_log: Array[Dictionary] = []
 var emergency_intro_shown: bool = false
 
 
@@ -39,6 +45,8 @@ func setup(p_config: GameConfig, p_events: GameEvents, account: PDataAccount) ->
 	game_events = p_events
 	players.clear()
 	cards.clear()
+	departed_players.clear()
+	explosion_log.clear()
 
 	var account_players: Array = account.get_players()
 	for i in account_players.size():
@@ -65,14 +73,9 @@ func resync_players_from_account(account: PDataAccount) -> void:
 		setup(game_config, game_events, account)
 		return
 
-	var score_by_key: Dictionary = {}
-	var active_by_key: Dictionary = {}
-	var eliminated_by_key: Dictionary = {}
+	var old_by_key: Dictionary = {}
 	for player in players:
-		var key := _player_key(player.info)
-		score_by_key[key] = player.score
-		active_by_key[key] = player.is_active
-		eliminated_by_key[key] = player.eliminated_at
+		old_by_key[_player_key(player.info)] = player
 
 	var current_key := _player_key(get_current_player().info) if not players.is_empty() else ""
 	var previous_index := current_player_index
@@ -83,12 +86,33 @@ func resync_players_from_account(account: PDataAccount) -> void:
 	var account_players: Array = account.get_players()
 	for i in account_players.size():
 		var info := account.player_info_from_dict(account_players[i])
-		var player := GamePlayer.new(info, i)
 		var key := _player_key(info)
-		player.score = int(score_by_key.get(key, 0))
-		player.is_active = bool(active_by_key.get(key, true))
-		player.eliminated_at = int(eliminated_by_key.get(key, -1))
+		var player: GamePlayer = old_by_key.get(key)
+		if player != null:
+			old_by_key.erase(key)
+			player.info = info
+			player.index = i
+		else:
+			player = _take_departed(key)
+			if player != null:
+				player.info = info
+				player.index = i
+				player.left_round = -1
+				player.left_sec = -1.0
+				player.left_reason = &""
+			else:
+				player = GamePlayer.new(info, i)
+				player.joined_round = rounds_played
+				player.joined_sec = match_elapsed_seconds
+			# Mid-match (re)joiners count every missed round as survived.
+			player.score = rounds_played - player.explosions
 		players.append(player)
+
+	for gone: GamePlayer in old_by_key.values():
+		gone.left_round = rounds_played
+		gone.left_sec = match_elapsed_seconds
+		gone.left_reason = LEFT_REMOVED
+		departed_players.append(gone)
 
 	if players.is_empty():
 		current_player_index = 0
@@ -122,6 +146,15 @@ func _next_clockwise_player_index(from_index: int, old_players: Array[GamePlayer
 			if _player_key(info) == key:
 				return i
 	return 0
+
+
+func _take_departed(key: String) -> GamePlayer:
+	for i in departed_players.size():
+		if _player_key(departed_players[i].info) == key:
+			var player := departed_players[i]
+			departed_players.remove_at(i)
+			return player
+	return null
 
 
 func _player_key(info: PlayerInfo) -> String:
@@ -195,12 +228,15 @@ func apply_tutorial_final_scores() -> void:
 		return
 	for player in players:
 		player.score = 0
+		player.explosions = 0
 	rounds_played = OnboardingTutorialData.ROUND_COUNT
 	for round_idx in OnboardingTutorialData.ROUND_COUNT:
 		var explode_idx := OnboardingTutorialData.explode_player_index(round_idx)
 		for i in players.size():
 			if i != explode_idx:
 				players[i].score += 1
+			else:
+				players[i].explosions += 1
 
 
 func reset_round() -> void:
@@ -318,6 +354,15 @@ func _append_random_card() -> void:
 ## Round ended with `exploded` blown up: every other active player gets a point.
 func award_round(exploded: GamePlayer) -> void:
 	rounds_played += 1
+	if exploded != null:
+		exploded.explosions += 1
+		explosion_log.append({
+			"round": rounds_played,
+			"sec": match_elapsed_seconds,
+			"name": exploded.info.name,
+			"preset_id": exploded.info.preset_id,
+			"overtime": is_overtime,
+		})
 	for player in players:
 		if player.is_active and player != exploded:
 			player.on_round_survived()
@@ -362,6 +407,7 @@ func enter_overtime() -> void:
 		if player.score < max_score:
 			player.is_active = false
 			player.eliminated_at = 0
+			_mark_left(player, LEFT_ELIMINATED)
 
 
 func eliminate_player(player: GamePlayer) -> void:
@@ -370,6 +416,23 @@ func eliminate_player(player: GamePlayer) -> void:
 	_knockout_seq += 1
 	player.is_active = false
 	player.eliminated_at = _knockout_seq
+	_mark_left(player, LEFT_ELIMINATED)
+
+
+func _mark_left(player: GamePlayer, reason: StringName) -> void:
+	player.left_round = rounds_played
+	player.left_sec = match_elapsed_seconds
+	player.left_reason = reason
+
+
+## Everyone who took part, current roster first (by rank), then removed players.
+func get_stats_players() -> Array[GamePlayer]:
+	var result := get_sorted_results()
+	var gone: Array[GamePlayer] = []
+	gone.assign(departed_players)
+	gone.sort_custom(func(a: GamePlayer, b: GamePlayer) -> bool: return a.score > b.score)
+	result.append_array(gone)
+	return result
 
 
 func get_rounds_remaining() -> int:

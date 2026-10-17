@@ -9,7 +9,7 @@ paths:
 
 # Архитектура
 
-**Контексты:** `IContext` (`src/contexts/icontext.gd`: `initialize(data)`, `deinit()`). `MainContext.switch_game_context()` — async load. Цепочка: Menu → Game → Menu (`ev_return_to_menu` из `result`). Новый экран = `src/contexts/` + путь в MainContext.
+**Контексты:** `IContext` (`src/contexts/icontext.gd`: `initialize(data)`, `deinit()`). `MainContext.switch_game_context()` — async load. Цепочка: Menu → Game → Menu (`ev_return_to_menu` из `result`) или Game → Game (`ev_play_again`). Новый экран = `src/contexts/` + путь в MainContext.
 
 **События:** Resource + `signal ev_*` (`MainEvents`, `GameEvents`, `MenuEvents`; экземпляры `.tres`). Подписка: `EventListener` (`core/lib/event_listener.gd`) + `listener.deinit()` в `_exit_tree()`. Контексты не линковать напрямую.
 

@@ -7,6 +7,7 @@ func _init() -> void:
 	failed += _test_resync_preserves_match_clock()
 	failed += _test_estimated_rounds()
 	failed += _test_points_for_survived_rounds()
+	failed += _test_late_joiner_and_leaver()
 	if failed == 0:
 		print("test_match_clock: OK")
 		quit(0)
@@ -101,6 +102,37 @@ func _test_points_for_survived_rounds() -> int:
 	session.enter_overtime()
 	if session.players[0].is_active or not session.players[2].is_active:
 		printerr("overtime should keep only max-points players")
+		return 1
+	return 0
+
+
+func _test_late_joiner_and_leaver() -> int:
+	var session := GameSession.new()
+	session.players = [_player("A", 0, 0), _player("B", 1, 0)]
+	session.match_elapsed_seconds = 30.0
+	session.award_round(session.players[0])
+	session.award_round(session.players[0])
+	session.award_round(session.players[1])
+	var roster := PDataAccount.new()
+	roster.set_players([{"name": "A", "preset_id": 0}, {"name": "C", "preset_id": 2}])
+	session.resync_players_from_account(roster)
+	var joiner := session.players[1]
+	if joiner.info.name != "C" or joiner.score != 3 or joiner.joined_round != 3:
+		printerr("late joiner should get 3 points at round 3, got %d / %d" % [joiner.score, joiner.joined_round])
+		return 1
+	if session.departed_players.size() != 1 or session.departed_players[0].left_reason != GameSession.LEFT_REMOVED:
+		printerr("removed player B should be kept as departed")
+		return 1
+	if session.get_stats_players().size() != 3:
+		printerr("stats should list all 3 participants")
+		return 1
+	# B returns: keeps own explosions, missed rounds count as survived.
+	roster.set_players([{"name": "A", "preset_id": 0}, {"name": "C", "preset_id": 2}, {"name": "B", "preset_id": 1}])
+	session.award_round(session.players[0])
+	session.resync_players_from_account(roster)
+	var back := session.players[2]
+	if back.score != 3 or back.explosions != 1 or not session.departed_players.is_empty():
+		printerr("returning B expected 3 pts / 1 boom, got %d / %d" % [back.score, back.explosions])
 		return 1
 	return 0
 
