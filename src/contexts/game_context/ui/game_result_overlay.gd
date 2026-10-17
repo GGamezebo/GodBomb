@@ -16,6 +16,7 @@ const MENU_REVEAL_SEC := 10.0
 const HAPTIC_PULSE_INTERVAL := 0.55
 const CONTENT_WIDTH_MARGIN := 200.0
 const WINNER_RANKING_GAP := 36.0
+const RANKING_STATS_GAP := 28.0
 const TOP_MARGIN := 188.0
 const BUTTON_BOTTOM_MARGIN := 212.0
 const PREVIEW_NAMES := ["ANYA", "MAX", "OLGA", "DIMA", "KATE", "IGOR", "LENA", "PAVEL"]
@@ -159,8 +160,7 @@ func _build_ui() -> void:
 	_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_scroll.custom_minimum_size.y = 180.0
-	_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
+	ModalScroll.configure(_scroll)
 	_root_layout.add_child(_scroll)
 
 	var rank_host := CenterContainer.new()
@@ -171,6 +171,10 @@ func _build_ui() -> void:
 	_rank_list.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	_rank_list.add_theme_constant_override("separation", 14)
 	rank_host.add_child(_rank_list)
+
+	var ranking_stats_gap := Control.new()
+	ranking_stats_gap.custom_minimum_size = Vector2(0.0, RANKING_STATS_GAP)
+	_root_layout.add_child(ranking_stats_gap)
 
 	var stats_host := CenterContainer.new()
 	stats_host.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -476,6 +480,7 @@ static func build_rank_row(
 	row.add_child(score_label)
 
 	row_panel.modulate.a = 1.0 if visible_now else 0.0
+	GameResultStatsPanel.pass_touches_through(row_panel)
 	return row_panel
 
 

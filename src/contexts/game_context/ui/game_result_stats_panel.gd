@@ -8,6 +8,8 @@ const SLIME_PATH := "res://assets/party_kitchen/slimes/%d.svg"
 const START_ACTIVE_TEXTURE := "res://assets/party_kitchen/buttons/start_active.svg"
 const BACK_BUTTON_SIZE := Vector2(520.0, 140.0)
 const MAX_BOOM_DOTS := 10
+const TOP_MARGIN := 300
+const SLIDE_IN_OFFSET := 60.0
 const ACCENT := Color(0.88, 0.62, 0.38, 1.0)
 const TEXT_MUTED := Color(0.96, 0.9, 0.82, 0.78)
 const TAG_COLORS := {
@@ -45,7 +47,8 @@ func _build_ui() -> void:
 	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	margin.add_theme_constant_override("margin_left", 64)
 	margin.add_theme_constant_override("margin_right", 64)
-	margin.add_theme_constant_override("margin_top", 150)
+	# Clear of the camera cutout / status bar on phones.
+	margin.add_theme_constant_override("margin_top", TOP_MARGIN)
 	margin.add_theme_constant_override("margin_bottom", 170)
 	margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(margin)
@@ -69,7 +72,7 @@ func _build_ui() -> void:
 
 	var scroll := ScrollContainer.new()
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	ModalScroll.configure(scroll)
 	_content.add_child(scroll)
 
 	var list_margin := MarginContainer.new()
@@ -111,11 +114,12 @@ func show_stats(session: GameSession, background: Color) -> void:
 
 	visible = true
 	modulate.a = 0.0
-	_content.position.y += 60.0
+	# Slide the whole panel (not `_content`: it lives in a MarginContainer that owns its position).
+	position.y = SLIDE_IN_OFFSET
 	_kill_tween()
 	_tween = create_tween().set_parallel()
 	_tween.tween_property(self, "modulate:a", 1.0, 0.22).set_trans(Tween.TRANS_SINE)
-	_tween.tween_property(_content, "position:y", _content.position.y - 60.0, 0.32).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	_tween.tween_property(self, "position:y", 0.0, 0.32).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	_back_button.set_pulse_active(true)
 	for i in _list.get_child_count():
 		var row := _list.get_child(i) as Control
@@ -194,6 +198,8 @@ func _fill_list(session: GameSession) -> void:
 		_list.add_child(_label(LocaleService.text("STATS_NO_EVENTS"), 30, TEXT_MUTED, HORIZONTAL_ALIGNMENT_CENTER))
 	for event in events:
 		_list.add_child(_build_timeline_row(event))
+	# Rows must not swallow touches, otherwise a drag that starts on a row never scrolls.
+	pass_touches_through(_list)
 
 
 func _build_player_card(player: GamePlayer, rank: int, session: GameSession) -> PanelContainer:
@@ -321,6 +327,14 @@ func _tag(kind: StringName) -> PanelContainer:
 
 
 # --- Helpers ---------------------------------------------------------------
+
+## Makes `node` and its whole subtree ignore pointer input so the parent ScrollContainer gets drags.
+static func pass_touches_through(node: Node) -> void:
+	if node is Control:
+		(node as Control).mouse_filter = Control.MOUSE_FILTER_IGNORE
+	for child in node.get_children():
+		pass_touches_through(child)
+
 
 static func format_time(seconds: float) -> String:
 	var total := maxi(int(seconds), 0)
