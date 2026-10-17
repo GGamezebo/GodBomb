@@ -878,33 +878,33 @@ const _IT: Dictionary = {
 }
 
 const SLIME_SR: Array[String] = [
-	"Crvena", "Plava", "Zelena", "Roze", "Narandžasta", "Žuta",
-	"Crna", "Bela", "Ljubičasta", "Braon", "Tirkizna", "Limeta",
+	"Paradajz", "Štrumf", "Krastavac", "Škamp", "Pomorandža", "Pile",
+	"Ugljen", "Šećer", "Patlidžan", "Čokolada", "Smuti", "Kivi",
 ]
 
 const SLIME_ES: Array[String] = [
-	"Rojo", "Azul", "Verde", "Rosa", "Naranja", "Amarillo",
-	"Negro", "Blanco", "Morado", "Marrón", "Cian", "Lima",
+	"Tomate", "Pitufo", "Pepinillo", "Gamba", "Naranja", "Pollito",
+	"Carbón", "Azúcar", "Berenjena", "Chocolate", "Batido", "Kiwi",
 ]
 
 const SLIME_HI: Array[String] = [
-	"लाल", "नीला", "हरा", "गुलाबी", "नारंगी", "पीला",
-	"काला", "सफ़ेद", "बैंगनी", "भूरा", "सियान", "लाइम",
+	"टमाटर", "स्मर्फ", "खीरा", "झींगा", "संतरा", "चूज़ा",
+	"कोयला", "चीनी", "बैंगन", "चॉकलेट", "स्मूदी", "कीवी",
 ]
 
 const SLIME_DE: Array[String] = [
-	"Rot", "Blau", "Grün", "Pink", "Orange", "Gelb",
-	"Schwarz", "Weiß", "Lila", "Braun", "Türkis", "Limette",
+	"Tomate", "Schlumpf", "Gurke", "Garnele", "Orange", "Küken",
+	"Kohle", "Zucker", "Aubergine", "Schokolade", "Smoothie", "Kiwi",
 ]
 
 const SLIME_FR: Array[String] = [
-	"Rouge", "Bleu", "Vert", "Rose", "Orange", "Jaune",
-	"Noir", "Blanc", "Violet", "Marron", "Cyan", "Citron vert",
+	"Tomate", "Schtroumpf", "Cornichon", "Crevette", "Orange", "Poussin",
+	"Charbon", "Sucre", "Aubergine", "Chocolat", "Smoothie", "Kiwi",
 ]
 
 const SLIME_IT: Array[String] = [
-	"Rosso", "Blu", "Verde", "Rosa", "Arancione", "Giallo",
-	"Nero", "Bianco", "Viola", "Marrone", "Ciano", "Lime",
+	"Pomodoro", "Puffo", "Cetriolino", "Gambero", "Arancia", "Pulcino",
+	"Carbone", "Zucchero", "Melanzana", "Cioccolato", "Frullato", "Kiwi",
 ]
 
 

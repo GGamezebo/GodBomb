@@ -316,13 +316,51 @@ const _EN: Dictionary = {
 }
 
 const _SLIME_RU: Array[String] = [
-	"Красный", "Синий", "Зелёный", "Розовый", "Оранжевый", "Жёлтый",
-	"Чёрный", "Белый", "Фиолетовый", "Коричневый", "Бирюзовый", "Лайм",
+	"Помидор", "Смурф", "Огурчик", "Креветка", "Апельсин", "Цыплёнок",
+	"Уголёк", "Сахарок", "Баклажан", "Шоколадка", "Смузи", "Киви",
 ]
 
 const _SLIME_EN: Array[String] = [
-	"Red", "Blue", "Green", "Pink", "Orange", "Yellow",
-	"Black", "White", "Purple", "Brown", "Cyan", "Lime",
+	"Tomato", "Smurf", "Pickle", "Shrimp", "Orange", "Chick",
+	"Coal", "Sugar", "Eggplant", "Chocolate", "Smoothie", "Kiwi",
+]
+
+
+## Pre-2026-10 default names (colors), same index order. Still recognized as
+## defaults so saved rosters get remapped to the current names.
+const _LEGACY_SLIME_NAMES: Array = [
+	[
+		"Красный", "Синий", "Зелёный", "Розовый", "Оранжевый", "Жёлтый",
+		"Чёрный", "Белый", "Фиолетовый", "Коричневый", "Бирюзовый", "Лайм",
+	],
+	[
+		"Red", "Blue", "Green", "Pink", "Orange", "Yellow",
+		"Black", "White", "Purple", "Brown", "Cyan", "Lime",
+	],
+	[
+		"Crvena", "Plava", "Zelena", "Roze", "Narandžasta", "Žuta",
+		"Crna", "Bela", "Ljubičasta", "Braon", "Tirkizna", "Limeta",
+	],
+	[
+		"Rojo", "Azul", "Verde", "Rosa", "Naranja", "Amarillo",
+		"Negro", "Blanco", "Morado", "Marrón", "Cian", "Lima",
+	],
+	[
+		"लाल", "नीला", "हरा", "गुलाबी", "नारंगी", "पीला",
+		"काला", "सफ़ेद", "बैंगनी", "भूरा", "सियान", "लाइम",
+	],
+	[
+		"Rot", "Blau", "Grün", "Pink", "Orange", "Gelb",
+		"Schwarz", "Weiß", "Lila", "Braun", "Türkis", "Limette",
+	],
+	[
+		"Rouge", "Bleu", "Vert", "Rose", "Orange", "Jaune",
+		"Noir", "Blanc", "Violet", "Marron", "Cyan", "Citron vert",
+	],
+	[
+		"Rosso", "Blu", "Verde", "Rosa", "Arancione", "Giallo",
+		"Nero", "Bianco", "Viola", "Marrone", "Ciano", "Lime",
+	],
 ]
 
 
@@ -377,8 +415,8 @@ static func get_slime_name(locale: String, preset_id: int) -> String:
 	return names[preset_id]
 
 
-## Returns the color index if `player_name` matches a default slime name in any
-## supported locale, otherwise -1. Colors share the same order across locales,
+## Returns the color index if `player_name` matches a default slime name (current
+## or legacy) in any supported locale, otherwise -1. Colors share the same order across locales,
 ## so the index is unambiguous regardless of the source language.
 static func default_slime_index(player_name: String) -> int:
 	var trimmed := player_name.strip_edges()
@@ -389,6 +427,10 @@ static func default_slime_index(player_name: String) -> int:
 		for i in names.size():
 			if names[i].strip_edges() == trimmed:
 				return i
+	for names: Array in _LEGACY_SLIME_NAMES:
+		var legacy_index := names.find(trimmed)
+		if legacy_index >= 0:
+			return legacy_index
 	return -1
 
 
