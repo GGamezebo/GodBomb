@@ -39,6 +39,7 @@ var _game_events: GameEvents
 var _start_round_button: BaseButton
 var _overlay_paused := false
 var _cached_roster: Array = []
+var _cached_recent_names: Array[String] = []
 var _tutorial_swap_applied := false
 var _skipping_step := false
 
@@ -355,6 +356,7 @@ func _present_rules_step() -> void:
 func _present_current_step() -> void:
 	if _overlay_paused:
 		return
+	_overlay.set_progress(_step - Step.LOBBY_ADD + 1, Step.COMPLETE - Step.LOBBY_ADD)
 	match _step:
 		Step.LOBBY_ADD:
 			_present_add_players_step()
@@ -421,6 +423,8 @@ func _apply_add_player_spotlight() -> void:
 		_overlay.set_spotlight_control(targets[0] as Control)
 	else:
 		_overlay.set_spotlight_controls(targets)
+	var add_button: Control = _player_widget.add_player_button if count < LOBBY_TARGET_PLAYERS else null
+	_overlay.set_gesture(OnboardingGestureHint.Gesture.TAP, add_button)
 
 
 func _present_swap_step() -> void:
@@ -441,8 +445,10 @@ func _present_swap_step() -> void:
 	)
 	if targets.is_empty():
 		_overlay.clear_spotlight()
+		_overlay.set_gesture(OnboardingGestureHint.Gesture.DRAG)
 	else:
 		_overlay.set_spotlight_controls(targets)
+		_overlay.set_gesture(OnboardingGestureHint.Gesture.DRAG, targets[0] as Control, targets[targets.size() - 1] as Control)
 
 
 func _present_play_step() -> void:
@@ -455,6 +461,8 @@ func _present_play_step() -> void:
 	_overlay.set_continue_visible(false)
 	_overlay.show_step(LocaleService.text("ONBOARDING_PLAY_TITLE"), body, true)
 	_overlay.clear_spotlight()
+	var view := _overlay.get_viewport().get_visible_rect()
+	_overlay.set_gesture(OnboardingGestureHint.Gesture.TAP, null, null, view.position + view.size * Vector2(0.8, 0.6))
 
 
 func _present_explosion_step() -> void:
@@ -465,6 +473,7 @@ func _present_explosion_step() -> void:
 	_overlay.set_continue_visible(false)
 	_overlay.show_step(LocaleService.text("ONBOARDING_TIME_UP_TITLE"), body, true)
 	_overlay.clear_spotlight()
+	_overlay.set_gesture(OnboardingGestureHint.Gesture.BOOM)
 
 
 func _present_result_step() -> void:
@@ -476,6 +485,7 @@ func _present_result_step() -> void:
 	)
 	_overlay.set_bottom_action(LocaleService.text("RESULT_TO_MENU"))
 	_overlay.clear_spotlight()
+	_overlay.set_gesture(OnboardingGestureHint.Gesture.TAP, _overlay.action_button())
 
 
 func _show_lobby_step(title: String, body: String, focus: Control) -> void:
@@ -486,6 +496,7 @@ func _show_lobby_step(title: String, body: String, focus: Control) -> void:
 		_overlay.set_spotlight_control(focus)
 	else:
 		_overlay.clear_spotlight()
+	_overlay.set_gesture(_step_gesture(), focus)
 
 
 func _show_game_step(title: String, body: String, focus: Control) -> void:
@@ -496,6 +507,16 @@ func _show_game_step(title: String, body: String, focus: Control) -> void:
 		_overlay.set_spotlight_control(focus)
 	else:
 		_overlay.clear_spotlight()
+	_overlay.set_gesture(_step_gesture(), focus)
+
+
+func _step_gesture() -> OnboardingGestureHint.Gesture:
+	match _step:
+		Step.LOBBY_NAME:
+			return OnboardingGestureHint.Gesture.HOLD
+		Step.GAME_CHOICE:
+			return OnboardingGestureHint.Gesture.WAIT
+	return OnboardingGestureHint.Gesture.TAP
 
 
 func _first_player_icon() -> Control:
@@ -512,14 +533,21 @@ func _lobby_player_count() -> int:
 
 func _cache_roster() -> void:
 	_cached_roster = account.get_players().duplicate(true) if account else []
+	# Tutorial players consume names from the history; give them back afterwards.
+	_cached_recent_names.clear()
+	if account:
+		_cached_recent_names = account.get_recent_names()
 
 
 func _restore_roster() -> void:
 	if account:
 		account.set_players(_cached_roster.duplicate(true))
+		if not _cached_recent_names.is_empty():
+			account.set_recent_names(_cached_recent_names)
 	if _player_widget:
 		_player_widget.reload_from_account()
 	_cached_roster.clear()
+	_cached_recent_names.clear()
 
 
 func _ensure_tutorial_players() -> void:

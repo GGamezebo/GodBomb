@@ -13,7 +13,7 @@ paths:
 
 **API:** autoload `LocaleService` — `text(key)`, `textf(key, args)`, `get_locale()`, `set_locale(code, persist)` (пишет в `PDataAccount`), сигнал `locale_changed`. Инициализация `init_from_account()` (дефолт — системная локаль). Платформенный язык (Yandex) приходит только через `PlatformServices`.
 
-**Строки:** `LocaleStrings` — таблицы `_RU` / `_EN` + rules text; `LocaleStringsLocales` — sr/es/hi/de/fr/it (`ui_table()`), fallback → EN → сам ключ. Новый ключ UI — добавлять **минимум в RU и EN**, по возможности во все локали. Ключи `LANG_*` → native name.
+**Строки:** `LocaleStrings` — таблицы `_RU` / `_EN` + rules footer (`RULES_TEXT_*`, само содержание правил — ключи `RULES_<CARD>_TITLE/BODY` + подписи картинок `RULES_ILL_*`, слова-примеры с `[слогом]` в скобках); `LocaleStringsLocales` — sr/es/hi/de/fr/it (`ui_table()`), fallback → EN → сам ключ. Новый ключ UI — добавлять **минимум в RU и EN**, по возможности во все локали. Ключи `LANG_*` → native name.
 
 **Дефолтные имена игроков:** `_SLIME_RU/_EN` + `SLIME_*` — предметы цвета слайма (Помидор, Аватар, … Киви), индекс = `preset_id`. Старые имена-цвета лежат в `_LEGACY_SLIME_NAMES` — `default_slime_index()` их распознаёт, и `retranslate_default_names()` меняет их на текущие имена.
 

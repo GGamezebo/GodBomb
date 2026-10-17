@@ -4,6 +4,23 @@ extends Control
 signal onboarding_continue_pressed
 signal tutorial_requested
 
+## Illustrated rule cards, in order; locale keys RULES_<NAME>_TITLE / _BODY.
+const RULE_CARDS := {
+	"CIRCLE": RulesIllustration.Kind.CIRCLE,
+	"SYLLABLE": RulesIllustration.Kind.SYLLABLE,
+	"PASS": RulesIllustration.Kind.PASS,
+	"BOOM": RulesIllustration.Kind.BOOM,
+	"WIN": RulesIllustration.Kind.WIN,
+	"LOBBY": RulesIllustration.Kind.LOBBY,
+	"OOPS": RulesIllustration.Kind.OOPS,
+	"CENTER": RulesIllustration.Kind.CENTER,
+}
+const CARD_BG := Color(1.0, 0.98, 0.94, 0.05)
+const CARD_BORDER := Color(0.88, 0.62, 0.38, 0.38)
+const CARD_TITLE_COLOR := Color(0.99, 0.96, 0.9, 1.0)
+const CARD_BODY_COLOR := Color(0.92, 0.88, 0.82, 0.95)
+const BADGE_COLOR := Color(0.88, 0.62, 0.38, 0.95)
+
 @export var rules_scroll: ScrollContainer
 @export var rules_text: RichTextLabel
 @export var close_button: StartActionButton
@@ -13,6 +30,9 @@ signal tutorial_requested
 var _layout_pending := false
 var _onboarding_mode := false
 var _layout_width := -1
+var _card_titles: Dictionary = {}
+var _card_bodies: Dictionary = {}
+var _illustrations: Array[RulesIllustration] = []
 
 
 func _ready() -> void:
@@ -27,6 +47,7 @@ func _ready() -> void:
 		rules_text.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 		rules_text.bbcode_enabled = true
 		rules_text.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_build_rule_cards()
 	if rules_scroll:
 		ModalScroll.configure(rules_scroll)
 		if not rules_scroll.resized.is_connected(_queue_rules_layout):
@@ -44,11 +65,18 @@ func _ready() -> void:
 	call_deferred("_update_modal_layer_visibility")
 	call_deferred("_queue_rules_layout")
 	refresh_localized()
+	if get_tree().current_scene == self:
+		call_deferred("open")
 
 
 func refresh_localized(_locale: String = "") -> void:
 	if rules_text:
 		rules_text.text = LocaleService.get_rules_text()
+	for card_name: String in _card_titles:
+		(_card_titles[card_name] as Label).text = LocaleService.text("RULES_%s_TITLE" % card_name)
+		(_card_bodies[card_name] as Label).text = LocaleService.text("RULES_%s_BODY" % card_name)
+	for illustration in _illustrations:
+		illustration.queue_redraw()
 	var title := get_node_or_null("Panel/Margin/VBox/TitleBlock/TitleRules") as Label
 	if title:
 		title.text = LocaleService.text("RULES_TITLE")
@@ -60,6 +88,84 @@ func refresh_localized(_locale: String = "") -> void:
 	if tutorial_button:
 		tutorial_button.action_text = LocaleService.text("RULES_TUTORIAL")
 	_apply_mode_ui()
+
+
+func _build_rule_cards() -> void:
+	if rules_text == null or not _card_titles.is_empty():
+		return
+	var content := rules_text.get_parent() as VBoxContainer
+	if content == null:
+		return
+	content.add_theme_constant_override("separation", 28)
+	var number := 0
+	for card_name: String in RULE_CARDS:
+		number += 1
+		var card := _build_rule_card(card_name, RULE_CARDS[card_name], number)
+		content.add_child(card)
+		content.move_child(card, rules_text.get_index())
+
+
+func _build_rule_card(card_name: String, kind: RulesIllustration.Kind, number: int) -> PanelContainer:
+	var card := PanelContainer.new()
+	card.name = "Rule%s" % card_name.capitalize()
+	card.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	card.add_theme_stylebox_override("panel", _rounded_style(CARD_BG, CARD_BORDER, 28, 22))
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 16)
+	card.add_child(column)
+
+	var frame := PanelContainer.new()
+	frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	frame.add_theme_stylebox_override("panel", _rounded_style(Color(0.0, 0.0, 0.0, 0.3), Color(0, 0, 0, 0), 20, 6))
+	column.add_child(frame)
+	var illustration := RulesIllustration.new()
+	illustration.kind = kind
+	illustration.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	frame.add_child(illustration)
+	_illustrations.append(illustration)
+
+	var header := HBoxContainer.new()
+	header.add_theme_constant_override("separation", 16)
+	column.add_child(header)
+	var badge := PanelContainer.new()
+	badge.custom_minimum_size = Vector2(56.0, 56.0)
+	badge.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	badge.add_theme_stylebox_override("panel", _rounded_style(BADGE_COLOR, Color(0, 0, 0, 0), 28, 0))
+	var badge_label := _card_label(str(number), 32, Color(0.1, 0.06, 0.03, 1.0))
+	badge_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	badge.add_child(badge_label)
+	header.add_child(badge)
+	var title := _card_label("", 46, CARD_TITLE_COLOR)
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	header.add_child(title)
+
+	var body := _card_label("", 36, CARD_BODY_COLOR)
+	column.add_child(body)
+	_card_titles[card_name] = title
+	_card_bodies[card_name] = body
+	return card
+
+
+func _card_label(text: String, font_size: int, color: Color) -> Label:
+	var label := Label.new()
+	label.text = text
+	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	label.add_theme_font_size_override("font_size", font_size)
+	label.add_theme_color_override("font_color", color)
+	return label
+
+
+static func _rounded_style(bg: Color, border: Color, radius: int, padding: int) -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = bg
+	style.border_color = border
+	style.set_border_width_all(2 if border.a > 0.0 else 0)
+	style.set_corner_radius_all(radius)
+	style.set_content_margin_all(padding)
+	style.anti_aliasing = true
+	return style
 
 
 func open() -> void:

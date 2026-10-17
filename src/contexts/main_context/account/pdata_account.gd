@@ -57,6 +57,12 @@ func get_recent_names_for_display() -> Array[String]:
 	return all.slice(0, RECENT_NAMES_DISPLAY_MAX)
 
 
+## Replaces the whole name history (e.g. tutorial restoring the pre-tutorial state).
+func set_recent_names(names: Array[String]) -> void:
+	data["recent_player_names"] = _trim_recent_names(names.duplicate())
+	emit_changed()
+
+
 func consume_recent_name(player_name: String) -> void:
 	var trimmed := PlayerInfo.sanitize_name(player_name)
 	if trimmed.is_empty():

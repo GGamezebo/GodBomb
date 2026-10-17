@@ -1,78 +1,15 @@
 class_name LocaleStrings
 extends RefCounted
 
-const RULES_TEXT_RU := """[font_size=36]Весёлая словесная игра для вечеринок на одном экране: садитесь с друзьями кругом, бомба-телефон передаётся друг другу по очереди, вы на лету придумываете слова. Не успели — бум и штраф. Для двоих и для большой компании.
-
-[font_size=40][b]Как играть?[/b][/font_size]
-На циферблате — слог, например «ЛО», и подсказка: слог в начале, в конце или в любом месте слова.
-
-Назовите слово вслух и передайте бомбу соседу — коротким нажатием на экран.
-
-Лодка — лось — ложка — ло… бум! У кого бомба взорвалась — +1 штраф.
-
-[font_size=40][b]Когда бум?[/b][/font_size]
-Каждый раз по-своему: таймер случайный. Может рвануть сразу, а может дать много кругов. Перед взрывом бомба предупреждает.
-
-Между раундами видно, сколько минут ещё осталось до конца игры.
-
-[font_size=40][b]Кто победил?[/b][/font_size]
-В конце — таблица результатов. Меньше штрафов — выше место. Если у нескольких игроков одинаковый минимум, основное время заканчивается и они играют на вылет: остальные выбывают, пока не останется один победитель. Кто продержался дольше при равных штрафах — выше в рейтинге.
-
-[font_size=40][b]Сбор игроков[/b][/font_size]
-От 2 до 12 человек. [b]+[/b] — добавить, перетащите слайм на соседа — сменить место, удержите 1,5 с — имя и цвет.
-
-В настройках — длительность партии, от неё зависит число раундов.
-
-[font_size=40][b]Если накосячили[/b][/font_size]
-Неверное слово или ложное нажатие? Аварийная кнопка в бою — выберите, кто переигрывает ход. Состав можно поправить через кнопку со списком игроков.
-
-[font_size=40][b]Телефон в центре[/b][/font_size]
-Для компании 6–12 человек: включите режим «телефон в центре» и положите смартфон на стол. Текст сам поворачивается к текущему игроку — крутить телефон не нужно.
-
-
-[font_size=24][color=#ffffff18]————————————————[/color][/font_size]
-
-
-[font_size=36][b]Разработчики[/b][/font_size]
+## Rules footer (credits / sign-off) under the illustrated rule cards (`RULES_<KIND>_*`).
+const RULES_TEXT_RU := """[font_size=36][b]Разработчики[/b][/font_size]
 Екатерина Кровш — продакт-менеджер
 Герман Гульдеров — sound-дизайнер
 Игорь Белов — вайб-кодер
 
 [center][font_size=40][b]Приятной игры![/b][/font_size][/center]"""
 
-const RULES_TEXT_EN := """[font_size=36]A fun word party game on one screen: sit in a circle with friends, pass the phone-bomb in turn, and make up words on the fly. Too slow — boom and a penalty. For two players or a big group.
-
-[font_size=40][b]How to play?[/b][/font_size]
-The dial shows a syllable, e.g. «LO», and a hint: at the start, end, or anywhere in the word.
-
-Say a word out loud and pass the bomb to your neighbor — with a quick tap on the screen.
-
-Boat — canvas — paddle — aloe — lo… boom! Whoever gets caught with the bomb gets +1 penalty.
-
-[font_size=40][b]When does it boom?[/b][/font_size]
-Every time is different: the timer is random. It may blow up right away or give you many turns. The bomb warns you before exploding.
-
-Between rounds you see how many minutes are left until the end.
-
-[font_size=40][b]Who wins?[/b][/font_size]
-At the end — a scoreboard. Fewer penalties — higher rank. If several players share the lowest score, regulation ends and they play knockout: everyone else is out until one winner remains. Among equal scores, whoever lasted longer ranks higher.
-
-[font_size=40][b]Gathering players[/b][/font_size]
-2 to 12 people. [b]+[/b] to add, drag a slime onto a neighbor to swap seats, hold 1.5 s for name and color.
-
-In settings — match length, which sets the number of rounds.
-
-[font_size=40][b]Made a mistake?[/b][/font_size]
-Wrong word or accidental tap? The emergency button in battle — pick who replays the turn. Adjust the roster via the player list button.
-
-[font_size=40][b]Phone in the center[/b][/font_size]
-For a table of 6–12: turn on «phone in the center» and leave the phone flat. On-screen text turns toward the current player — nobody spins the device.
-
-
-[font_size=24][color=#ffffff18]————————————————[/color][/font_size]
-
-
-[font_size=36][b]Developers[/b][/font_size]
+const RULES_TEXT_EN := """[font_size=36][b]Developers[/b][/font_size]
 Ekaterina Krovsh — product manager
 German Gulderov — sound designer
 Igor Belov — vibe coder
@@ -189,12 +126,43 @@ const _RU: Dictionary = {
 	"ONBOARDING_DONE_TITLE": "Обучение пройдено!",
 	"ONBOARDING_DONE_BODY": "Правила ясны. Для 6–12 человек: режим «телефон в центре» — экран сам поворачивается к ходящему. Соберите друзей!",
 	"TUTORIAL_PLAY_BODY": "Слог «%s» — %s.\nПодойдут слова: %s.\nНапример: «%s».\n%s",
-	"TUTORIAL_EXPLOSION": "%s не успел(а) придумать слово — бомба взорвалась.",
+	"TUTORIAL_EXPLOSION": "%s не успел(а) — бомба взорвалась. Все остальные получают +1 очко.",
 	"OVERTIME_TITLE": "Основное время истекло",
-	"OVERTIME_BODY": "Игру продолжают игроки с одинаковым наименьшим числом штрафов. Остальные выбывают.",
+	"OVERTIME_BODY": "Играют только лидеры с одинаковым числом очков. Остальные выбывают.",
 	"OVERTIME_STILL_IN": "ОСТАЮТСЯ",
 	"OVERTIME_OUT": "ВЫБЫЛИ",
 	"PLAYER_ELIMINATED": "%s выбывает из игры",
+	"RULES_CIRCLE_TITLE": "Бомба по кругу",
+	"RULES_CIRCLE_BODY": "Садитесь в круг — от 2 до 12 человек. Один телефон — это бомба: её передают друг другу по очереди.",
+	"RULES_SYLLABLE_TITLE": "Слог и условие",
+	"RULES_SYLLABLE_BODY": "На бомбе — слог и подсказка, где он должен стоять: в начале, в конце или где угодно в слове. Быстро придумайте подходящее слово.",
+	"RULES_PASS_TITLE": "Сказал — передай",
+	"RULES_PASS_BODY": "Назовите слово вслух, коротко коснитесь экрана и отдайте телефон соседу. Долгое касание не считается.",
+	"RULES_BOOM_TITLE": "Бум!",
+	"RULES_BOOM_BODY": "Таймер скрыт и каждый раз разный, перед взрывом бомба предупреждает. У кого взорвалась — без очка, все остальные получают +1.",
+	"RULES_WIN_TITLE": "Кто победил",
+	"RULES_WIN_BODY": "Длительность партии — в настройках, между раундами видно, сколько осталось. Больше очков — выше место. Ничья у лидеров — овертайм на вылет.",
+	"RULES_LOBBY_TITLE": "Сбор игроков",
+	"RULES_LOBBY_BODY": "«+» — добавить игрока. Удержите слайм 1,5 с — имя и цвет. Перетащите слайм на соседа — поменяться местами. Порядок за столом = порядок передачи.",
+	"RULES_OOPS_TITLE": "Если накосячили",
+	"RULES_OOPS_BODY": "Неверное слово или случайное касание? Аварийная кнопка ставит паузу — выберите, кто переигрывает ход. Состав меняется прямо в бою.",
+	"RULES_CENTER_TITLE": "Телефон в центре",
+	"RULES_CENTER_BODY": "Для компании 6–12 человек: включите режим «телефон в центре» и положите смартфон на стол. Текст сам поворачивается к тому, чей ход.",
+	"RULES_ILL_SYLLABLE": "ЛО",
+	"RULES_ILL_CONDITION": "в начале слова",
+	"RULES_ILL_WORD_OK1": "[ЛО]дка",
+	"RULES_ILL_WORD_OK2": "[ЛО]жка",
+	"RULES_ILL_WORD_BAD": "мо[ЛО]ко",
+	"RULES_ILL_SAY": "Лодка!",
+	"RULES_ILL_TAP": "коротко коснуться",
+	"RULES_ILL_MORE_POINTS": "больше очков — выше",
+	"RULES_ILL_ADD": "добавить",
+	"RULES_ILL_HOLD": "имя и цвет",
+	"RULES_ILL_HOLD_TIME": "1,5 с",
+	"RULES_ILL_SWAP": "поменяться",
+	"RULES_ILL_EMERGENCY": "аварийная кнопка",
+	"RULES_ILL_REPICK": "кто переигрывает",
+	"ONBOARDING_STEP": "Шаг %d из %d",
 }
 
 const _EN: Dictionary = {
@@ -307,12 +275,43 @@ const _EN: Dictionary = {
 	"ONBOARDING_DONE_TITLE": "Tutorial complete!",
 	"ONBOARDING_DONE_BODY": "You know the rules. For 6–12 players: «phone in the center» turns the dial toward whoever's up. Gather friends!",
 	"TUTORIAL_PLAY_BODY": "Syllable «%s» — %s.\nWords like: %s.\nFor example: «%s».\n%s",
-	"TUTORIAL_EXPLOSION": "%s ran out of time — the bomb exploded.",
+	"TUTORIAL_EXPLOSION": "%s ran out of time — the bomb exploded. Everyone else gets +1 point.",
 	"OVERTIME_TITLE": "Regulation time is over",
-	"OVERTIME_BODY": "Players tied for the fewest penalties continue. Everyone else is out.",
+	"OVERTIME_BODY": "Only the leaders tied on points keep playing. Everyone else is out.",
 	"OVERTIME_STILL_IN": "STILL IN",
 	"OVERTIME_OUT": "OUT",
 	"PLAYER_ELIMINATED": "%s is out of the game",
+	"RULES_CIRCLE_TITLE": "Bomb around the circle",
+	"RULES_CIRCLE_BODY": "Sit in a circle — 2 to 12 players. One phone is the bomb: you pass it to each other in turn.",
+	"RULES_SYLLABLE_TITLE": "Syllable and rule",
+	"RULES_SYLLABLE_BODY": "The bomb shows a syllable and where it must be: at the start, at the end or anywhere in the word. Think of a fitting word fast.",
+	"RULES_PASS_TITLE": "Say it — pass it",
+	"RULES_PASS_BODY": "Say the word out loud, give the screen a quick tap and hand the phone to your neighbor. A long press doesn't count.",
+	"RULES_BOOM_TITLE": "Boom!",
+	"RULES_BOOM_BODY": "The timer is hidden and different every time; the bomb warns you before it blows. Whoever holds it gets nothing — everyone else gets +1.",
+	"RULES_WIN_TITLE": "Who wins",
+	"RULES_WIN_BODY": "Match length is in settings; between rounds you see how much time is left. Most points wins. A tie at the top — overtime knockout.",
+	"RULES_LOBBY_TITLE": "Gather players",
+	"RULES_LOBBY_BODY": "«+» adds a player. Hold a slime 1.5 s for name and color. Drag a slime onto another to swap seats. Order at the table = passing order.",
+	"RULES_OOPS_TITLE": "Messed up?",
+	"RULES_OOPS_BODY": "Wrong word or accidental tap? The emergency button pauses the game — pick who replays the turn. You can change the roster mid-match.",
+	"RULES_CENTER_TITLE": "Phone in the center",
+	"RULES_CENTER_BODY": "For 6–12 players: turn on «phone in the center» and lay the phone on the table. The text turns toward whoever's up.",
+	"RULES_ILL_SYLLABLE": "BA",
+	"RULES_ILL_CONDITION": "at the start",
+	"RULES_ILL_WORD_OK1": "[Ba]nana",
+	"RULES_ILL_WORD_OK2": "[Ba]sket",
+	"RULES_ILL_WORD_BAD": "Tu[ba]",
+	"RULES_ILL_SAY": "Banana!",
+	"RULES_ILL_TAP": "quick tap",
+	"RULES_ILL_MORE_POINTS": "more points — higher",
+	"RULES_ILL_ADD": "add",
+	"RULES_ILL_HOLD": "name & color",
+	"RULES_ILL_HOLD_TIME": "1.5 s",
+	"RULES_ILL_SWAP": "swap seats",
+	"RULES_ILL_EMERGENCY": "emergency button",
+	"RULES_ILL_REPICK": "who replays",
+	"ONBOARDING_STEP": "Step %d of %d",
 }
 
 const _SLIME_RU: Array[String] = [

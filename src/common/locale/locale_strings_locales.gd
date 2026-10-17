@@ -1,185 +1,17 @@
 class_name LocaleStringsLocales
 extends RefCounted
 
-const RULES_TEXT_SR := """[font_size=36]Brza žurka-reči na jednom ekranu: sedite u krug, predajete bombu-telefon i smišljate reči u hodu. Ako zakasniš — bum i kazneni poen. Za dvoje ili veliku ekipu.
+const RULES_TEXT_SR := """[center][font_size=40][b]Srećno![/b][/font_size][/center]"""
 
-[font_size=40][b]Kako se igra?[/b][/font_size]
-Na brojčaniku je slog, npr. «СТ», i pravilo: na početku, na kraju ili bilo gde u reči.
+const RULES_TEXT_ES := """[center][font_size=40][b]¡Que os divirtáis![/b][/font_size][/center]"""
 
-Izgovori reč naglas i kratko tapni ekran da predaš bombu.
+const RULES_TEXT_HI := """[center][font_size=40][b]मज़े करें![/b][/font_size][/center]"""
 
-Sto — stolica — strana — st… bum! Ko drži bombu kad eksplodira — +1 kazna.
+const RULES_TEXT_DE := """[center][font_size=40][b]Viel Spaß![/b][/font_size][/center]"""
 
-[font_size=40][b]Kada je bum?[/b][/font_size]
-Tajmer je skriven i nasumičan: nekad odmah, nekad posle više krugova. Pre eksplozije bomba upozorava.
+const RULES_TEXT_FR := """[center][font_size=40][b]Bonne partie ![/b][/font_size][/center]"""
 
-Između rundi vidiš koliko minuta još ostaje do kraja partije.
-
-[font_size=40][b]Ko pobeđuje?[/b][/font_size]
-Na kraju — tabela. Manje kazni — bolje mesto. Ako više igrača deli najmanji skor, igraju nokaut dok ne ostane jedan pobednik.
-
-[font_size=40][b]Okupljanje[/b][/font_size]
-2–12 igrača. [b]+[/b] dodaje, prevuci slajma na suseda — zamena mesta, drži 1,5 s — ime i boja.
-
-U podešavanjima — trajanje partije (utječe na broj rundi) i težina (duži slogovi / stroža pravila).
-
-[font_size=40][b]Greška?[/b][/font_size]
-Pogrešna reč ili slučajni tap? Hitno dugme u borbi — izaberi ko ponavlja potez. Sastav menjaš preko liste igrača.
-
-[font_size=40][b]Telefon u centru[/b][/font_size]
-Za 6–12 ljudi: uključi režim «telefon u centru», ostavi telefon na stolu. Tekst na ekranu sam se okreće ka trenutnom igraču — niko ne okreće uređaj.
-
-[center][font_size=40][b]Srećno![/b][/font_size][/center]"""
-
-const RULES_TEXT_ES := """[font_size=36]Juego de palabras para fiestas en una sola pantalla: en círculo, pasad la bomba-teléfono e inventad palabras al momento. Si tardas — boom y penalización. De 2 a un grupo grande.
-
-[font_size=40][b]¿Cómo se juega?[/b][/font_size]
-En el dial hay una sílaba, p. ej. «CH», y una pista: al inicio, al final o en cualquier parte.
-
-Di una palabra en voz alta y toca la pantalla para pasar la bomba.
-
-Chalé — noche — leche — ch… ¡boom! Quien tenga la bomba al explotar — +1 penalización.
-
-[font_size=40][b]¿Cuándo explota?[/b][/font_size]
-El temporizador es oculto y aleatorio. Puede ser al instante o tras varias rondas. La bomba avisa antes.
-
-Entre rondas ves cuántos minutos quedan hasta el final.
-
-[font_size=40][b]¿Quién gana?[/b][/font_size]
-Al final — ranking. Menos penalizaciones, mejor puesto. Si varios empatan al mínimo, juegan a eliminación hasta un ganador.
-
-[font_size=40][b]Jugadores[/b][/font_size]
-2–12 personas. [b]+[/b] añade, arrastra un slime a otro — cambio de sitio, mantén 1,5 s — nombre y color.
-
-En ajustes — duración de la partida y dificultad (sílabas más largas / reglas más duras).
-
-[font_size=40][b]¿Error?[/b][/font_size]
-Palabra incorrecta o toque accidental? Botón de emergencia en partida — elige quién repite el turno. Cambia el equipo con la lista de jugadores.
-
-[font_size=40][b]Teléfono en el centro[/b][/font_size]
-Para 6–12 personas: activa el modo «teléfono en el centro» y deja el móvil en la mesa. El texto gira hacia el jugador actual — nadie gira el aparato.
-
-[center][font_size=40][b]¡A jugar![/b][/font_size][/center]"""
-
-const RULES_TEXT_HI := """[font_size=36]एक स्क्रीन पर पार्टी वर्ड गेम: गोल बैठें, फोन-बम पास करें और तुरंत शब्द बोलें। देर हुई — बूम और पेनल्टी। 2 से लेकर बड़ी पार्टी तक।
-
-[font_size=40][b]कैसे खेलें?[/b][/font_size]
-डायल पर सिलेबल है, जैसे «क», और नियम: शुरुआत, अंत, या कहीं भी।
-
-शब्द ज़ोर से बोलें और टैप करके बम पास करें।
-
-कला — मकान — काला — क… बूम! विस्फोट पर बम जिसके पास — +1 पेनल्टी।
-
-[font_size=40][b]बूम कब?[/b][/font_size]
-टाइमर छुपा और रैंडम है। कभी तुरंत, कभी कई राउंड बाद। विस्फोट से पहले बम चेतावनी देता है।
-
-राउंड के बीच दिखता है कि खेल खत्म होने में कितने मिनट बचे हैं।
-
-[font_size=40][b]कौन जीतेगा?[/b][/font_size]
-अंत में रैंकिंग। कम पेनल्टी — ऊँचा स्थान। सबसे कम स्कोर पर टाई हो तो नॉकआउट जब तक एक विजेता न रह जाए।
-
-[font_size=40][b]खिलाड़ी[/b][/font_size]
-2–12 लोग। [b]+[/b] जोड़ें, स्लाइम खींचकर सीट बदलें, 1.5 सेकंड दबाएँ — नाम और रंग।
-
-सेटिंग में — मैच की लंबाई और कठिनाई (लंबे सिलेबल / सख्त नियम)।
-
-[font_size=40][b]गलती?[/b][/font_size]
-गलत शब्द या गलत टैप? इमरजेंसी बटन — चुनें कौन दोबारा खेले। रोस्टर सूची से बदलें।
-
-[font_size=40][b]टेबल के बीच फोन[/b][/font_size]
-6–12 लोगों के लिए: «फोन केंद्र में» मोड चालू करें, फोन टेबल पर रख दें। टेक्स्ट खुद मौजूदा खिलाड़ी की ओर घूमेगा — फोन घुमाने की ज़रूरत नहीं।
-
-[center][font_size=40][b]मज़े से खेलिए![/b][/font_size][/center]"""
-
-const RULES_TEXT_DE := """[font_size=36]Schnelles Party-Wortspiel auf einem Bildschirm: im Kreis die Handy-Bombe weitergeben und Wörter erfinden. Zu langsam — bumm und Strafpunkt. Für zwei oder eine große Runde.
-
-[font_size=40][b]Wie spielt man?[/b][/font_size]
-Auf dem Zifferblatt steht eine Silbe, z. B. «CH», und eine Regel: am Anfang, am Ende oder irgendwo.
-
-Sag ein Wort laut und tippe kurz, um die Bombe weiterzugeben.
-
-Chaos — Milch — Dach — ch… bumm! Wer die Bombe hält — +1 Strafpunkt.
-
-[font_size=40][b]Wann bumm?[/b][/font_size]
-Der Timer ist versteckt und zufällig. Manchmal sofort, manchmal nach vielen Runden. Vor dem Knall warnt die Bombe.
-
-Zwischen den Runden siehst du, wie viele Minuten bis zum Ende bleiben.
-
-[font_size=40][b]Wer gewinnt?[/b][/font_size]
-Am Ende — Rangliste. Weniger Strafen, besserer Platz. Bei Gleichstand der Besten: K.-o., bis ein Sieger bleibt.
-
-[font_size=40][b]Spieler[/b][/font_size]
-2–12 Personen. [b]+[/b] hinzufügen, Schleim auf Nachbarn ziehen — Platz tauschen, 1,5 s halten — Name und Farbe.
-
-In den Einstellungen — Spieldauer und Schwierigkeit (längere Silben / härtere Regeln).
-
-[font_size=40][b]Fehler?[/b][/font_size]
-Falsches Wort oder FehlTipp? Notfall-Taste im Kampf — wähle, wer den Zug wiederholt. Roster über die Spielerliste ändern.
-
-[font_size=40][b]Handy in der Mitte[/b][/font_size]
-Für 6–12 Leute: Modus «Handy in der Mitte» an, Gerät flach auf den Tisch. Text dreht sich zum aktuellen Spieler — niemand dreht das Handy.
-
-[center][font_size=40][b]Viel Spaß![/b][/font_size][/center]"""
-
-const RULES_TEXT_FR := """[font_size=36]Jeu de mots explosif pour soirée sur un écran: en cercle, passez la bombe-téléphone et inventez des mots vite. Trop lent — boum et pénalité. Pour deux ou une grosse table.
-
-[font_size=40][b]Comment jouer ?[/b][/font_size]
-Le cadran montre une syllabe, ex. «CH», et une règle: au début, à la fin ou n'importe où.
-
-Dis un mot à voix haute et touche l'écran pour passer la bombe.
-
-Chat — machine — riche — ch… boum ! Qui tient la bombe — +1 pénalité.
-
-[font_size=40][b]Quand ça explose ?[/b][/font_size]
-Le minuteur est caché et aléatoire. Parfois immédiat, parfois après plusieurs tours. La bombe prévient avant.
-
-Entre les manches, tu vois combien de minutes restent.
-
-[font_size=40][b]Qui gagne ?[/b][/font_size]
-À la fin — classement. Moins de pénalités, mieux. En cas d'égalité au minimum: élimination jusqu'à un vainqueur.
-
-[font_size=40][b]Joueurs[/b][/font_size]
-2–12 personnes. [b]+[/b] ajoute, glisse un slime sur un voisin — échange de place, maintiens 1,5 s — nom et couleur.
-
-Dans les réglages — durée de partie et difficulté (syllabes plus longues / règles plus dures).
-
-[font_size=40][b]Erreur ?[/b][/font_size]
-Mauvais mot ou tap accidentel ? Bouton d'urgence en partie — choisis qui rejoue le tour. Modifie l'équipe via la liste.
-
-[font_size=40][b]Téléphone au centre[/b][/font_size]
-Pour 6–12 personnes: active le mode «téléphone au centre», pose le téléphone à plat. Le texte tourne vers le joueur actuel — plus besoin de faire pivoter l'appareil.
-
-[center][font_size=40][b]Bonne partie ![/b][/font_size][/center]"""
-
-const RULES_TEXT_IT := """[font_size=36]Gioco di parole da festa su uno schermo: in cerchio passate la bomba-telefono e inventate parole al volo. Troppo lenti — boom e penalità. Per due o un gruppo grande.
-
-[font_size=40][b]Come si gioca?[/b][/font_size]
-Il quadrante mostra una sillaba, es. «ST», e una regola: all'inizio, alla fine o ovunque.
-
-Pronuncia una parola ad alta voce e tocca per passare la bomba.
-
-Stella — pasta — testa — st… boom! Chi ha la bomba — +1 penalità.
-
-[font_size=40][b]Quando esplode?[/b][/font_size]
-Il timer è nascosto e casuale. A volte subito, a volte dopo molti turni. La bomba avvisa prima.
-
-Tra i round vedi quanti minuti restano alla fine.
-
-[font_size=40][b]Chi vince?[/b][/font_size]
-Alla fine — classifica. Meno penalità, posto migliore. A parità sul minimo: eliminazione fino a un vincitore.
-
-[font_size=40][b]Giocatori[/b][/font_size]
-2–12 persone. [b]+[/b] aggiunge, trascina uno slime su un vicino — scambio posto, tieni 1,5 s — nome e colore.
-
-Nelle impostazioni — durata partita e difficoltà (sillabe più lunghe / regole più dure).
-
-[font_size=40][b]Errore?[/b][/font_size]
-Parola sbagliata o tocco accidentale? Pulsante di emergenza — scegli chi ripete il turno. Cambia il roster dalla lista.
-
-[font_size=40][b]Telefono al centro[/b][/font_size]
-Per 6–12 persone: attiva la modalità «telefono al centro», lascia il telefono sul tavolo. Il testo ruota verso il giocatore attuale — nessuno gira il device.
-
-[center][font_size=40][b]Buon divertimento![/b][/font_size][/center]"""
+const RULES_TEXT_IT := """[center][font_size=40][b]Buon divertimento![/b][/font_size][/center]"""
 
 const _SR: Dictionary = {
 	"SETTINGS_TITLE": "Podešavanja",
@@ -289,12 +121,43 @@ const _SR: Dictionary = {
 	"ONBOARDING_DONE_TITLE": "Tutorijal završen!",
 	"ONBOARDING_DONE_BODY": "Pravila znaš. Za 6–12 ljudi: režim «telefon u centru» okreće tekst ka igraču na potezu.",
 	"TUTORIAL_PLAY_BODY": "Slog «%s» — %s.\nOdgovaraju reči: %s.\nNa primer: «%s».\n%s",
-	"TUTORIAL_EXPLOSION": "%s nije stigao/la da smisli reč — bomba je eksplodirala.",
+	"TUTORIAL_EXPLOSION": "%s nije stigao/la — bomba je eksplodirala. Svi ostali dobijaju +1 poen.",
 	"OVERTIME_TITLE": "Osnovno vreme je isteklo",
-	"OVERTIME_BODY": "Igru nastavljaju igrači sa jednako najmanje kaznenih poena. Ostali ispadaju.",
+	"OVERTIME_BODY": "Igraju samo lideri sa jednakim brojem poena. Ostali ispadaju.",
 	"OVERTIME_STILL_IN": "OSTAJU",
 	"OVERTIME_OUT": "ISPALI",
 	"PLAYER_ELIMINATED": "%s ispada iz igre",
+	"RULES_CIRCLE_TITLE": "Bomba u krug",
+	"RULES_CIRCLE_BODY": "Sedite u krug — od 2 do 12 igrača. Jedan telefon je bomba: dodajete ga jedni drugima redom.",
+	"RULES_SYLLABLE_TITLE": "Slog i pravilo",
+	"RULES_SYLLABLE_BODY": "Na bombi je slog i gde mora da stoji: na početku, na kraju ili bilo gde u reči. Brzo smisli odgovarajuću reč.",
+	"RULES_PASS_TITLE": "Reci — dodaj",
+	"RULES_PASS_BODY": "Izgovori reč naglas, kratko dodirni ekran i daj telefon susedu. Dugi dodir se ne računa.",
+	"RULES_BOOM_TITLE": "Bum!",
+	"RULES_BOOM_BODY": "Tajmer je skriven i svaki put drugačiji, bomba upozorava pre eksplozije. Kome eksplodira — bez poena, svi ostali dobijaju +1.",
+	"RULES_WIN_TITLE": "Ko pobeđuje",
+	"RULES_WIN_BODY": "Trajanje partije je u podešavanjima, između rundi vidiš koliko je ostalo. Više poena — bolje mesto. Nerešeno na vrhu — produžetak na ispadanje.",
+	"RULES_LOBBY_TITLE": "Okupljanje",
+	"RULES_LOBBY_BODY": "«+» dodaje igrača. Drži slajma 1,5 s — ime i boja. Prevuci slajma na drugog — zamena mesta. Redosled za stolom = redosled dodavanja.",
+	"RULES_OOPS_TITLE": "Greška?",
+	"RULES_OOPS_BODY": "Pogrešna reč ili slučajan dodir? Hitno dugme pauzira igru — izaberi ko ponavlja potez. Sastav menjaš i usred meča.",
+	"RULES_CENTER_TITLE": "Telefon u centru",
+	"RULES_CENTER_BODY": "Za 6–12 ljudi: uključi «telefon u centru» i stavi telefon na sto. Tekst se sam okreće ka onom ko je na potezu.",
+	"RULES_ILL_SYLLABLE": "MA",
+	"RULES_ILL_CONDITION": "na početku reči",
+	"RULES_ILL_WORD_OK1": "[Ma]čka",
+	"RULES_ILL_WORD_OK2": "[Ma]lina",
+	"RULES_ILL_WORD_BAD": "La[ma]",
+	"RULES_ILL_SAY": "Mačka!",
+	"RULES_ILL_TAP": "kratak dodir",
+	"RULES_ILL_MORE_POINTS": "više poena — više",
+	"RULES_ILL_ADD": "dodaj",
+	"RULES_ILL_HOLD": "ime i boja",
+	"RULES_ILL_HOLD_TIME": "1,5 s",
+	"RULES_ILL_SWAP": "zamena",
+	"RULES_ILL_EMERGENCY": "hitno dugme",
+	"RULES_ILL_REPICK": "ko ponavlja",
+	"ONBOARDING_STEP": "Korak %d od %d",
 }
 
 const _ES: Dictionary = {
@@ -405,12 +268,43 @@ const _ES: Dictionary = {
 	"ONBOARDING_DONE_TITLE": "¡Tutorial completado!",
 	"ONBOARDING_DONE_BODY": "Ya conoces las reglas. Para 6–12: el modo «teléfono en el centro» gira el texto hacia quien juega.",
 	"TUTORIAL_PLAY_BODY": "Sílaba «%s» — %s.\nPalabras válidas: %s.\nPor ejemplo: «%s».\n%s",
-	"TUTORIAL_EXPLOSION": "%s se quedó sin tiempo para decir una palabra — la bomba explotó.",
+	"TUTORIAL_EXPLOSION": "%s se quedó sin tiempo — la bomba explotó. Todos los demás ganan +1 punto.",
 	"OVERTIME_TITLE": "Se acabó el tiempo reglamentario",
-	"OVERTIME_BODY": "Siguen los jugadores empatados con menos penalizaciones. El resto queda eliminado.",
+	"OVERTIME_BODY": "Solo siguen los líderes empatados a puntos. El resto queda eliminado.",
 	"OVERTIME_STILL_IN": "SIGUEN",
 	"OVERTIME_OUT": "ELIMINADOS",
 	"PLAYER_ELIMINATED": "%s queda eliminado",
+	"RULES_CIRCLE_TITLE": "La bomba en círculo",
+	"RULES_CIRCLE_BODY": "Sentaos en círculo — de 2 a 12 jugadores. Un teléfono es la bomba: os lo pasáis por turnos.",
+	"RULES_SYLLABLE_TITLE": "Sílaba y regla",
+	"RULES_SYLLABLE_BODY": "La bomba muestra una sílaba y dónde debe ir: al principio, al final o en cualquier parte. Piensa rápido una palabra válida.",
+	"RULES_PASS_TITLE": "Dilo y pásala",
+	"RULES_PASS_BODY": "Di la palabra en voz alta, toca la pantalla brevemente y pasa el teléfono al vecino. Una pulsación larga no cuenta.",
+	"RULES_BOOM_TITLE": "¡Bum!",
+	"RULES_BOOM_BODY": "El temporizador está oculto y cambia cada vez; la bomba avisa antes de explotar. Quien la tenga no suma — todos los demás ganan +1.",
+	"RULES_WIN_TITLE": "Quién gana",
+	"RULES_WIN_BODY": "La duración se elige en ajustes; entre rondas ves cuánto queda. Más puntos — mejor puesto. Empate arriba — prórroga a eliminación.",
+	"RULES_LOBBY_TITLE": "Reunir jugadores",
+	"RULES_LOBBY_BODY": "«+» añade un jugador. Mantén un slime 1,5 s — nombre y color. Arrástralo sobre otro para cambiar de sitio. Orden en la mesa = orden de pase.",
+	"RULES_OOPS_TITLE": "¿Fallo?",
+	"RULES_OOPS_BODY": "¿Palabra incorrecta o toque sin querer? El botón de emergencia pausa el juego — elige quién repite el turno. El grupo se cambia en plena partida.",
+	"RULES_CENTER_TITLE": "Teléfono en el centro",
+	"RULES_CENTER_BODY": "Para 6–12 jugadores: activa «teléfono en el centro» y deja el móvil en la mesa. El texto gira hacia quien tiene el turno.",
+	"RULES_ILL_SYLLABLE": "CA",
+	"RULES_ILL_CONDITION": "al principio",
+	"RULES_ILL_WORD_OK1": "[Ca]sa",
+	"RULES_ILL_WORD_OK2": "[Ca]ma",
+	"RULES_ILL_WORD_BAD": "Bo[ca]",
+	"RULES_ILL_SAY": "¡Casa!",
+	"RULES_ILL_TAP": "toque breve",
+	"RULES_ILL_MORE_POINTS": "más puntos — más arriba",
+	"RULES_ILL_ADD": "añadir",
+	"RULES_ILL_HOLD": "nombre y color",
+	"RULES_ILL_HOLD_TIME": "1,5 s",
+	"RULES_ILL_SWAP": "cambiar",
+	"RULES_ILL_EMERGENCY": "botón de emergencia",
+	"RULES_ILL_REPICK": "quién repite",
+	"ONBOARDING_STEP": "Paso %d de %d",
 }
 
 const _HI: Dictionary = {
@@ -521,12 +415,43 @@ const _HI: Dictionary = {
 	"ONBOARDING_DONE_TITLE": "ट्यूटोरियल पूरा!",
 	"ONBOARDING_DONE_BODY": "नियम पता हैं। 6–12 के लिए: «फोन केंद्र में» मोड टेक्स्ट को मौजूदा खिलाड़ी की ओर घुमाता है।",
 	"TUTORIAL_PLAY_BODY": "सिलेबल «%s» — %s.\nमान्य शब्द: %s.\nउदाहरण: «%s».\n%s",
-	"TUTORIAL_EXPLOSION": "%s समय पर शब्द नहीं बोल पाया/पाई — बम फट गया।",
+	"TUTORIAL_EXPLOSION": "%s समय पर शब्द नहीं बोल पाया/पाई — बम फट गया। बाकी सबको +1 अंक।",
 	"OVERTIME_TITLE": "मुख्य समय समाप्त",
-	"OVERTIME_BODY": "सबसे कम पेनल्टी पर बराबरी वाले खिलाड़ी खेलते रहेंगे। बाकी बाहर।",
+	"OVERTIME_BODY": "सिर्फ़ बराबर अंकों वाले लीडर खेलते रहेंगे। बाकी बाहर।",
 	"OVERTIME_STILL_IN": "अभी खेल में",
 	"OVERTIME_OUT": "बाहर",
 	"PLAYER_ELIMINATED": "%s खेल से बाहर",
+	"RULES_CIRCLE_TITLE": "घेरे में बम",
+	"RULES_CIRCLE_BODY": "गोल घेरे में बैठें — 2 से 12 खिलाड़ी। एक फ़ोन ही बम है: उसे बारी-बारी एक-दूसरे को दें।",
+	"RULES_SYLLABLE_TITLE": "अक्षर और नियम",
+	"RULES_SYLLABLE_BODY": "बम पर एक अक्षर और उसकी जगह दिखती है: शब्द की शुरुआत, अंत या कहीं भी। जल्दी से सही शब्द सोचें।",
+	"RULES_PASS_TITLE": "बोलो — आगे दो",
+	"RULES_PASS_BODY": "शब्द ज़ोर से बोलें, स्क्रीन को हल्के से छुएँ और फ़ोन पड़ोसी को दें। लंबा दबाना नहीं गिना जाता।",
+	"RULES_BOOM_TITLE": "बूम!",
+	"RULES_BOOM_BODY": "टाइमर छिपा है और हर बार अलग, फटने से पहले बम चेतावनी देता है। जिसके पास फटे उसे अंक नहीं — बाकी सबको +1।",
+	"RULES_WIN_TITLE": "कौन जीता",
+	"RULES_WIN_BODY": "मैच की लंबाई सेटिंग्स में है, राउंड के बीच बचा समय दिखता है। ज़्यादा अंक — ऊँचा स्थान। शीर्ष पर बराबरी — ओवरटाइम नॉकआउट।",
+	"RULES_LOBBY_TITLE": "खिलाड़ी जोड़ें",
+	"RULES_LOBBY_BODY": "«+» से खिलाड़ी जोड़ें। स्लाइम को 1.5 से. दबाएँ — नाम और रंग। स्लाइम को दूसरे पर खींचें — जगह बदलें। मेज़ का क्रम = पास का क्रम।",
+	"RULES_OOPS_TITLE": "गलती हुई?",
+	"RULES_OOPS_BODY": "गलत शब्द या गलती से टैप? इमरजेंसी बटन खेल रोकता है — चुनें कि बारी कौन दोहराएगा। खिलाड़ी बीच मैच में भी बदल सकते हैं।",
+	"RULES_CENTER_TITLE": "बीच में फ़ोन",
+	"RULES_CENTER_BODY": "6–12 खिलाड़ियों के लिए: «बीच में फ़ोन» चालू करें और फ़ोन मेज़ पर रखें। लिखावट अपने आप बारी वाले की ओर घूमती है।",
+	"RULES_ILL_SYLLABLE": "क",
+	"RULES_ILL_CONDITION": "शुरुआत में",
+	"RULES_ILL_WORD_OK1": "[क]मल",
+	"RULES_ILL_WORD_OK2": "[क]लम",
+	"RULES_ILL_WORD_BAD": "ना[क]",
+	"RULES_ILL_SAY": "कमल!",
+	"RULES_ILL_TAP": "हल्का टैप",
+	"RULES_ILL_MORE_POINTS": "ज़्यादा अंक — ऊपर",
+	"RULES_ILL_ADD": "जोड़ें",
+	"RULES_ILL_HOLD": "नाम और रंग",
+	"RULES_ILL_HOLD_TIME": "1.5 से.",
+	"RULES_ILL_SWAP": "जगह बदलें",
+	"RULES_ILL_EMERGENCY": "इमरजेंसी बटन",
+	"RULES_ILL_REPICK": "कौन दोहराए",
+	"ONBOARDING_STEP": "चरण %d / %d",
 }
 
 const _DE: Dictionary = {
@@ -637,12 +562,43 @@ const _DE: Dictionary = {
 	"ONBOARDING_DONE_TITLE": "Tutorial abgeschlossen!",
 	"ONBOARDING_DONE_BODY": "Regeln sitzen. Für 6–12: Modus «Handy in der Mitte» dreht den Text zum aktuellen Spieler.",
 	"TUTORIAL_PLAY_BODY": "Silbe «%s» — %s.\nPassende Wörter: %s.\nZum Beispiel: «%s».\n%s",
-	"TUTORIAL_EXPLOSION": "%s war zu langsam mit einem Wort — die Bombe ist explodiert.",
+	"TUTORIAL_EXPLOSION": "%s war zu langsam — die Bombe ist explodiert. Alle anderen bekommen +1 Punkt.",
 	"OVERTIME_TITLE": "Die reguläre Zeit ist vorbei",
-	"OVERTIME_BODY": "Spieler mit den wenigsten Strafpunkten spielen weiter. Alle anderen scheiden aus.",
+	"OVERTIME_BODY": "Nur die punktgleichen Spitzenreiter spielen weiter. Alle anderen scheiden aus.",
 	"OVERTIME_STILL_IN": "NOCH DABEI",
 	"OVERTIME_OUT": "AUSGESCHIEDEN",
 	"PLAYER_ELIMINATED": "%s scheidet aus",
+	"RULES_CIRCLE_TITLE": "Bombe im Kreis",
+	"RULES_CIRCLE_BODY": "Setzt euch in einen Kreis — 2 bis 12 Spieler. Ein Handy ist die Bombe: ihr gebt es reihum weiter.",
+	"RULES_SYLLABLE_TITLE": "Silbe und Regel",
+	"RULES_SYLLABLE_BODY": "Die Bombe zeigt eine Silbe und wo sie stehen muss: am Anfang, am Ende oder irgendwo im Wort. Schnell ein passendes Wort finden!",
+	"RULES_PASS_TITLE": "Sagen — weitergeben",
+	"RULES_PASS_BODY": "Sag das Wort laut, tippe kurz auf den Bildschirm und gib das Handy weiter. Langes Drücken zählt nicht.",
+	"RULES_BOOM_TITLE": "Bumm!",
+	"RULES_BOOM_BODY": "Der Timer ist versteckt und jedes Mal anders; die Bombe warnt vor der Explosion. Wer sie hält, bekommt nichts — alle anderen +1.",
+	"RULES_WIN_TITLE": "Wer gewinnt",
+	"RULES_WIN_BODY": "Die Spieldauer stellst du in den Einstellungen ein; zwischen den Runden siehst du die Restzeit. Meiste Punkte gewinnt. Gleichstand oben — K.-o.-Verlängerung.",
+	"RULES_LOBBY_TITLE": "Spieler sammeln",
+	"RULES_LOBBY_BODY": "«+» fügt einen Spieler hinzu. Slime 1,5 s halten — Name und Farbe. Slime auf einen anderen ziehen — Plätze tauschen. Sitzordnung = Reihenfolge.",
+	"RULES_OOPS_TITLE": "Vertan?",
+	"RULES_OOPS_BODY": "Falsches Wort oder aus Versehen getippt? Der Notfallknopf pausiert — wähle, wer den Zug wiederholt. Spieler lassen sich mitten im Spiel ändern.",
+	"RULES_CENTER_TITLE": "Handy in der Mitte",
+	"RULES_CENTER_BODY": "Für 6–12 Spieler: «Handy in der Mitte» einschalten und das Handy auf den Tisch legen. Der Text dreht sich zu dem, der dran ist.",
+	"RULES_ILL_SYLLABLE": "MA",
+	"RULES_ILL_CONDITION": "am Anfang",
+	"RULES_ILL_WORD_OK1": "[Ma]us",
+	"RULES_ILL_WORD_OK2": "[Ma]ler",
+	"RULES_ILL_WORD_BAD": "Ko[ma]",
+	"RULES_ILL_SAY": "Maus!",
+	"RULES_ILL_TAP": "kurz tippen",
+	"RULES_ILL_MORE_POINTS": "mehr Punkte — höher",
+	"RULES_ILL_ADD": "hinzufügen",
+	"RULES_ILL_HOLD": "Name & Farbe",
+	"RULES_ILL_HOLD_TIME": "1,5 s",
+	"RULES_ILL_SWAP": "tauschen",
+	"RULES_ILL_EMERGENCY": "Notfallknopf",
+	"RULES_ILL_REPICK": "wer wiederholt",
+	"ONBOARDING_STEP": "Schritt %d von %d",
 }
 
 const _FR: Dictionary = {
@@ -753,12 +709,43 @@ const _FR: Dictionary = {
 	"ONBOARDING_DONE_TITLE": "Tutoriel terminé !",
 	"ONBOARDING_DONE_BODY": "Les règles sont claires. Pour 6–12: le mode «téléphone au centre» tourne le texte vers le joueur actif.",
 	"TUTORIAL_PLAY_BODY": "Syllabe «%s» — %s.\nMots valides: %s.\nPar exemple: «%s».\n%s",
-	"TUTORIAL_EXPLOSION": "%s n'a pas trouvé de mot à temps — la bombe a explosé.",
+	"TUTORIAL_EXPLOSION": "%s n'a pas trouvé à temps — la bombe a explosé. Tous les autres gagnent +1 point.",
 	"OVERTIME_TITLE": "Temps réglementaire écoulé",
-	"OVERTIME_BODY": "Les joueurs à égalité avec le moins de pénalités continuent. Les autres sont éliminés.",
+	"OVERTIME_BODY": "Seuls les leaders à égalité de points continuent. Les autres sont éliminés.",
 	"OVERTIME_STILL_IN": "ENCORE EN JEU",
 	"OVERTIME_OUT": "ÉLIMINÉS",
 	"PLAYER_ELIMINATED": "%s est éliminé",
+	"RULES_CIRCLE_TITLE": "La bombe en cercle",
+	"RULES_CIRCLE_BODY": "Asseyez-vous en cercle — de 2 à 12 joueurs. Un téléphone est la bombe : on se le passe à tour de rôle.",
+	"RULES_SYLLABLE_TITLE": "Syllabe et règle",
+	"RULES_SYLLABLE_BODY": "La bombe affiche une syllabe et sa place : au début, à la fin ou n'importe où dans le mot. Trouvez vite un mot qui colle.",
+	"RULES_PASS_TITLE": "Dis-le, passe-la",
+	"RULES_PASS_BODY": "Dites le mot à voix haute, touchez brièvement l'écran et passez le téléphone au voisin. Un appui long ne compte pas.",
+	"RULES_BOOM_TITLE": "Boum !",
+	"RULES_BOOM_BODY": "Le minuteur est caché et change à chaque fois ; la bombe prévient avant d'exploser. Celui qui la tient ne marque rien — tous les autres +1.",
+	"RULES_WIN_TITLE": "Qui gagne",
+	"RULES_WIN_BODY": "La durée se règle dans les paramètres ; entre les manches, le temps restant s'affiche. Le plus de points gagne. Égalité en tête — prolongation à élimination.",
+	"RULES_LOBBY_TITLE": "Réunir les joueurs",
+	"RULES_LOBBY_BODY": "«+» ajoute un joueur. Maintenez un slime 1,5 s — nom et couleur. Glissez-le sur un autre pour échanger les places. Ordre à table = ordre de passe.",
+	"RULES_OOPS_TITLE": "Une erreur ?",
+	"RULES_OOPS_BODY": "Mauvais mot ou appui par erreur ? Le bouton d'urgence met en pause — choisissez qui rejoue le tour. Les joueurs se changent en pleine partie.",
+	"RULES_CENTER_TITLE": "Téléphone au centre",
+	"RULES_CENTER_BODY": "Pour 6 à 12 joueurs : activez «téléphone au centre» et posez-le sur la table. Le texte se tourne vers celui qui joue.",
+	"RULES_ILL_SYLLABLE": "MA",
+	"RULES_ILL_CONDITION": "au début",
+	"RULES_ILL_WORD_OK1": "[Ma]ison",
+	"RULES_ILL_WORD_OK2": "[Ma]in",
+	"RULES_ILL_WORD_BAD": "Pyja[ma]",
+	"RULES_ILL_SAY": "Maison !",
+	"RULES_ILL_TAP": "appui bref",
+	"RULES_ILL_MORE_POINTS": "plus de points — plus haut",
+	"RULES_ILL_ADD": "ajouter",
+	"RULES_ILL_HOLD": "nom et couleur",
+	"RULES_ILL_HOLD_TIME": "1,5 s",
+	"RULES_ILL_SWAP": "échanger",
+	"RULES_ILL_EMERGENCY": "bouton d'urgence",
+	"RULES_ILL_REPICK": "qui rejoue",
+	"ONBOARDING_STEP": "Étape %d sur %d",
 }
 
 const _IT: Dictionary = {
@@ -869,12 +856,43 @@ const _IT: Dictionary = {
 	"ONBOARDING_DONE_TITLE": "Tutorial completato!",
 	"ONBOARDING_DONE_BODY": "Conosci le regole. Per 6–12: la modalità «telefono al centro» gira il testo verso chi gioca.",
 	"TUTORIAL_PLAY_BODY": "Sillaba «%s» — %s.\nParole valide: %s.\nPer esempio: «%s».\n%s",
-	"TUTORIAL_EXPLOSION": "%s non ha trovato una parola in tempo — la bomba è esplosa.",
+	"TUTORIAL_EXPLOSION": "%s non ce l'ha fatta — la bomba è esplosa. Tutti gli altri prendono +1 punto.",
 	"OVERTIME_TITLE": "Tempo regolamentare scaduto",
-	"OVERTIME_BODY": "Continuano i giocatori in parità con meno penalità. Gli altri sono eliminati.",
+	"OVERTIME_BODY": "Continuano solo i leader a pari punti. Gli altri sono eliminati.",
 	"OVERTIME_STILL_IN": "ANCORA IN GIOCO",
 	"OVERTIME_OUT": "ELIMINATI",
 	"PLAYER_ELIMINATED": "%s è eliminato",
+	"RULES_CIRCLE_TITLE": "Bomba in cerchio",
+	"RULES_CIRCLE_BODY": "Sedetevi in cerchio — da 2 a 12 giocatori. Un telefono è la bomba: ve lo passate a turno.",
+	"RULES_SYLLABLE_TITLE": "Sillaba e regola",
+	"RULES_SYLLABLE_BODY": "La bomba mostra una sillaba e dove deve stare: all'inizio, alla fine o ovunque nella parola. Trova in fretta una parola giusta.",
+	"RULES_PASS_TITLE": "Dilla e passala",
+	"RULES_PASS_BODY": "Di' la parola ad alta voce, tocca brevemente lo schermo e passa il telefono al vicino. Una pressione lunga non conta.",
+	"RULES_BOOM_TITLE": "Boom!",
+	"RULES_BOOM_BODY": "Il timer è nascosto e cambia ogni volta; la bomba avvisa prima di esplodere. Chi ce l'ha non prende nulla — tutti gli altri +1.",
+	"RULES_WIN_TITLE": "Chi vince",
+	"RULES_WIN_BODY": "La durata si sceglie nelle impostazioni; tra i round vedi il tempo rimasto. Più punti vince. Pareggio in testa — supplementari a eliminazione.",
+	"RULES_LOBBY_TITLE": "Riunire i giocatori",
+	"RULES_LOBBY_BODY": "«+» aggiunge un giocatore. Tieni premuto uno slime 1,5 s — nome e colore. Trascinalo su un altro per scambiare posto. Ordine al tavolo = ordine di passaggio.",
+	"RULES_OOPS_TITLE": "Errore?",
+	"RULES_OOPS_BODY": "Parola sbagliata o tocco per sbaglio? Il pulsante d'emergenza mette in pausa — scegli chi ripete il turno. I giocatori si cambiano anche a partita in corso.",
+	"RULES_CENTER_TITLE": "Telefono al centro",
+	"RULES_CENTER_BODY": "Per 6–12 giocatori: attiva «telefono al centro» e appoggia il telefono sul tavolo. Il testo si gira verso chi è di turno.",
+	"RULES_ILL_SYLLABLE": "PA",
+	"RULES_ILL_CONDITION": "all'inizio",
+	"RULES_ILL_WORD_OK1": "[Pa]sta",
+	"RULES_ILL_WORD_OK2": "[Pa]ne",
+	"RULES_ILL_WORD_BAD": "Ra[pa]",
+	"RULES_ILL_SAY": "Pasta!",
+	"RULES_ILL_TAP": "tocco breve",
+	"RULES_ILL_MORE_POINTS": "più punti — più in alto",
+	"RULES_ILL_ADD": "aggiungi",
+	"RULES_ILL_HOLD": "nome e colore",
+	"RULES_ILL_HOLD_TIME": "1,5 s",
+	"RULES_ILL_SWAP": "scambia",
+	"RULES_ILL_EMERGENCY": "pulsante d'emergenza",
+	"RULES_ILL_REPICK": "chi ripete",
+	"ONBOARDING_STEP": "Passo %d di %d",
 }
 
 const SLIME_SR: Array[String] = [
