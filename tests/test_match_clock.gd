@@ -6,6 +6,7 @@ func _init() -> void:
 	failed += _test_time_up_unique_leader_vs_overtime()
 	failed += _test_resync_preserves_match_clock()
 	failed += _test_estimated_rounds()
+	failed += _test_points_for_survived_rounds()
 	if failed == 0:
 		print("test_match_clock: OK")
 		quit(0)
@@ -28,7 +29,7 @@ func _test_time_up_unique_leader_vs_overtime() -> int:
 		printerr("expected regulation time up")
 		return 1
 	if not session.has_unique_leader():
-		printerr("expected unique leader A")
+		printerr("expected unique leader B (most points)")
 		return 1
 
 	session.players[1].score = 1
@@ -78,6 +79,28 @@ func _test_estimated_rounds() -> int:
 	var est := session.get_estimated_rounds_remaining()
 	if est < 3 or est > 5:
 		printerr("unexpected estimated rounds: %d" % est)
+		return 1
+	return 0
+
+
+func _test_points_for_survived_rounds() -> int:
+	var session := GameSession.new()
+	session.players = [_player("A", 0, 0), _player("B", 1, 0), _player("C", 2, 0)]
+	session.award_round(session.players[0])
+	session.award_round(session.players[1])
+	if session.rounds_played != 2:
+		printerr("expected 2 rounds played, got %d" % session.rounds_played)
+		return 1
+	var scores := [session.players[0].score, session.players[1].score, session.players[2].score]
+	if scores != [1, 1, 2]:
+		printerr("unexpected points: %s" % [scores])
+		return 1
+	if session.get_sorted_results()[0].info.name != "C":
+		printerr("expected C (most points) ranked first")
+		return 1
+	session.enter_overtime()
+	if session.players[0].is_active or not session.players[2].is_active:
+		printerr("overtime should keep only max-points players")
 		return 1
 	return 0
 

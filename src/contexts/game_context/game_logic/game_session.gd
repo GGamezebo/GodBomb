@@ -30,6 +30,7 @@ var _knockout_seq: int = 0
 var match_limit_seconds: float = 0.0
 var match_elapsed_seconds: float = 0.0
 var regulation_boom_count: int = 0
+var rounds_played: int = 0
 var emergency_intro_shown: bool = false
 
 
@@ -50,6 +51,7 @@ func setup(p_config: GameConfig, p_events: GameEvents, account: PDataAccount) ->
 	_knockout_seq = 0
 	match_elapsed_seconds = 0.0
 	regulation_boom_count = 0
+	rounds_played = 0
 	emergency_intro_shown = false
 	current_player_index = randi() % maxi(players.size(), 1)
 	max_rand_player_choices = 40 + randi() % maxi(players.size(), 1)
@@ -193,10 +195,12 @@ func apply_tutorial_final_scores() -> void:
 		return
 	for player in players:
 		player.score = 0
+	rounds_played = OnboardingTutorialData.ROUND_COUNT
 	for round_idx in OnboardingTutorialData.ROUND_COUNT:
 		var explode_idx := OnboardingTutorialData.explode_player_index(round_idx)
-		if explode_idx >= 0 and explode_idx < players.size():
-			players[explode_idx].score += 1
+		for i in players.size():
+			if i != explode_idx:
+				players[i].score += 1
 
 
 func reset_round() -> void:
@@ -266,7 +270,7 @@ func update_bomb(delta: float) -> bool:
 
 	if (bomb_alive_time - bomb_duration) <= 0.0:
 		bomb_is_exploded = true
-		get_current_player().on_explosion()
+		award_round(get_current_player())
 		return true
 
 	bomb_duration += delta
@@ -311,23 +315,31 @@ func _append_random_card() -> void:
 	cards.append(GameCard.new(syllable, WordCondition.random_for(syllable)))
 
 
-func get_min_score() -> int:
+## Round ended with `exploded` blown up: every other active player gets a point.
+func award_round(exploded: GamePlayer) -> void:
+	rounds_played += 1
+	for player in players:
+		if player.is_active and player != exploded:
+			player.on_round_survived()
+
+
+func get_max_score() -> int:
 	if players.is_empty():
 		return 0
-	var min_score := players[0].score
+	var max_score := players[0].score
 	for player in players:
-		if player.score < min_score:
-			min_score = player.score
-	return min_score
+		if player.score > max_score:
+			max_score = player.score
+	return max_score
 
 
 func has_unique_leader() -> bool:
 	if players.size() <= 1:
 		return true
-	var min_score := get_min_score()
+	var max_score := get_max_score()
 	var tied := 0
 	for player in players:
-		if player.score == min_score:
+		if player.score == max_score:
 			tied += 1
 			if tied > 1:
 				return false
@@ -345,9 +357,9 @@ func active_count() -> int:
 func enter_overtime() -> void:
 	is_overtime = true
 	_knockout_seq = 0
-	var min_score := get_min_score()
+	var max_score := get_max_score()
 	for player in players:
-		if player.score > min_score:
+		if player.score < max_score:
 			player.is_active = false
 			player.eliminated_at = 0
 
@@ -454,7 +466,7 @@ func get_sorted_results() -> Array[GamePlayer]:
 	result.assign(players)
 	result.sort_custom(func(a: GamePlayer, b: GamePlayer) -> bool:
 		if a.score != b.score:
-			return a.score < b.score
+			return a.score > b.score
 		return _rank_eliminated_at(a) > _rank_eliminated_at(b)
 	)
 	return result

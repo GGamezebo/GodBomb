@@ -14,7 +14,9 @@ paths:
 
 **FSM:** choice → ready → countdown → play ⇄ **emergency** → explosion → ready|result. First card at countdown end if null. After boom: next_card→next_player→ready, or match end / overtime.
 
-**Overtime knockout:** regulation clock up after boom → unique min = `result`. Tie on min → `enter_overtime()`, splash `OVERTIME_*` (`BattleSplashOverlay` child of HUD fullscreen — not cover-scaled `ScaledContent`). Roster hidden. Each OT boom: +1 and out. Splash **Continue** (`EMERGENCY_CONTINUE`) bottom slot like results. OT board: plain VBox/Scroll + expand-fill rows (no CenterContainer / `_fit_control_size`). Tutorial skips OT. Подробности / лидерборд → `.claude/plans/battle-overtime-knockout.md`.
+**Score = points:** `GameSession.award_round(exploded)` on each boom → `rounds_played += 1`, every other **active** player `+1` (`GamePlayer.on_round_survived`). Winner = max points; `get_sorted_results()` desc. Tutorial: `apply_tutorial_final_scores()` (rounds = `ROUND_COUNT`).
+
+**Overtime knockout:** regulation clock up after boom → unique max = `result`. Tie on max → `enter_overtime()` (players below max out), splash `OVERTIME_*` (`BattleSplashOverlay` child of HUD fullscreen — not cover-scaled `ScaledContent`). Roster hidden. Each OT boom: exploded out, others +1. Splash **Continue** (`EMERGENCY_CONTINUE`) bottom slot like results. OT board: plain VBox/Scroll + expand-fill rows (no CenterContainer / `_fit_control_size`). Tutorial skips OT. Подробности / лидерборд → `.claude/plans/battle-overtime-knockout.md`.
 
 **Match clock:** `match_elapsed_seconds` only in **countdown** + **play** (not ready/explosion/emergency/pause/roster). Limit = `game_time_minutes * 60`. Roster resync does not reset clock. After boom: time up → result or overtime; else next card. Editor (`OS.has_feature("editor")`): top-left debug clock on GameManager CanvasLayer. Тест: `tests/test_match_clock.gd` (headless).
 
@@ -38,7 +40,7 @@ State UI: choice/ready/countdown/play share dial layout · ready=«Готовы?
 
 **Battle lobby overlay:** `BattlePlayerLobbyOverlay` — edit roster mid-game · hidden/locked in overtime · Done = confirm if roster ok else click · reuses `PlayerSelectionWidget` + `StartActionButton`.
 
-**Visual:** `GameBombBackground` — player-color backdrop · `DisplayBomb`/`BombDialGlass` dial glass (`BombDialLayout` cover-scale 800@138,550) · hides with bomb on explosion/result · alert pulse · bomb flash/shake on explosion · `ExplosionEffect` · `GameResultOverlay` full-screen winner tint, rank scroll only, celebration particles.
+**Visual:** `GameBombBackground` — player-color backdrop · `DisplayBomb`/`BombDialGlass` dial glass (`BombDialLayout` cover-scale 800@138,550) · hides with bomb on explosion/result · alert pulse · bomb flash/shake on explosion · `ExplosionEffect` · `GameResultOverlay` (`game_result_overlay.tscn`, instanced by HUD; F6 = demo leaderboard via `preview_*` exports) full-screen winner tint, subtitle `RESULT_TOTAL_ROUNDS` (session `rounds_played`), rank rows show points, celebration particles.
 
 **Audio:** gameplay → `GameSound` · UI buttons → `UiSounds` → `audio.md`.
 

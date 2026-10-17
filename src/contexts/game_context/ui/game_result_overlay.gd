@@ -14,6 +14,11 @@ const CONTENT_WIDTH_MARGIN := 200.0
 const WINNER_RANKING_GAP := 36.0
 const TOP_MARGIN := 188.0
 const BUTTON_BOTTOM_MARGIN := 212.0
+const PREVIEW_NAMES := ["ANYA", "MAX", "OLGA", "DIMA", "KATE", "IGOR"]
+
+## F6 preview: fake leaderboard when this scene runs on its own.
+@export var preview_player_count: int = 6
+@export var preview_rounds: int = 9
 
 var _winner_bg: ColorRect
 var _celebration: ResultCelebrationLayer
@@ -45,6 +50,18 @@ func _ready() -> void:
 	_main_events = load("res://src/contexts/main_context/main_events.tres") as MainEvents
 	_build_ui()
 	resized.connect(_on_resized)
+	if get_tree().current_scene == self:
+		call_deferred("_show_preview")
+
+
+func _show_preview() -> void:
+	var players: Array[GamePlayer] = []
+	var count := clampi(preview_player_count, 1, PREVIEW_NAMES.size())
+	for i in count:
+		var player := GamePlayer.new(PlayerInfo.new(PREVIEW_NAMES[i], i), i)
+		player.score = maxi(preview_rounds - i * 2, 0)
+		players.append(player)
+	show_results(players, preview_rounds)
 
 
 func _on_resized() -> void:
@@ -200,7 +217,7 @@ func _build_winner_frame() -> PanelContainer:
 	_winner_strip_host.add_child(_winner_strip)
 
 	_winner_subtitle = Label.new()
-	_winner_subtitle.text = LocaleService.text("RESULT_FEWER_PENALTIES")
+	_winner_subtitle.text = LocaleService.textf("RESULT_TOTAL_ROUNDS", [0])
 	_winner_subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_winner_subtitle.add_theme_font_size_override("font_size", 72)
 	_winner_subtitle.add_theme_color_override("font_color", Color.WHITE)
@@ -229,7 +246,7 @@ func _refresh_menu_button_layout() -> void:
 		_menu_button.refresh_label_layout()
 
 
-func show_results(sorted_players: Array[GamePlayer], tutorial_mode: bool = false) -> void:
+func show_results(sorted_players: Array[GamePlayer], total_rounds: int, tutorial_mode: bool = false) -> void:
 	if sorted_players.is_empty():
 		return
 	if not is_node_ready():
@@ -244,6 +261,7 @@ func show_results(sorted_players: Array[GamePlayer], tutorial_mode: bool = false
 	_winner_bg.color = _winner_background_color(winner.info.preset_id)
 	_winner_strip.set_visual_scale(WINNER_PILL_SCALE)
 	_winner_strip.set_player(winner)
+	_winner_subtitle.text = LocaleService.textf("RESULT_TOTAL_ROUNDS", [total_rounds])
 
 	for i in sorted_players.size():
 		_rank_list.add_child(_build_rank_row(i + 1, sorted_players[i], i == 0))

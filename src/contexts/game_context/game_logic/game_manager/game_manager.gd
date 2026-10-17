@@ -205,7 +205,7 @@ func _apply_tutorial_explosion_at(player_index: int) -> void:
 	session.set_current_player_index(player_index)
 	session.bomb_is_exploded = true
 	if not session.is_tutorial:
-		session.get_current_player().on_explosion()
+		session.award_round(session.get_current_player())
 	fsm.add_event(FSMGameEvents.EXPLODE)
 
 

@@ -6,6 +6,7 @@ const FALLBACK_ROUND_WORD := Vector2(540, 928)
 const TABLE_CENTER := GamePlayerStrip.TABLE_CENTER
 const FALLBACK_HINT_MARKER := Vector2(528, 483)
 const PASS_HINT_RECT := Rect2(48.0, 1415.0, 984.0, 96.0)
+const RESULT_OVERLAY_SCENE := preload("res://src/contexts/game_context/ui/game_result_overlay.tscn")
 
 @export var game_manager: GameManager
 @export var game_events: GameEvents
@@ -209,7 +210,7 @@ func _build_splash_overlay() -> void:
 
 
 func _build_result_overlay() -> void:
-	_result_overlay = GameResultOverlay.new()
+	_result_overlay = RESULT_OVERLAY_SCENE.instantiate() as GameResultOverlay
 	var ui_layer := get_parent()
 	if ui_layer:
 		ui_layer.add_child.call_deferred(_result_overlay)
@@ -560,4 +561,4 @@ func _show_result() -> void:
 	if not _result_overlay or not game_manager:
 		return
 	var sorted := game_manager.session.get_sorted_results()
-	_result_overlay.show_results(sorted, game_manager.session.is_tutorial)
+	_result_overlay.show_results(sorted, game_manager.session.rounds_played, game_manager.session.is_tutorial)

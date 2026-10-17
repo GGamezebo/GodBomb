@@ -2,7 +2,7 @@
 
 Party hot-potato, слоги. Godot **4.7** GDScript, 1080×1920 portrait, mobile renderer на десктопе; Android и web = `gl_compatibility`. Entry: `main.tscn` → `MainContext`.
 
-**Цикл:** 2–12 игроков, слог+условие, передача бомбы, скрытый таймер, взрыв = +1 штраф, победа = min score. Основное время = countdown+play до `game_time_minutes`; истекло: уникальный лидер → result, ничья → овертайм на вылет.
+**Цикл:** 2–12 игроков, слог+условие, передача бомбы, скрытый таймер, раунд без взрыва = +1 очко, победа = max очков. Основное время = countdown+play до `game_time_minutes`; истекло: уникальный лидер → result, ничья → овертайм на вылет.
 
 **FSM:** `player_choice` → `ready_to_start` → `countdown` → `play` ⇄ `emergency` → `explosion` → … → `result`
 
