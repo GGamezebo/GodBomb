@@ -878,32 +878,32 @@ const _IT: Dictionary = {
 }
 
 const SLIME_SR: Array[String] = [
-	"Paradajz", "Štrumf", "Krastavac", "Škamp", "Pomorandža", "Pile",
+	"Paradajz", "Avatar", "Krastavac", "Škamp", "Pomorandža", "Pile",
 	"Ugljen", "Šećer", "Patlidžan", "Čokolada", "Smuti", "Kivi",
 ]
 
 const SLIME_ES: Array[String] = [
-	"Tomate", "Pitufo", "Pepinillo", "Gamba", "Naranja", "Pollito",
+	"Tomate", "Avatar", "Pepinillo", "Gamba", "Naranja", "Pollito",
 	"Carbón", "Azúcar", "Berenjena", "Chocolate", "Batido", "Kiwi",
 ]
 
 const SLIME_HI: Array[String] = [
-	"टमाटर", "स्मर्फ", "खीरा", "झींगा", "संतरा", "चूज़ा",
+	"टमाटर", "अवतार", "खीरा", "झींगा", "संतरा", "चूज़ा",
 	"कोयला", "चीनी", "बैंगन", "चॉकलेट", "स्मूदी", "कीवी",
 ]
 
 const SLIME_DE: Array[String] = [
-	"Tomate", "Schlumpf", "Gurke", "Garnele", "Orange", "Küken",
+	"Tomate", "Avatar", "Gurke", "Garnele", "Orange", "Küken",
 	"Kohle", "Zucker", "Aubergine", "Schokolade", "Smoothie", "Kiwi",
 ]
 
 const SLIME_FR: Array[String] = [
-	"Tomate", "Schtroumpf", "Cornichon", "Crevette", "Orange", "Poussin",
+	"Tomate", "Avatar", "Cornichon", "Crevette", "Orange", "Poussin",
 	"Charbon", "Sucre", "Aubergine", "Chocolat", "Smoothie", "Kiwi",
 ]
 
 const SLIME_IT: Array[String] = [
-	"Pomodoro", "Puffo", "Cetriolino", "Gambero", "Arancia", "Pulcino",
+	"Pomodoro", "Avatar", "Cetriolino", "Gambero", "Arancia", "Pulcino",
 	"Carbone", "Zucchero", "Melanzana", "Cioccolato", "Frullato", "Kiwi",
 ]
 

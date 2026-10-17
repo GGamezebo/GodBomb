@@ -316,12 +316,12 @@ const _EN: Dictionary = {
 }
 
 const _SLIME_RU: Array[String] = [
-	"Помидор", "Смурф", "Огурчик", "Креветка", "Апельсин", "Цыплёнок",
+	"Помидор", "Аватар", "Огурчик", "Креветка", "Апельсин", "Цыплёнок",
 	"Уголёк", "Сахарок", "Баклажан", "Шоколадка", "Смузи", "Киви",
 ]
 
 const _SLIME_EN: Array[String] = [
-	"Tomato", "Smurf", "Pickle", "Shrimp", "Orange", "Chick",
+	"Tomato", "Avatar", "Pickle", "Shrimp", "Orange", "Chick",
 	"Coal", "Sugar", "Eggplant", "Chocolate", "Smoothie", "Kiwi",
 ]
 
